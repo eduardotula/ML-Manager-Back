@@ -17,9 +17,9 @@ public class ProdutoEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "ml_id")
+    @Column(name = "ml_id", unique = true)
     private String mlId;
-    @Column(name = "sku", nullable = false)
+    @Column(name = "sku", nullable = false, unique = true)
     private String sku;
     @Column(name = "gtin")
     private String gtin;
@@ -39,8 +39,8 @@ public class ProdutoEntity {
     private double taxaML;
     @Column(name = "custo_frete")
     private double custoFrete;
-    @Column(name = "ativo", nullable = false)
-    private boolean ativo;
+    @Column(name = "status")
+    private String status;
 
 
 }

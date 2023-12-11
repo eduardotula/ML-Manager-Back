@@ -23,6 +23,6 @@ public class ProdutoDto {
     private double precoDesconto;
     private double taxaML;
     private double custoFrete;
-    private boolean ativo;
+    private String status;
     private LocalDateTime createAt;
 }

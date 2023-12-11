@@ -19,7 +19,7 @@ public class MercadoLivreServiceHeader implements ClientHeadersFactory {
         result.add("Accept", "application/json");
         result.add("Cache-Control", "no-cache");
         result.add("Content-Type", "application/json");
-        result.add("Authorization", "Basic " + Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8)));
+        result.add("Authorization", "Bearer " + auth);
         return result;
     }
 }

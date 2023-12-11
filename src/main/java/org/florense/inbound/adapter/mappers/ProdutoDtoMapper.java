@@ -6,7 +6,7 @@ import org.florense.inbound.adapter.dto.ProdutoDto;
 import org.mapstruct.Mapper;
 
 @ApplicationScoped
-@Mapper(componentModel = "cdi")
+@Mapper(componentModel = "jakarta")
 public interface ProdutoDtoMapper {
 
     ProdutoDto toDto(Produto produto);
