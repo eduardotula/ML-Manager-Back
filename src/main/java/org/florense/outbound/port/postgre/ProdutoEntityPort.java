@@ -12,4 +12,6 @@ public interface ProdutoEntityPort {
     Produto findByMlId(String mlId);
 
     List<Produto> listAll();
+
+    void deleteById(Long id);
 }

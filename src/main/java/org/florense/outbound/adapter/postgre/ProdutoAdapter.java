@@ -8,6 +8,7 @@ import org.florense.outbound.adapter.postgre.mappers.ProdutoEntityMapper;
 import org.florense.outbound.adapter.postgre.repository.ProdutoRepository;
 import org.florense.outbound.port.postgre.ProdutoEntityPort;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,6 +22,7 @@ public class ProdutoAdapter implements ProdutoEntityPort {
 
     @Override
     public Produto saveUpdate(Produto produto){
+        if(produto.getId() == null) produto.setCreatedAt(LocalDateTime.now());
         return mapper.toModel(repository.save(mapper.toEntity(produto)));
     }
 
@@ -38,6 +40,11 @@ public class ProdutoAdapter implements ProdutoEntityPort {
     @Override
     public List<Produto> listAll(){
         return repository.findAll().stream().map(mapper::toModel).collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteById(Long id){
+        repository.deleteById(id);
     }
 
 }

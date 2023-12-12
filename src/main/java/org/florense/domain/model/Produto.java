@@ -24,5 +24,10 @@ public class Produto {
     private double taxaML;
     private double custoFrete;
     private String status;
-    private LocalDateTime createAt;
+    private LocalDateTime createdAt;
+
+    public void update(Produto produto){
+        this.id = produto.getId();
+        this.createdAt = produto.getCreatedAt();
+    }
 }

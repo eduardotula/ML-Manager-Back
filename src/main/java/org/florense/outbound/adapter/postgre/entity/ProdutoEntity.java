@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @NoArgsConstructor
 @Getter
 @Setter
@@ -41,6 +43,8 @@ public class ProdutoEntity {
     private double custoFrete;
     @Column(name = "status")
     private String status;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
 
 }

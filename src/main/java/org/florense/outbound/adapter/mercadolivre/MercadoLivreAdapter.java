@@ -20,6 +20,7 @@ public class MercadoLivreAdapter implements MercadoLivrePort {
 
     @Override
     public Produto getProduto(String mlId) {
-        return mapper.toProduto(mercadoLivreService.produto(mlId));
+        var p = mercadoLivreService.produto(mlId);
+        return mapper.toProduto(p);
     }
 }

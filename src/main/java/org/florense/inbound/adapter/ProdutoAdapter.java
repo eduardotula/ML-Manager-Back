@@ -26,28 +26,41 @@ public class ProdutoAdapter implements ProdutoAdapterPort {
     @Inject
     ProdutoDtoMapper produtoDtoMapper;
 
-    @POST
+    @PUT
     @Path("/")
-    public ProdutoDto createProduto(@Valid ProdutoDto produtoDto){
-        return produtoDtoMapper.toDto(produtoUseCase.saveUpdate(produtoDtoMapper.toModel(produtoDto)));
+    public ProdutoDto updateProduto(@Valid ProdutoDto produtoDto){
+        return produtoDtoMapper.toDto(produtoUseCase.createUpdate(produtoDtoMapper.toModel(produtoDto)));
     }
 
     @POST
     @Path("/simple")
-    public ProdutoDto createProdutoSimple(@Valid ProdutoDtoSimple simple){
+    public ProdutoDto createProdutoSearch(@Valid ProdutoDtoSimple simple){
         Produto produtoDtoSimple = Produto.builder().csosn(simple.getCsosn()).mlId(simple.getMlId()).custo(simple.getCusto()).build();
-        return produtoDtoMapper.toDto(produtoUseCase.saveUpdateByMl(produtoDtoSimple));
+        return produtoDtoMapper.toDto(produtoUseCase.createMlSearch(produtoDtoSimple));
+    }
+
+    @PUT
+    @Path("/simple")
+    public ProdutoDto updateProdutoSimple(@Valid ProdutoDtoSimple simple){
+        Produto produtoDtoSimple = Produto.builder().csosn(simple.getCsosn()).mlId(simple.getMlId()).custo(simple.getCusto()).build();
+        return produtoDtoMapper.toDto(produtoUseCase.updateSimple(produtoDtoSimple));
     }
 
     @PUT
     @Path("/simple/{mlId}")
-    public ProdutoDto updateExistProd(@PathParam("mlId") String mlID){
-        return produtoDtoMapper.toDto(produtoUseCase.updateExistProd(mlID));
+    public ProdutoDto searchExitProd(@PathParam("mlId") String mlID){
+        return produtoDtoMapper.toDto(produtoUseCase.updateSearch(mlID));
     }
 
     @GET
     @Path("/all")
     public List<ProdutoDto> listAll(){
         return produtoUseCase.listAll().stream().map(produtoDtoMapper::toDto).collect(Collectors.toList());
+    }
+
+    @DELETE
+    @Path("/{id}")
+    public void deleteById(@PathParam("id") Long id){
+        produtoUseCase.deleteBy(id);
     }
 }
