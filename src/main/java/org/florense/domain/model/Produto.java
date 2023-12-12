@@ -25,6 +25,7 @@ public class Produto {
     private double custoFrete;
     private String status;
     private LocalDateTime createdAt;
+    private double lucro;
 
     public void update(Produto produto){
         this.id = produto.getId();

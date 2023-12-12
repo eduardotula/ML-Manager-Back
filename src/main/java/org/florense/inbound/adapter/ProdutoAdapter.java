@@ -58,6 +58,12 @@ public class ProdutoAdapter implements ProdutoAdapterPort {
         return produtoUseCase.listAll().stream().map(produtoDtoMapper::toDto).collect(Collectors.toList());
     }
 
+    @GET
+    @Path("/list/ml/active")
+    public List<String> listAllActiveMl(){
+        return produtoUseCase.listAllActiveMl();
+    }
+
     @DELETE
     @Path("/{id}")
     public void deleteById(@PathParam("id") Long id){

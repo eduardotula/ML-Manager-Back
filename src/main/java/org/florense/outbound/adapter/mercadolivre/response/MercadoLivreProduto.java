@@ -53,34 +53,6 @@ public class MercadoLivreProduto {
 
 }
 
-class GtinDese extends JsonDeserializer<String> {
-    ObjectMapper mapper = new ObjectMapper();
-
-    @Override
-    public String deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
-        var nodes = mapper.readTree(p.getText());
-        for (int i = 0; i < nodes.size(); i++) {
-            if(nodes.get(i).get("id").asText().equals("SKU")) return nodes.get(i).get("value_name").asText();
-
-        }
-        return "";
-    }
-}
-
-class SkuDese extends JsonDeserializer<String> {
-
-    ObjectMapper mapper = new ObjectMapper();
-
-    @Override
-    public String deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
-        var nodes = mapper.readTree(p.getText());
-        for (int i = 0; i < nodes.size(); i++) {
-            if(nodes.get(i).get("id").asText().equals("GTIN")) return nodes.get(i).get("value_name").asText();
-
-        }
-        return "";
-    }
-}
 
 
 

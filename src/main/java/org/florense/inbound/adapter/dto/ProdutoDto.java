@@ -39,4 +39,5 @@ public class ProdutoDto {
     private String status;
     @NotNull
     private LocalDateTime createdAt;
+    private double lucro;
 }

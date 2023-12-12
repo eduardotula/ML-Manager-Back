@@ -6,6 +6,8 @@ import org.florense.domain.model.Produto;
 import org.florense.outbound.port.mercadolivre.MercadoLivrePort;
 import org.florense.outbound.port.postgre.ProdutoEntityPort;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,8 +29,14 @@ public class ProdutoUseCase {
         if(existProd != null) throw new IllegalArgumentException(String.format("Produto com id: %s já cadastrado",produto.getMlId()));
 
         Produto completeProduto = mercadoLivreAdapter.getProduto(produto.getMlId());
+        completeProduto.setTaxaML(mercadoLivreAdapter.getTarifas(completeProduto.getPrecoDesconto(), completeProduto.getCategoria()));
+        if(completeProduto.getPrecoDesconto() >= 80)
+            completeProduto.setCustoFrete(mercadoLivreAdapter.getFrete(completeProduto.getMlId(),"06950000"));
+        else completeProduto.setCustoFrete(0.0);
+
         completeProduto.setCusto(produto.getCusto());
         completeProduto.setCsosn(produto.getCsosn());
+        completeProduto.setLucro(calculateLucro(completeProduto));
 
         return produtoEntityPort.saveUpdate(completeProduto);
     }
@@ -37,8 +45,9 @@ public class ProdutoUseCase {
     public Produto updateSimple(Produto produto){
         var existProd = produtoEntityPort.findByMlId(produto.getMlId());
         if(Objects.isNull(existProd)) throw new IllegalArgumentException(String.format("Produto com id %s não encontrado", produto.getMlId()));
-        produto.setCsosn(produto.getCsosn());
-        produto.setCusto(produto.getCusto());
+        existProd.setCsosn(produto.getCsosn());
+        existProd.setCusto(produto.getCusto());
+        existProd.setLucro(calculateLucro(existProd));
 
         return produtoEntityPort.saveUpdate(existProd);
     }
@@ -51,8 +60,20 @@ public class ProdutoUseCase {
         }
 
         Produto completeProduto = mercadoLivreAdapter.getProduto(mlId);
+        completeProduto.setTaxaML(mercadoLivreAdapter.getTarifas(completeProduto.getPrecoDesconto(), completeProduto.getCategoria()));
+        if(completeProduto.getPrecoDesconto() >= 80)
+            completeProduto.setCustoFrete(mercadoLivreAdapter.getFrete(completeProduto.getMlId(),"06950000"));
+        else completeProduto.setCustoFrete(0.0);
         completeProduto.update(existProd);
+        completeProduto.setCsosn(existProd.getCsosn());
+        completeProduto.setCusto(existProd.getCusto());
+        completeProduto.setLucro(calculateLucro(completeProduto));
+
         return produtoEntityPort.saveUpdate(completeProduto);
+    }
+
+    public List<String> listAllActiveMl(){
+        return mercadoLivreAdapter.listActiveMlIds();
     }
 
     public List<Produto> listAll(){
@@ -68,5 +89,18 @@ public class ProdutoUseCase {
         }catch (Exception e){
             throw new IllegalStateException(String.format("Falha ao apagar produto com id: %s",id));
         }
+    }
+
+    private double calculateLucro(Produto produto){
+        BigDecimal porcenNf = new BigDecimal(6);
+        if(produto.getCsosn().equals("102")) new BigDecimal(11);
+        porcenNf = porcenNf.setScale(2,  RoundingMode.HALF_UP);
+        porcenNf = porcenNf.divide(new BigDecimal(100), RoundingMode.HALF_UP);
+
+        BigDecimal nfTaxa = new BigDecimal(produto.getPrecoDesconto()).multiply(porcenNf);
+        double custoTotal = produto.getCusto() + produto.getTaxaML() + produto.getCustoFrete() + nfTaxa.doubleValue();
+        var lucroBig = new BigDecimal(produto.getPrecoDesconto() - custoTotal);
+        lucroBig = lucroBig.setScale(2,RoundingMode.HALF_UP);
+        return lucroBig.doubleValue();
     }
 }
