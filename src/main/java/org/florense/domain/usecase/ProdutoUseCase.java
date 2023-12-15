@@ -76,6 +76,10 @@ public class ProdutoUseCase {
         return mercadoLivreAdapter.listActiveMlIds();
     }
 
+    public Produto findProdutoByMlId(String mlId){
+        return produtoEntityPort.findByMlId(mlId);
+    }
+
     public List<Produto> listAll(){
         return produtoEntityPort.listAll();
     }
@@ -97,7 +101,8 @@ public class ProdutoUseCase {
         porcenNf = porcenNf.setScale(2,  RoundingMode.HALF_UP);
         porcenNf = porcenNf.divide(new BigDecimal(100), RoundingMode.HALF_UP);
 
-        BigDecimal nfTaxa = new BigDecimal(produto.getPrecoDesconto()).multiply(porcenNf);
+        var precoDesconto = BigDecimal.valueOf(produto.getPrecoDesconto()).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal nfTaxa = precoDesconto.multiply(porcenNf);
         double custoTotal = produto.getCusto() + produto.getTaxaML() + produto.getCustoFrete() + nfTaxa.doubleValue();
         var lucroBig = new BigDecimal(produto.getPrecoDesconto() - custoTotal);
         lucroBig = lucroBig.setScale(2,RoundingMode.HALF_UP);

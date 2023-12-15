@@ -64,6 +64,12 @@ public class ProdutoAdapter implements ProdutoAdapterPort {
         return produtoUseCase.listAllActiveMl();
     }
 
+    @GET
+    @Path("/{mlId}")
+    public ProdutoDto findProdutoByMlId(@PathParam("mlId") String mlId){
+        return produtoDtoMapper.toDto(produtoUseCase.findProdutoByMlId(mlId));
+    }
+
     @DELETE
     @Path("/{id}")
     public void deleteById(@PathParam("id") Long id){
