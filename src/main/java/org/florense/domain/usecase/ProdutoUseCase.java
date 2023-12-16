@@ -8,8 +8,11 @@ import org.florense.outbound.port.postgre.ProdutoEntityPort;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RequestScoped
 public class ProdutoUseCase {
@@ -74,6 +77,18 @@ public class ProdutoUseCase {
 
     public List<String> listAllActiveMl(){
         return mercadoLivreAdapter.listActiveMlIds();
+    }
+
+    public List<String> listAllActiveMlMinusRegistered(){
+        List<String> actives = mercadoLivreAdapter.listActiveMlIds();
+        Set<String> registeredIds = produtoEntityPort.listAll()
+                .stream()
+                .map(Produto::getMlId)
+                .collect(Collectors.toSet());
+
+        return actives.stream()
+                .filter(mlId -> !registeredIds.contains(mlId))
+                .collect(Collectors.toList());
     }
 
     public Produto findProdutoByMlId(String mlId){

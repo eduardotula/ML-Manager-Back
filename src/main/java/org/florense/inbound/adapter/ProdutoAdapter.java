@@ -65,6 +65,12 @@ public class ProdutoAdapter implements ProdutoAdapterPort {
     }
 
     @GET
+    @Path("/list/ml/active/dife")
+    public List<String> listAllActiveMlMinusRegistered(){
+        return produtoUseCase.listAllActiveMlMinusRegistered();
+    }
+
+    @GET
     @Path("/{mlId}")
     public ProdutoDto findProdutoByMlId(@PathParam("mlId") String mlId){
         return produtoDtoMapper.toDto(produtoUseCase.findProdutoByMlId(mlId));
