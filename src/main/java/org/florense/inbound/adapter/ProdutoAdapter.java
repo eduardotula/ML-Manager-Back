@@ -26,12 +26,14 @@ public class ProdutoAdapter implements ProdutoAdapterPort {
     @Inject
     ProdutoDtoMapper produtoDtoMapper;
 
+    @Override
     @PUT
     @Path("/")
     public ProdutoDto updateProduto(@Valid ProdutoDto produtoDto){
         return produtoDtoMapper.toDto(produtoUseCase.createUpdate(produtoDtoMapper.toModel(produtoDto)));
     }
 
+    @Override
     @POST
     @Path("/simple")
     public ProdutoDto createProdutoSearch(@Valid ProdutoDtoSimple simple){
@@ -39,6 +41,7 @@ public class ProdutoAdapter implements ProdutoAdapterPort {
         return produtoDtoMapper.toDto(produtoUseCase.createMlSearch(produtoDtoSimple));
     }
 
+    @Override
     @PUT
     @Path("/simple")
     public ProdutoDto updateProdutoSimple(@Valid ProdutoDtoSimple simple){
@@ -46,36 +49,42 @@ public class ProdutoAdapter implements ProdutoAdapterPort {
         return produtoDtoMapper.toDto(produtoUseCase.updateSimple(produtoDtoSimple));
     }
 
+    @Override
     @PUT
     @Path("/simple/{mlId}")
     public ProdutoDto searchExitProd(@PathParam("mlId") String mlID){
         return produtoDtoMapper.toDto(produtoUseCase.updateSearch(mlID));
     }
 
+    @Override
     @GET
     @Path("/all")
     public List<ProdutoDto> listAll(){
         return produtoUseCase.listAll().stream().map(produtoDtoMapper::toDto).collect(Collectors.toList());
     }
 
+    @Override
     @GET
     @Path("/list/ml/active")
     public List<String> listAllActiveMl(){
         return produtoUseCase.listAllActiveMl();
     }
 
+    @Override
     @GET
     @Path("/list/ml/active/dife")
     public List<String> listAllActiveMlMinusRegistered(){
         return produtoUseCase.listAllActiveMlMinusRegistered();
     }
 
+    @Override
     @GET
     @Path("/{mlId}")
     public ProdutoDto findProdutoByMlId(@PathParam("mlId") String mlId){
         return produtoDtoMapper.toDto(produtoUseCase.findProdutoByMlId(mlId));
     }
 
+    @Override
     @DELETE
     @Path("/{id}")
     public void deleteById(@PathParam("id") Long id){

@@ -1,6 +1,7 @@
 package org.florense.outbound.port.mercadolivre;
 
 import org.florense.domain.model.Produto;
+import org.florense.outbound.adapter.mercadolivre.exceptions.UnauthorizedAcessKeyException;
 
 import java.util.List;
 
@@ -11,5 +12,5 @@ public interface MercadoLivrePort {
 
     Double getFrete(String mlId, String cep);
 
-    List<String> listActiveMlIds();
+    List<String> listActiveMlIds() ;
 }

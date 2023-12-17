@@ -57,6 +57,7 @@ public class ProdutoUseCase {
 
     //Atualiza dados somente do mercado livre
     public Produto updateSearch(String mlId){
+
         var existProd = produtoEntityPort.findByMlId(mlId);
         if(Objects.isNull(existProd)){
             throw new IllegalArgumentException(String.format("Produto com mlId: %s não encontrado", mlId ));
