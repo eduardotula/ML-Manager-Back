@@ -2,29 +2,34 @@ package org.florense.inbound.port;
 
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
+import org.florense.domain.model.Produto;
 import org.florense.inbound.adapter.dto.ProdutoDto;
 import org.florense.inbound.adapter.dto.ProdutoDtoSimple;
+import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
 
 import java.util.List;
 
 public interface ProdutoAdapterPort {
 
 
-    ProdutoDto updateProduto(@Valid ProdutoDto produtoDto);
+    Produto createUpdate(Produto produto);
 
-    ProdutoDto createProdutoSearch(@Valid ProdutoDtoSimple simple);
+    //Cria e atualiza com mercado livre
+    Produto createMlSearch(Produto produto) throws FailRequestRefreshTokenException;
 
-    ProdutoDto updateProdutoSimple(@Valid ProdutoDtoSimple simple);
+    //Somente atualiza um produto
+    Produto updateSimple(Produto produto);
 
-    ProdutoDto searchExitProd(@PathParam("mlId") String mlID);
+    //Atualiza dados somente do mercado livre
+    Produto updateSearch(String mlId) throws FailRequestRefreshTokenException;
 
-    List<ProdutoDto> listAll();
+    List<String> listAllActiveMl() throws FailRequestRefreshTokenException;
 
-    List<String> listAllActiveMl();
+    List<String> listAllActiveMlMinusRegistered() throws FailRequestRefreshTokenException;
 
-    List<String> listAllActiveMlMinusRegistered();
+    Produto findProdutoByMlId(String mlId);
 
-    ProdutoDto findProdutoByMlId(@PathParam("mlId") String mlId);
+    List<Produto> listAll();
 
-    void deleteById(@PathParam("id") Long id);
+    void deleteBy(Long id);
 }

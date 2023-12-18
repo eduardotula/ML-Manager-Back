@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class UnauthorizedAcessKeyException extends Exception{
 
     private String message;
