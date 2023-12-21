@@ -1,5 +1,6 @@
 package org.florense.inbound.port;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import org.florense.domain.model.Produto;
@@ -28,6 +29,9 @@ public interface ProdutoAdapterPort {
     List<String> listAllActiveMlMinusRegistered() throws FailRequestRefreshTokenException;
 
     Produto findProdutoByMlId(String mlId);
+
+    @Transactional
+    Produto findProdutoByMlIdSearch(String mlId) throws FailRequestRefreshTokenException;
 
     List<Produto> listAll();
 

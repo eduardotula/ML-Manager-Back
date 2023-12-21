@@ -39,7 +39,7 @@ public class ProdutoAdapter implements ProdutoEntityPort {
 
     @Override
     public List<Produto> listAll(){
-        return repository.findAll().stream().map(mapper::toModel).collect(Collectors.toList());
+        return repository.findByOrderByIdAsc().stream().map(mapper::toModel).collect(Collectors.toList());
     }
 
     @Override

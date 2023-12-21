@@ -9,4 +9,5 @@ public interface ProdutoRepository extends JpaRepository<ProdutoEntity, Long> {
 
 
     List<ProdutoEntity> findByMlId(String mlId);
+    List<ProdutoEntity> findByOrderByIdAsc();
 }

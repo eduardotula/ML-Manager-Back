@@ -37,12 +37,6 @@ public interface MercadoLivreService {
     @Path("/users/{userId}/items/search")
     Map<String, Object> listMlIds(@PathParam("userId") String userId, @QueryParam("status") String status, @QueryParam("offset") int offset, @QueryParam("limit") int limit) throws RuntimeException;
 
-    @POST
-    @Path("/oauth/token")
-    MLRefreshTokenResponse refreshToken(@QueryParam("grant_type") String grantType,
-                                        @QueryParam("client_id") String appId,
-                                        @QueryParam("client_secret") String clientSecret,
-                                        @QueryParam("refresh_token") String refreshToken);
 
     @ClientExceptionMapper
     static RuntimeException toException(Response response) {

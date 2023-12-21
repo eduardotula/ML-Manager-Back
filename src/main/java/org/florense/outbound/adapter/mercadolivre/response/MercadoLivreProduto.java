@@ -46,7 +46,7 @@ public class MercadoLivreProduto {
         this.sku = "";
         this.gtin = "";
         list.forEach(at ->{
-            if(at.get("id").equals("SKU")) this.sku = (String) at.get("value_name");
+            if(at.get("id").equals("SELLER_SKU")) this.sku = (String) at.get("value_name");
             else if(at.get("id").equals("GTIN")) this.gtin = (String)at.get("value_name");
         });
     }

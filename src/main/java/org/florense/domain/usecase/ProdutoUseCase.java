@@ -69,7 +69,7 @@ public class ProdutoUseCase implements ProdutoAdapterPort{
     @Transactional
     public Produto updateSearch(String mlId) throws FailRequestRefreshTokenException {
 
-        var existProd = produtoEntityPort.findByMlId(mlId);
+         var existProd = produtoEntityPort.findByMlId(mlId);
         if(Objects.isNull(existProd)){
             throw new IllegalArgumentException(String.format("Produto com mlId: %s não encontrado", mlId ));
         }
@@ -111,6 +111,12 @@ public class ProdutoUseCase implements ProdutoAdapterPort{
     @Transactional
     public Produto findProdutoByMlId(String mlId){
         return produtoEntityPort.findByMlId(mlId);
+    }
+
+    @Override
+    @Transactional
+    public Produto findProdutoByMlIdSearch(String mlId) throws FailRequestRefreshTokenException {
+        return mercadoLivreAdapter.getProduto(mlId,true);
     }
 
     @Override

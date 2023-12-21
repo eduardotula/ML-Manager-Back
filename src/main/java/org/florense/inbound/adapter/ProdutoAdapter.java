@@ -77,6 +77,12 @@ public class ProdutoAdapter{
         return produtoDtoMapper.toDto(produtoUseCase.findProdutoByMlId(mlId));
     }
 
+    @GET
+    @Path("/{mlId}/search")
+    public ProdutoDto findProdutoByMlIdSearch(@PathParam("mlId") String mlId) throws FailRequestRefreshTokenException {
+        return produtoDtoMapper.toDto(produtoUseCase.findProdutoByMlIdSearch(mlId));
+    }
+
     @DELETE
     @Path("/{id}")
     public void deleteById(@PathParam("id") Long id){
