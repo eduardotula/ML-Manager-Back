@@ -8,7 +8,7 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProdutoDtoSimple {
+public class AnuncioDtoSimple {
 
     @NotBlank
     private String mlId;

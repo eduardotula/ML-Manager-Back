@@ -11,7 +11,7 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import org.florense.domain.util.ObjectMapperUtil;
 import org.florense.outbound.adapter.mercadolivre.exceptions.UnauthorizedAcessKeyException;
 import org.florense.outbound.adapter.mercadolivre.response.MLRefreshTokenResponse;
-import org.florense.outbound.adapter.mercadolivre.response.MercadoLivreProduto;
+import org.florense.outbound.adapter.mercadolivre.response.MercadoLivreAnuncio;
 
 import java.util.Map;
 
@@ -23,7 +23,7 @@ public interface MercadoLivreService {
 
     @GET
     @Path("items/{mlId}")
-    MercadoLivreProduto produto(@PathParam("mlId") String mlId) throws RuntimeException;
+    MercadoLivreAnuncio anuncio(@PathParam("mlId") String mlId) throws RuntimeException;
 
     @GET
     @Path("/sites/MLB/listing_prices")

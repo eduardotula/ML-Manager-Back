@@ -1,6 +1,6 @@
 package org.florense.outbound.port.mercadolivre;
 
-import org.florense.domain.model.Produto;
+import org.florense.domain.model.Anuncio;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
 import org.florense.outbound.adapter.mercadolivre.exceptions.UnauthorizedAcessKeyException;
 
@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface MercadoLivrePort {
 
-    Produto getProduto(String mlId, boolean retry) throws FailRequestRefreshTokenException;
+    Anuncio getAnuncio(String mlId, boolean retry) throws FailRequestRefreshTokenException;
 
     Double getTarifas(Double preco, String categoria, boolean retry) throws FailRequestRefreshTokenException;
 

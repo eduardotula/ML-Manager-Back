@@ -1,7 +1,7 @@
 package org.florense.outbound.port.postgre;
 
 import org.florense.domain.model.AccessCode;
-import org.florense.domain.model.Produto;
+import org.florense.domain.model.Anuncio;
 
 import java.util.List;
 

@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MercadoLivreProduto {
+public class MercadoLivreAnuncio {
 
     @JsonProperty("id")
     private String mlId;

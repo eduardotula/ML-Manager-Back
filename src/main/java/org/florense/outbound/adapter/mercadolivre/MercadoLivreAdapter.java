@@ -6,13 +6,13 @@ import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.florense.domain.model.AccessCode;
-import org.florense.domain.model.Produto;
+import org.florense.domain.model.Anuncio;
 import org.florense.domain.usecase.AccessCodeUseCase;
 import org.florense.outbound.adapter.mercadolivre.client.MLAuthService;
 import org.florense.outbound.adapter.mercadolivre.client.MercadoLivreService;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
 import org.florense.outbound.adapter.mercadolivre.exceptions.UnauthorizedAcessKeyException;
-import org.florense.outbound.adapter.mercadolivre.mapper.MercadoLivreProdutoProduto;
+import org.florense.outbound.adapter.mercadolivre.mapper.MercadoLivreAnuncioAnuncio;
 import org.florense.outbound.adapter.mercadolivre.response.MLRefreshTokenResponse;
 import org.florense.outbound.port.mercadolivre.MercadoLivrePort;
 
@@ -32,7 +32,7 @@ public class MercadoLivreAdapter implements MercadoLivrePort {
     AccessCodeUseCase accessCodeUseCase;
 
     @Inject
-    MercadoLivreProdutoProduto mapper;
+    MercadoLivreAnuncioAnuncio mapper;
 
     @RestClient
     @Inject
@@ -47,14 +47,14 @@ public class MercadoLivreAdapter implements MercadoLivrePort {
 
 
     @Override
-    public Produto getProduto(String mlId, boolean retry) throws FailRequestRefreshTokenException {
+    public Anuncio getAnuncio(String mlId, boolean retry) throws FailRequestRefreshTokenException {
         try {
-            var p = mercadoLivreService.produto(mlId);
-            return mapper.toProduto(p);
+            var p = mercadoLivreService.anuncio(mlId);
+            return mapper.toAnuncio(p);
         } catch (RuntimeException e) {
             if(e.getCause() instanceof UnauthorizedAcessKeyException){
                 refreshAccessToken();
-                if(retry) getProduto(mlId,false);
+                if(retry) getAnuncio(mlId,false);
             }
         }
         return null;
