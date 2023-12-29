@@ -20,6 +20,8 @@ public class VendaEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "quantidade", columnDefinition = "integer")
+    private int quantidade;
     @Column(name = "preco_desconto", columnDefinition = "NUMERIC(18,2)")
     private double precoDesconto;
     @Column(name = "taxa_ml", columnDefinition = "NUMERIC(18,2)")
@@ -30,10 +32,6 @@ public class VendaEntity {
     private double custo;
     @Column(name = "lucro", columnDefinition = "NUMERIC(18,2)")
     private double lucro;
-    @Column(name = "stauts")
-    private String status;
-    @Column(name = "completo")
-    private boolean completo;
 
     @ManyToOne
     @JoinColumn(name = "anuncio_id_fk")

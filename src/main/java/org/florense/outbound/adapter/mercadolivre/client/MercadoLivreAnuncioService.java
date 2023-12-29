@@ -2,16 +2,12 @@ package org.florense.outbound.adapter.mercadolivre.client;
 
 import io.quarkus.rest.client.reactive.ClientExceptionMapper;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
-import org.florense.domain.util.ObjectMapperUtil;
 import org.florense.outbound.adapter.mercadolivre.exceptions.UnauthorizedAcessKeyException;
-import org.florense.outbound.adapter.mercadolivre.response.MLRefreshTokenResponse;
-import org.florense.outbound.adapter.mercadolivre.response.MercadoLivreAnuncio;
+import org.florense.outbound.adapter.mercadolivre.response.MercadoLivreAnuncioResponse;
 
 import java.util.Map;
 
@@ -19,11 +15,11 @@ import java.util.Map;
 @Path("/")
 @RegisterRestClient(configKey = "ml-api")
 @RegisterClientHeaders(MercadoLivreServiceHeader.class)
-public interface MercadoLivreService {
+public interface MercadoLivreAnuncioService {
 
     @GET
     @Path("items/{mlId}")
-    MercadoLivreAnuncio anuncio(@PathParam("mlId") String mlId) throws RuntimeException;
+    MercadoLivreAnuncioResponse anuncio(@PathParam("mlId") String mlId) throws RuntimeException;
 
     @GET
     @Path("/sites/MLB/listing_prices")

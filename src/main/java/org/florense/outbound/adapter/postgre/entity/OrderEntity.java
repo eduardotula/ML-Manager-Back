@@ -29,6 +29,13 @@ public class OrderEntity {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VendaEntity> vendas;
+    @Column(name = "completo")
+    private boolean completo;
+    @Column(name = "stauts")
+    private String status;
+
+    @Column(name = "order_creation_time")
+    private LocalDateTime orderCreationTime;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

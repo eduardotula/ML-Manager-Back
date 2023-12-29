@@ -17,5 +17,8 @@ public class Order {
     private Long orderId;
     private Long packId;
     private List<Venda> vendas;
+    private boolean completo;
+    private String status;
+    private LocalDateTime orderCreationTime;
     private LocalDateTime createdAt;
 }

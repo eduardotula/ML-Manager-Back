@@ -13,13 +13,12 @@ import java.time.LocalDateTime;
 public class Venda {
 
     private Long id;
+    private int quantidade;
     private double precoDesconto;
     private double taxaML;
     private double custoFrete;
     private double custo;
     private double lucro;
-    private String status;
-    private boolean completo;
     private Long orderId;
     private Long anuncioId;
     private LocalDateTime createdAt;

@@ -17,5 +17,8 @@ public class OrderDto {
     private Long orderId;
     private Long packId;
     private List<VendaDto> vendas;
+    private boolean completo;
+    private String status;
+    private LocalDateTime orderCreationTime;
     private LocalDateTime createdAt;
 }
