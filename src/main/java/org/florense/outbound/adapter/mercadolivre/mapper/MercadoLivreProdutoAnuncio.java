@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 
 @ApplicationScoped
 @Mapper(componentModel = "jakarta")
-public interface MercadoLivreAnuncioAnuncio {
+public interface MercadoLivreProdutoAnuncio {
 
     @Mapping(source = "title", target = "descricao")
     @Mapping(source = "permalink", target = "url")

@@ -5,6 +5,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.florense.domain.model.Anuncio;
 import org.florense.inbound.port.AnuncioAdapterPort;
+import org.florense.outbound.adapter.mercadolivre.MercadoLivreAdapter;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
 import org.florense.outbound.port.mercadolivre.MercadoLivrePort;
 import org.florense.outbound.port.postgre.AnuncioEntityPort;

@@ -10,8 +10,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-@Entity
-@Table(name = "vendas")
+@Entity(name = "venda")
+@Table(name = "venda")
 public class VendaEntity {
 
     @Id
@@ -28,6 +28,13 @@ public class VendaEntity {
     private double custo;
     @Column(name = "lucro", columnDefinition = "NUMERIC(18,2)")
     private double lucro;
+    @Column(name = "stauts")
+    private String status;
+    @Column(name = "completo")
+    private boolean completo;
 
+    @ManyToOne
+    @JoinColumn(name = "order_id_fk")
+    private OrderEntity order;
 
 }

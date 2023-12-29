@@ -1,6 +1,7 @@
 package org.florense.outbound.adapter.mercadolivre;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -12,7 +13,7 @@ import org.florense.outbound.adapter.mercadolivre.client.MLAuthService;
 import org.florense.outbound.adapter.mercadolivre.client.MercadoLivreService;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
 import org.florense.outbound.adapter.mercadolivre.exceptions.UnauthorizedAcessKeyException;
-import org.florense.outbound.adapter.mercadolivre.mapper.MercadoLivreAnuncioAnuncio;
+import org.florense.outbound.adapter.mercadolivre.mapper.MercadoLivreProdutoAnuncio;
 import org.florense.outbound.adapter.mercadolivre.response.MLRefreshTokenResponse;
 import org.florense.outbound.port.mercadolivre.MercadoLivrePort;
 
@@ -21,7 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-@ApplicationScoped
+@RequestScoped
 public class MercadoLivreAdapter implements MercadoLivrePort {
 
     @RestClient
@@ -32,7 +33,7 @@ public class MercadoLivreAdapter implements MercadoLivrePort {
     AccessCodeUseCase accessCodeUseCase;
 
     @Inject
-    MercadoLivreAnuncioAnuncio mapper;
+    MercadoLivreProdutoAnuncio mapper;
 
     @RestClient
     @Inject
