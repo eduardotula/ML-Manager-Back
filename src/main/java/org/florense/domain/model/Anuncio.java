@@ -3,6 +3,7 @@ package org.florense.domain.model;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -26,6 +27,8 @@ public class Anuncio {
     private String status;
     private LocalDateTime createdAt;
     private double lucro;
+
+    private List<Venda> vendas;
 
     public void update(Anuncio anuncio){
         this.id = anuncio.getId();

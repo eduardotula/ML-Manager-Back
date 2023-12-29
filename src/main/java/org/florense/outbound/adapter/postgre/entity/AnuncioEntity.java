@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @Getter
@@ -46,6 +47,10 @@ public class AnuncioEntity {
     private double lucro;
     @Column(name = "status")
     private String status;
+
+    @OneToMany(mappedBy = "anuncio", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VendaEntity> vendas;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

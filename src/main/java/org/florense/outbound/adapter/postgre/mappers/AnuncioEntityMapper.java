@@ -6,7 +6,7 @@ import org.florense.outbound.adapter.postgre.entity.AnuncioEntity;
 import org.mapstruct.Mapper;
 
 @ApplicationScoped
-@Mapper(componentModel = "jakarta")
+@Mapper(componentModel = "jakarta", uses = VendaEntityMapper.class)
 public interface AnuncioEntityMapper {
 
     Anuncio toModel(AnuncioEntity anuncio);

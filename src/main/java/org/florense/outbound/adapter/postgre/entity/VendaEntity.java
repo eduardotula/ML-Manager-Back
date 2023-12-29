@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @NoArgsConstructor
 @Getter
 @Setter
@@ -34,7 +36,13 @@ public class VendaEntity {
     private boolean completo;
 
     @ManyToOne
+    @JoinColumn(name = "anuncio_id_fk")
+    private AnuncioEntity anuncio;
+
+    @ManyToOne
     @JoinColumn(name = "order_id_fk")
     private OrderEntity order;
 
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 }
