@@ -22,6 +22,14 @@ public class Venda {
     private boolean completo;
     private String status;
     private Long orderId;
-    private Long anuncioId;
+    private Anuncio anuncio;
     private LocalDateTime createdAt;
+
+    public void setDataFromAnuncio(Anuncio anuncio){
+        this.taxaML = anuncio.getTaxaML();
+        this.custoFrete = anuncio.getCustoFrete();
+        this.custo = anuncio.getCusto();
+        this.lucro = Anuncio.calculateLucro(anuncio);
+
+    }
 }

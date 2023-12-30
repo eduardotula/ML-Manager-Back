@@ -4,6 +4,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 
 @Getter
@@ -19,4 +20,13 @@ public class Order {
     private List<Venda> vendas;
     private LocalDateTime orderCreationTime;
     private LocalDateTime createdAt;
+
+    public void updateVendasByMatchingByMlId(List<Venda> newVendas){
+        newVendas.forEach(newVenda ->{
+            var registered = this.vendas.stream().filter(old -> Objects.equals(old.getAnuncio().getMlId(),
+                    newVenda.getAnuncio().getMlId())).findFirst();
+
+            registered.ifPresent(venda -> newVenda.setId(venda.getOrderId()));
+        });
+    }
 }

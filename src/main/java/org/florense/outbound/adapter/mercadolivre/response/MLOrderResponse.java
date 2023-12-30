@@ -30,6 +30,8 @@ public class MLOrderResponse {
     private double precoDesconto;
     @JsonProperty("fulfilled")
     private Boolean completo;
+    @JsonProperty("sale_fee")
+    private double saleFee;
 
     @JsonIgnore
     private String mlId;
@@ -44,7 +46,6 @@ public class MLOrderResponse {
             this.quantity = 0;
             this.mlId = "";
             this.title = "";
-            this.shippingId = 0L;
         }else{
             var orderItems = list.get(0);
             this.quantity = (Integer) orderItems.get("quantity");
@@ -52,9 +53,11 @@ public class MLOrderResponse {
             var item = (Map<String, Object>)list.get(0).get("item");
             this.mlId = (String) item.get("id");
             this.title = (String) item.get("title");
-
-            var shipping = (Map<String, Object>)list.get(0).get("shipping");
-            this.shippingId = (Long)shipping.get("id");
         }
+    }
+
+    @JsonProperty("shipping")
+    private void setShipping(Map<String, Long> list){
+        this.shippingId = list.get("id") != null ? list.get("id") : 0L;
     }
 }

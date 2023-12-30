@@ -4,6 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.florense.domain.model.Anuncio;
 import org.florense.domain.model.Order;
 import org.florense.domain.model.Venda;
 import org.florense.outbound.adapter.mercadolivre.client.MercadoLivreOrderService;
@@ -90,8 +91,12 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
 
     private Order convertMlVendaToOrder(MLOrderResponse mlOrderResponse) {
         boolean completo = mlOrderResponse.getCompleto() != null;
-        Venda venda = new Venda(null, mlOrderResponse.getQuantity(), mlOrderResponse.getPrecoDesconto(), 0.0, 0.0, 0.0, 0.0, completo, mlOrderResponse.getStatus(), null, null, null);
+        Venda venda = new Venda(null, mlOrderResponse.getQuantity(), mlOrderResponse.getPrecoDesconto(), mlOrderResponse.getSaleFee(),
+                0.0, 0.0, 0.0, completo, mlOrderResponse.getStatus(), null, null, null);
         var vendas = new ArrayList<Venda>();
+        var anuncio = new Anuncio();
+        anuncio.setMlId(mlOrderResponse.getMlId());
+        venda.setAnuncio(anuncio);
         vendas.add(venda);
 
         return new Order(null, mlOrderResponse.getOrderId(), mlOrderResponse.getShippingId(), vendas, mlOrderResponse.getOrderCreationTime().toLocalDateTime(), null);

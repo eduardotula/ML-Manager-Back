@@ -19,13 +19,15 @@ public class OrderAdapter implements OrderEntityPort {
 
     @Override
     public Order saveUpdate(Order order){
+        var orderEntity = mapper.toEntity(order);
         var now = LocalDateTime.now();
-        if(order.getId() == null) order.setCreatedAt(now);
-        order.getVendas().forEach(venda -> {
+        if(orderEntity.getCreatedAt() == null) orderEntity.setCreatedAt(now);
+        orderEntity.getVendas().forEach(venda -> {
             if(venda.getCreatedAt() == null) venda.setCreatedAt(now);
+            venda.setOrder(orderEntity);
         });
 
-        return mapper.toModel(repository.save(mapper.toEntity(order)));
+        return mapper.toModel(repository.save(orderEntity));
     }
 
     @Override

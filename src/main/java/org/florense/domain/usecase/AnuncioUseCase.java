@@ -9,8 +9,6 @@ import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshT
 import org.florense.outbound.port.mercadolivre.MercadoLivreAnuncioPort;
 import org.florense.outbound.port.postgre.AnuncioEntityPort;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -46,7 +44,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort{
 
         completeAnuncio.setCusto(anuncio.getCusto());
         completeAnuncio.setCsosn(anuncio.getCsosn());
-        completeAnuncio.setLucro(calculateLucro(completeAnuncio));
+        completeAnuncio.setLucro(Anuncio.calculateLucro(completeAnuncio));
 
         return anuncioEntityPort.saveUpdate(completeAnuncio);
     }
@@ -59,7 +57,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort{
         if(Objects.isNull(existProd)) throw new IllegalArgumentException(String.format("Anuncio com id %s não encontrado", anuncio.getMlId()));
         existProd.setCsosn(anuncio.getCsosn());
         existProd.setCusto(anuncio.getCusto());
-        existProd.setLucro(calculateLucro(existProd));
+        existProd.setLucro(Anuncio.calculateLucro(existProd));
 
         return anuncioEntityPort.saveUpdate(existProd);
     }
@@ -82,7 +80,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort{
         completeAnuncio.update(existProd);
         completeAnuncio.setCsosn(existProd.getCsosn());
         completeAnuncio.setCusto(existProd.getCusto());
-        completeAnuncio.setLucro(calculateLucro(completeAnuncio));
+        completeAnuncio.setLucro(Anuncio.calculateLucro(completeAnuncio));
 
         return anuncioEntityPort.saveUpdate(completeAnuncio);
     }
@@ -138,17 +136,4 @@ public class AnuncioUseCase implements AnuncioAdapterPort{
         }
     }
 
-    private double calculateLucro(Anuncio anuncio){
-        BigDecimal porcenNf = new BigDecimal(6);
-        if(anuncio.getCsosn().equals("102")) new BigDecimal(11);
-        porcenNf = porcenNf.setScale(2,  RoundingMode.HALF_UP);
-        porcenNf = porcenNf.divide(new BigDecimal(100), RoundingMode.HALF_UP);
-
-        var precoDesconto = BigDecimal.valueOf(anuncio.getPrecoDesconto()).setScale(2, RoundingMode.HALF_UP);
-        BigDecimal nfTaxa = precoDesconto.multiply(porcenNf);
-        double custoTotal = anuncio.getCusto() + anuncio.getTaxaML() + anuncio.getCustoFrete() + nfTaxa.doubleValue();
-        var lucroBig = new BigDecimal(anuncio.getPrecoDesconto() - custoTotal);
-        lucroBig = lucroBig.setScale(2,RoundingMode.HALF_UP);
-        return lucroBig.doubleValue();
-    }
 }

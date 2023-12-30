@@ -1,4 +1,4 @@
-package org.florense.inbound;
+package org.florense.inbound.adapter;
 
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;

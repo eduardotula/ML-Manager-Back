@@ -48,9 +48,6 @@ public class AnuncioEntity {
     @Column(name = "status")
     private String status;
 
-    @OneToMany(mappedBy = "anuncio")
-    private List<VendaEntity> vendas;
-
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

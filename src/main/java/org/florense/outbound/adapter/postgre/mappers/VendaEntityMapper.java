@@ -9,12 +9,9 @@ import org.mapstruct.Mapping;
 @ApplicationScoped
 @Mapper(componentModel = "jakarta")
 public interface VendaEntityMapper {
-
     @Mapping(source = "order.id", target = "orderId")
-    @Mapping(source = "anuncio.id", target = "anuncioId")
     Venda toModel(VendaEntity vendaEntity);
 
     @Mapping(source = "orderId", target = "order.id")
-    @Mapping(source = "anuncioId", target = "anuncio.id")
     VendaEntity toEntity(Venda venda);
 }

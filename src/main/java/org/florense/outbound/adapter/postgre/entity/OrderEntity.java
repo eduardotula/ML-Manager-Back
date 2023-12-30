@@ -27,7 +27,7 @@ public class OrderEntity {
     @Column(name = "pack_id")
     private Long packId;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "order",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VendaEntity> vendas;
 
     @Column(name = "order_creation_time")
