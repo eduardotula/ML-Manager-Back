@@ -19,6 +19,8 @@ public class Venda {
     private double custoFrete;
     private double custo;
     private double lucro;
+    private boolean completo;
+    private String status;
     private Long orderId;
     private Long anuncioId;
     private LocalDateTime createdAt;

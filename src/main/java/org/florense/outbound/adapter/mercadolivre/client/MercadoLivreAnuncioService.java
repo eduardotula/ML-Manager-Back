@@ -31,7 +31,7 @@ public interface MercadoLivreAnuncioService {
 
     @GET
     @Path("/users/{userId}/items/search")
-    Map<String, Object> listMlIds(@PathParam("userId") String userId, @QueryParam("status") String status, @QueryParam("offset") int offset, @QueryParam("limit") int limit) throws RuntimeException;
+    Map<String, Object> listMlIds(@PathParam("userId") String userId, @QueryParam("status") String status, @QueryParam("offset") int offset) throws RuntimeException;
 
 
     @ClientExceptionMapper

@@ -48,7 +48,7 @@ public class AnuncioEntity {
     @Column(name = "status")
     private String status;
 
-    @OneToMany(mappedBy = "anuncio", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "anuncio")
     private List<VendaEntity> vendas;
 
     @Column(name = "created_at")

@@ -6,10 +6,13 @@ import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.florense.domain.model.AccessCode;
+import org.florense.domain.model.Order;
 import org.florense.domain.usecase.AccessCodeUseCase;
 import org.florense.outbound.adapter.mercadolivre.client.MLAuthService;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
 import org.florense.outbound.adapter.mercadolivre.response.MLRefreshTokenResponse;
+
+import java.util.List;
 
 @ApplicationScoped
 public abstract class MercadoLivreAdapter {

@@ -32,6 +32,10 @@ public class VendaEntity {
     private double custo;
     @Column(name = "lucro", columnDefinition = "NUMERIC(18,2)")
     private double lucro;
+    @Column(name = "completo")
+    private boolean completo;
+    @Column(name = "stauts")
+    private String status;
 
     @ManyToOne
     @JoinColumn(name = "anuncio_id_fk")

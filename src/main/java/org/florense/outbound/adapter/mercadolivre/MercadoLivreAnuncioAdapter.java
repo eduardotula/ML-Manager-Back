@@ -92,8 +92,7 @@ public class MercadoLivreAnuncioAdapter extends MercadoLivreAdapter implements M
             int total = 1;
 
             while (offset < total){
-                int limit = offset + 50;
-                Map<String, Object> resp = mercadoLivreAnuncioService.listMlIds(userId,"active", offset,limit);
+                Map<String, Object> resp = mercadoLivreAnuncioService.listMlIds(userId,"active", offset);
                 allActiveIds.addAll((Collection<String>) resp.get("results"));
                 offset += 50;
                 total = (Integer) ((Map<String, Object>)resp.get("paging")).get("total");
