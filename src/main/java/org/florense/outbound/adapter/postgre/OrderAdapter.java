@@ -3,11 +3,18 @@ package org.florense.outbound.adapter.postgre;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.florense.domain.model.Order;
+import org.florense.domain.model.PageParam;
+import org.florense.domain.model.Pagination;
+import org.florense.domain.model.filters.OrderFilter;
 import org.florense.outbound.adapter.postgre.mappers.OrderEntityMapper;
 import org.florense.outbound.adapter.postgre.repository.OrderRepository;
 import org.florense.outbound.port.postgre.OrderEntityPort;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class OrderAdapter implements OrderEntityPort {
@@ -28,6 +35,22 @@ public class OrderAdapter implements OrderEntityPort {
         });
 
         return mapper.toModel(repository.save(orderEntity));
+    }
+
+    @Override
+    public Pagination<Order> listByFilters(OrderFilter filter, PageParam pageParam){
+        Pageable pageable = PageRequest.of(pageParam.getPage(), pageParam.getPageSize());
+        Sort.Direction sortDirection = pageParam.getSortType().equalsIgnoreCase(Sort.Direction.ASC.toString()) ? Sort.Direction.ASC : Sort.Direction.DESC;
+
+        var page = repository.listByFilters(filter.getOrderCreationInicial(), filter.getOrderCreationFinal(),
+                Sort.by(sortDirection,pageParam.getSortField()), pageable);
+
+        return new Pagination<Order>(pageParam.getPage(), pageParam.getPageSize(),page.getTotalPages(), (int)page.getTotalElements(), pageParam.getSortField(),
+                pageParam.getSortType(), page.stream().map(mapper::toModel).collect(Collectors.toList()));    }
+
+    @Override
+    public Order getLastOrder(){
+        return mapper.toModel(repository.findTopByOrderByIdDesc().orElseGet(null));
     }
 
     @Override

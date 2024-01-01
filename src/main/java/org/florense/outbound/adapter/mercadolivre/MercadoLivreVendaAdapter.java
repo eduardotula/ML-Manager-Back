@@ -59,14 +59,18 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
     }
 
     @Override
-    public List<Order> listVendasUntilExistent(String status, Long existentOrderId, boolean retry) throws FailRequestRefreshTokenException {
+    public List<Order> listVendasUntilExistent(List<MLStatusEnum> status, Long existentOrderId, boolean retry) throws FailRequestRefreshTokenException {
         try {
             Map<Long, Order> listVendas = new HashMap<>();
             int offset = 0;
             int total = 1;
+            StringBuilder filterStatus = new StringBuilder();
+            status.forEach(mlStatusEnum -> filterStatus.append(status + ","));
+            filterStatus.setLength(filterStatus.length() - 1);
 
             while (offset < total) {
-                var resp = mercadoLivreOrderService.vendasOrderDescByStatus(userId, status, offset);
+
+                var resp = mercadoLivreOrderService.vendasOrderDescByStatus(userId, filterStatus.toString(), offset);
 
                 for (MLOrderResponse mlOrderResponse : resp.getOrderResponses()) {
                     if(mlOrderResponse.getOrderId().equals(existentOrderId)) return new ArrayList<>(listVendas.values());

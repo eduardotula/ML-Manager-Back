@@ -17,10 +17,7 @@ import org.florense.outbound.adapter.mercadolivre.mapper.MercadoLivreProdutoAnun
 import org.florense.outbound.adapter.mercadolivre.response.MLRefreshTokenResponse;
 import org.florense.outbound.port.mercadolivre.MercadoLivreAnuncioPort;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @ApplicationScoped
 public class MercadoLivreAnuncioAdapter extends MercadoLivreAdapter implements MercadoLivreAnuncioPort {
@@ -105,7 +102,7 @@ public class MercadoLivreAnuncioAdapter extends MercadoLivreAdapter implements M
                 if(retry) listActiveMlIds(false);
             }
         }
-        return null;
+        return new ArrayList<>();
     }
 
 
