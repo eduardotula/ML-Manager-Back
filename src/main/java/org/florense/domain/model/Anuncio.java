@@ -28,6 +28,7 @@ public class Anuncio {
     private String status;
     private LocalDateTime createdAt;
     private double lucro;
+    private ListingTypeEnum listingType;
 
     public void update(Anuncio anuncio){
         this.id = anuncio.getId();

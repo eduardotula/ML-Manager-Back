@@ -1,4 +1,4 @@
-package org.florense.outbound.adapter.mercadolivre;
+package org.florense.outbound.adapter.mercadolivre.mlenum;
 
 public enum MLStatusEnum {
 

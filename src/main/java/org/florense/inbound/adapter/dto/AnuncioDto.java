@@ -2,6 +2,7 @@ package org.florense.inbound.adapter.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.florense.domain.model.ListingTypeEnum;
 
 import java.time.LocalDateTime;
 
@@ -39,5 +40,6 @@ public class AnuncioDto {
     private String status;
     @NotNull
     private LocalDateTime createdAt;
+    private ListingTypeEnum listingType;
     private double lucro;
 }

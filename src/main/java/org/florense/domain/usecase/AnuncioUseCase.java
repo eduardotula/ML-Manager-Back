@@ -37,7 +37,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort{
         if(existProd != null) throw new IllegalArgumentException(String.format("Anuncio com id: %s já cadastrado",anuncio.getMlId()));
 
         Anuncio completeAnuncio = mercadoLivreAdapter.getAnuncio(anuncio.getMlId(), true);
-        completeAnuncio.setTaxaML(mercadoLivreAdapter.getTarifas(completeAnuncio.getPrecoDesconto(), completeAnuncio.getCategoria() , true));
+        completeAnuncio.setTaxaML(mercadoLivreAdapter.getTarifas(completeAnuncio.getPrecoDesconto(), completeAnuncio.getCategoria(), completeAnuncio.getListingType(), true));
         if(completeAnuncio.getPrecoDesconto() >= 80)
             completeAnuncio.setCustoFrete(mercadoLivreAdapter.getFrete(completeAnuncio.getMlId(),"06950000" , true));
         else completeAnuncio.setCustoFrete(0.0);
@@ -73,7 +73,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort{
         }
 
         Anuncio completeAnuncio = mercadoLivreAdapter.getAnuncio(mlId, true);
-        completeAnuncio.setTaxaML(mercadoLivreAdapter.getTarifas(completeAnuncio.getPrecoDesconto(), completeAnuncio.getCategoria(), true));
+        completeAnuncio.setTaxaML(mercadoLivreAdapter.getTarifas(completeAnuncio.getPrecoDesconto(), completeAnuncio.getCategoria(),completeAnuncio.getListingType(), true));
         if(completeAnuncio.getPrecoDesconto() >= 80)
             completeAnuncio.setCustoFrete(mercadoLivreAdapter.getFrete(completeAnuncio.getMlId(),"06950000", true));
         else completeAnuncio.setCustoFrete(0.0);

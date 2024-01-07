@@ -1,20 +1,15 @@
 package org.florense.outbound.adapter.mercadolivre;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.florense.domain.model.AccessCode;
 import org.florense.domain.model.Anuncio;
-import org.florense.domain.usecase.AccessCodeUseCase;
-import org.florense.outbound.adapter.mercadolivre.client.MLAuthService;
 import org.florense.outbound.adapter.mercadolivre.client.MercadoLivreAnuncioService;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
 import org.florense.outbound.adapter.mercadolivre.exceptions.UnauthorizedAcessKeyException;
 import org.florense.outbound.adapter.mercadolivre.mapper.MercadoLivreProdutoAnuncio;
-import org.florense.outbound.adapter.mercadolivre.response.MLRefreshTokenResponse;
+import org.florense.domain.model.ListingTypeEnum;
 import org.florense.outbound.port.mercadolivre.MercadoLivreAnuncioPort;
 
 import java.util.*;
@@ -52,14 +47,14 @@ public class MercadoLivreAnuncioAdapter extends MercadoLivreAdapter implements M
     }
 
     @Override
-    public Double getTarifas(Double preco, String categoria, boolean retry) throws FailRequestRefreshTokenException {
+    public Double getTarifas(Double preco, String categoria,ListingTypeEnum typeEnum, boolean retry) throws FailRequestRefreshTokenException {
         try {
-            Map<String, Object> tarifa = mercadoLivreAnuncioService.getListingPrices(preco, "gold_special", categoria);
+            Map<String, Object> tarifa = mercadoLivreAnuncioService.getListingPrices(preco, typeEnum.getValue(), categoria);
             return ((Number)tarifa.get("sale_fee_amount")).doubleValue();
         } catch (RuntimeException e) {
             if(e.getCause() instanceof UnauthorizedAcessKeyException){
                 refreshAccessToken(appId, clientSecret);
-                if(retry) getTarifas(preco, categoria,false);
+                if(retry) getTarifas(preco, categoria,typeEnum,false);
             }
         }
         return null;

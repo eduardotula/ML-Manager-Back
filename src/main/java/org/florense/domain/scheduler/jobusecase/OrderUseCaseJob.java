@@ -2,7 +2,7 @@ package org.florense.domain.scheduler.jobusecase;
 
 import jakarta.inject.Inject;
 import org.florense.domain.model.Order;
-import org.florense.outbound.adapter.mercadolivre.MLStatusEnum;
+import org.florense.outbound.adapter.mercadolivre.mlenum.MLStatusEnum;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
 import org.florense.outbound.port.mercadolivre.MercadoLivreVendaPort;
 import org.florense.outbound.port.postgre.AnuncioEntityPort;

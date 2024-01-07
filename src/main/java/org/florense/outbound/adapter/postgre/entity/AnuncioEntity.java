@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.florense.domain.model.ListingTypeEnum;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -47,7 +48,8 @@ public class AnuncioEntity {
     private double lucro;
     @Column(name = "status")
     private String status;
-
+    @Column(name = "listing_type")
+    private ListingTypeEnum listingType;
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

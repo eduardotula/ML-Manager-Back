@@ -10,6 +10,7 @@ import org.florense.domain.model.Venda;
 import org.florense.outbound.adapter.mercadolivre.client.MercadoLivreOrderService;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
 import org.florense.outbound.adapter.mercadolivre.exceptions.UnauthorizedAcessKeyException;
+import org.florense.outbound.adapter.mercadolivre.mlenum.MLStatusEnum;
 import org.florense.outbound.adapter.mercadolivre.response.MLOrderResponse;
 import org.florense.outbound.port.mercadolivre.MercadoLivreVendaPort;
 

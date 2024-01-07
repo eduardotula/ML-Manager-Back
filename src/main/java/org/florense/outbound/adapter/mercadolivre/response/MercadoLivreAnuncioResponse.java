@@ -28,6 +28,7 @@ public class MercadoLivreAnuncioResponse {
     @JsonIgnore
     private String sku;
     private String status;
+    private String listing_type_id;
 
     @JsonSetter("attributes")
     private void setTheAttributes(List<Map<String, Object>> list){
