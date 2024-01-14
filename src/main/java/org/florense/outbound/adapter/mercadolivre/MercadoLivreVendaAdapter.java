@@ -6,6 +6,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.florense.domain.model.Anuncio;
 import org.florense.domain.model.Order;
+import org.florense.domain.model.User;
 import org.florense.domain.model.Venda;
 import org.florense.outbound.adapter.mercadolivre.client.MercadoLivreOrderService;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
@@ -31,14 +32,14 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
     MercadoLivreOrderService mercadoLivreOrderService;
 
     @Override
-    public List<Order> listAllVendas(boolean retry) throws FailRequestRefreshTokenException {
+    public List<Order> listAllVendas(User user, boolean retry) throws FailRequestRefreshTokenException {
         try {
             Map<Long, Order> listVendas = new HashMap<>();
             int offset = 0;
             int total = 1;
 
             while (offset < total) {
-                var resp = mercadoLivreOrderService.vendasOrderDesc(userId, offset);
+                var resp = mercadoLivreOrderService.vendasOrderDesc(userId, offset, user.getAccessCode());
 
                 resp.getOrderResponses().forEach(mlOrderResponse -> {
                     var newOrder = convertMlVendaToOrder(mlOrderResponse);
@@ -52,15 +53,15 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
 
         } catch (RuntimeException e) {
             if (e.getCause() instanceof UnauthorizedAcessKeyException) {
-                refreshAccessToken(appId, clientSecret);
-                if (retry) listAllVendas(false);
+                refreshAccessToken(appId, clientSecret, user);
+                if (retry) listAllVendas(user,false);
             }
         }
         throw new IllegalStateException("Falha ao Buscar vendas");
     }
 
     @Override
-    public List<Order> listVendasUntilExistent(List<MLStatusEnum> status, Long existentOrderId, boolean retry) throws FailRequestRefreshTokenException {
+    public List<Order> listVendasUntilExistent(List<MLStatusEnum> status, Long existentOrderId, User user,boolean retry) throws FailRequestRefreshTokenException {
         try {
             Map<Long, Order> listVendas = new HashMap<>();
             int offset = 0;
@@ -71,7 +72,7 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
 
             while (offset < total) {
 
-                var resp = mercadoLivreOrderService.vendasOrderDescByStatus(userId, filterStatus.toString(), offset);
+                var resp = mercadoLivreOrderService.vendasOrderDescByStatus(userId, filterStatus.toString(), offset, user.getAccessCode());
 
                 for (MLOrderResponse mlOrderResponse : resp.getOrderResponses()) {
                     if(mlOrderResponse.getOrderId().equals(existentOrderId)) return new ArrayList<>(listVendas.values());
@@ -87,8 +88,8 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
 
         } catch (RuntimeException e) {
             if (e.getCause() instanceof UnauthorizedAcessKeyException) {
-                refreshAccessToken(appId, clientSecret);
-                if (retry) listAllVendas(false);
+                refreshAccessToken(appId, clientSecret, user);
+                if (retry) listAllVendas(user,false);
             }
         }
         throw new IllegalStateException("Falha ao Buscar vendas");

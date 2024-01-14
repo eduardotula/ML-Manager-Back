@@ -1,6 +1,5 @@
-package org.florense.inbound.adapter.dto;
+package org.florense.domain.model;
 
-import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,12 +11,12 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccessCodeDto {
+public class User {
 
     private Long id;
-    @NotEmpty
+    private String name;
+    private String userIdML;
     private String accessCode;
-    @NotEmpty
     private String refreshToken;
     private LocalDateTime createdAt;
 }

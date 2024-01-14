@@ -5,6 +5,7 @@ import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.florense.domain.model.Anuncio;
+import org.florense.domain.model.User;
 import org.florense.outbound.adapter.mercadolivre.client.MercadoLivreAnuncioService;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
 import org.florense.outbound.adapter.mercadolivre.exceptions.UnauthorizedAcessKeyException;
@@ -24,8 +25,6 @@ public class MercadoLivreAnuncioAdapter extends MercadoLivreAdapter implements M
     @Inject
     MercadoLivreProdutoAnuncio mapper;
 
-    @ConfigProperty(name = "quarkus.rest-client.ml-api.user-id")
-    String userId;
     @ConfigProperty(name = "quarkus.rest-client.ml-api.app-id")
     String appId;
     @ConfigProperty(name = "quarkus.rest-client.ml-api.secret")
@@ -33,68 +32,68 @@ public class MercadoLivreAnuncioAdapter extends MercadoLivreAdapter implements M
 
 
     @Override
-    public Anuncio getAnuncio(String mlId, boolean retry) throws FailRequestRefreshTokenException {
+    public Anuncio getAnuncio(String mlId, User user, boolean retry) throws FailRequestRefreshTokenException {
         try {
-            var p = mercadoLivreAnuncioService.anuncio(mlId);
+            var p = mercadoLivreAnuncioService.anuncio(mlId, user.getAccessCode());
             return mapper.toAnuncio(p);
         } catch (RuntimeException e) {
-            if(e.getCause() instanceof UnauthorizedAcessKeyException){
-                refreshAccessToken(appId, clientSecret);
-                if(retry) getAnuncio(mlId,false);
+            if (e.getCause() instanceof UnauthorizedAcessKeyException) {
+                refreshAccessToken(appId, clientSecret, user);
+                if (retry) getAnuncio(mlId, user, false);
             }
         }
         return null;
     }
 
     @Override
-    public Double getTarifas(Double preco, String categoria,ListingTypeEnum typeEnum, boolean retry) throws FailRequestRefreshTokenException {
+    public Double getTarifas(Double preco, String categoria, ListingTypeEnum typeEnum, User user, boolean retry) throws FailRequestRefreshTokenException {
         try {
-            Map<String, Object> tarifa = mercadoLivreAnuncioService.getListingPrices(preco, typeEnum.getValue(), categoria);
-            return ((Number)tarifa.get("sale_fee_amount")).doubleValue();
+            Map<String, Object> tarifa = mercadoLivreAnuncioService.getListingPrices(preco, typeEnum.getValue(), categoria, user.getAccessCode());
+            return ((Number) tarifa.get("sale_fee_amount")).doubleValue();
         } catch (RuntimeException e) {
-            if(e.getCause() instanceof UnauthorizedAcessKeyException){
-                refreshAccessToken(appId, clientSecret);
-                if(retry) getTarifas(preco, categoria,typeEnum,false);
+            if (e.getCause() instanceof UnauthorizedAcessKeyException) {
+                refreshAccessToken(appId, clientSecret, user);
+                if (retry) getTarifas(preco, categoria, typeEnum, user, false);
             }
         }
         return null;
     }
 
     @Override
-    public Double getFrete(String mlId, String cep, boolean retry) throws FailRequestRefreshTokenException {
+    public Double getFrete(String mlId, String cep, User user, boolean retry) throws FailRequestRefreshTokenException {
         try {
-            Map<String, Object> frete = mercadoLivreAnuncioService.getFretePrice(mlId, cep);
+            Map<String, Object> frete = mercadoLivreAnuncioService.getFretePrice(mlId, cep, user.getAccessCode());
             List<Object> options = (List<Object>) frete.get("options");
             Map<String, Object> option = (Map<String, Object>) options.get(0);
             return ((Number) option.get("list_cost")).doubleValue();
         } catch (RuntimeException e) {
-            if(e.getCause() instanceof UnauthorizedAcessKeyException){
-                refreshAccessToken(appId, clientSecret);
-                if(retry) getFrete(mlId,cep,false);
+            if (e.getCause() instanceof UnauthorizedAcessKeyException) {
+                refreshAccessToken(appId, clientSecret, user);
+                if (retry) getFrete(mlId, cep, user, false);
             }
         }
         return null;
     }
 
     @Override
-    public List<String> listActiveMlIds(boolean retry) throws FailRequestRefreshTokenException {
+    public List<String> listActiveMlIds(User user, boolean retry) throws FailRequestRefreshTokenException {
         try {
             List<String> allActiveIds = new LinkedList<>();
             int offset = 0;
             int total = 1;
 
-            while (offset < total){
-                Map<String, Object> resp = mercadoLivreAnuncioService.listMlIds(userId,"active", offset);
+            while (offset < total) {
+                Map<String, Object> resp = mercadoLivreAnuncioService.listMlIds(user.getUserIdML(), "active", offset, user.getAccessCode());
                 allActiveIds.addAll((Collection<String>) resp.get("results"));
                 offset += 50;
-                total = (Integer) ((Map<String, Object>)resp.get("paging")).get("total");
+                total = (Integer) ((Map<String, Object>) resp.get("paging")).get("total");
             }
 
             return allActiveIds;
         } catch (RuntimeException e) {
-            if(e.getCause() instanceof UnauthorizedAcessKeyException){
-                refreshAccessToken(appId, clientSecret);
-                if(retry) listActiveMlIds(false);
+            if (e.getCause() instanceof UnauthorizedAcessKeyException) {
+                refreshAccessToken(appId, clientSecret, user);
+                if (retry) listActiveMlIds(user, false);
             }
         }
         return new ArrayList<>();

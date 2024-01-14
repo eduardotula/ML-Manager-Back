@@ -13,27 +13,36 @@ import java.util.List;
 public interface AnuncioAdapterPort {
 
 
-    Anuncio createUpdate(Anuncio anuncio);
+    @Transactional
+    Anuncio createUpdate(Anuncio anuncio, Long userId);
 
     //Cria e atualiza com mercado livre
-    Anuncio createMlSearch(Anuncio anuncio) throws FailRequestRefreshTokenException;
+    @Transactional
+    Anuncio createMlSearch(Anuncio anuncio, Long userId) throws FailRequestRefreshTokenException;
 
     //Somente atualiza um anuncio
-    Anuncio updateSimple(Anuncio anuncio);
+    @Transactional
+    Anuncio updateSimple(Anuncio anuncio, Long userId);
 
     //Atualiza dados somente do mercado livre
-    Anuncio updateSearch(String mlId) throws FailRequestRefreshTokenException;
-
-    List<String> listAllActiveMl() throws FailRequestRefreshTokenException;
-
-    List<String> listAllActiveMlMinusRegistered() throws FailRequestRefreshTokenException;
-
-    Anuncio findAnuncioByMlId(String mlId);
+    @Transactional
+    Anuncio updateSearch(String mlId, Long userId) throws FailRequestRefreshTokenException;
 
     @Transactional
-    Anuncio findAnuncioByMlIdSearch(String mlId) throws FailRequestRefreshTokenException;
+    List<String> listAllActiveMl(Long userId) throws FailRequestRefreshTokenException;
 
-    List<Anuncio> listAll();
+    @Transactional
+    List<String> listAllActiveMlMinusRegistered(Long userId) throws FailRequestRefreshTokenException;
 
+    @Transactional
+    Anuncio findAnuncioByMlId(String mlId, Long userId);
+
+    @Transactional
+    Anuncio findAnuncioByMlIdSearch(String mlId, Long userId) throws FailRequestRefreshTokenException;
+
+    @Transactional
+    List<Anuncio> listAll(Long userId);
+
+    @Transactional
     void deleteBy(Long id);
 }

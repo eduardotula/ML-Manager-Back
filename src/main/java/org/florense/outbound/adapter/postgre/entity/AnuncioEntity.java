@@ -53,5 +53,8 @@ public class AnuncioEntity {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id_fk")
+    private UserEntity user;
 
 }

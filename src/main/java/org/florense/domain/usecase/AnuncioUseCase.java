@@ -4,10 +4,12 @@ import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.florense.domain.model.Anuncio;
+import org.florense.domain.model.User;
 import org.florense.inbound.port.AnuncioAdapterPort;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
 import org.florense.outbound.port.mercadolivre.MercadoLivreAnuncioPort;
 import org.florense.outbound.port.postgre.AnuncioEntityPort;
+import org.florense.outbound.port.postgre.UserEntityPort;
 
 import java.util.List;
 import java.util.Objects;
@@ -15,16 +17,18 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @RequestScoped
-public class AnuncioUseCase implements AnuncioAdapterPort{
+public class AnuncioUseCase implements AnuncioAdapterPort {
 
     @Inject
     AnuncioEntityPort anuncioEntityPort;
+    @Inject
+    UserEntityPort userEntityPort;
     @Inject
     MercadoLivreAnuncioPort mercadoLivreAdapter;
 
     @Override
     @Transactional
-    public Anuncio createUpdate(Anuncio anuncio){
+    public Anuncio createUpdate(Anuncio anuncio, Long userId) {
         return anuncioEntityPort.saveUpdate(anuncio);
     }
 
@@ -32,14 +36,17 @@ public class AnuncioUseCase implements AnuncioAdapterPort{
     //Cria e atualiza com mercado livre
     @Override
     @Transactional
-    public Anuncio createMlSearch(Anuncio anuncio) throws FailRequestRefreshTokenException {
+    public Anuncio createMlSearch(Anuncio anuncio, Long userId) throws FailRequestRefreshTokenException {
         var existProd = anuncioEntityPort.findByMlId(anuncio.getMlId());
-        if(existProd != null) throw new IllegalArgumentException(String.format("Anuncio com id: %s já cadastrado",anuncio.getMlId()));
+        if (existProd != null)
+            throw new IllegalArgumentException(String.format("Anuncio com id: %s já cadastrado", anuncio.getMlId()));
+        User user = getUserOrThrowException(userId);
 
-        Anuncio completeAnuncio = mercadoLivreAdapter.getAnuncio(anuncio.getMlId(), true);
-        completeAnuncio.setTaxaML(mercadoLivreAdapter.getTarifas(completeAnuncio.getPrecoDesconto(), completeAnuncio.getCategoria(), completeAnuncio.getListingType(), true));
-        if(completeAnuncio.getPrecoDesconto() >= 80)
-            completeAnuncio.setCustoFrete(mercadoLivreAdapter.getFrete(completeAnuncio.getMlId(),"06950000" , true));
+        Anuncio completeAnuncio = mercadoLivreAdapter.getAnuncio(anuncio.getMlId(), user, true);
+        completeAnuncio.setTaxaML(mercadoLivreAdapter.getTarifas(completeAnuncio.getPrecoDesconto(),
+                completeAnuncio.getCategoria(), completeAnuncio.getListingType(), user, true));
+        if (completeAnuncio.getPrecoDesconto() >= 80)
+            completeAnuncio.setCustoFrete(mercadoLivreAdapter.getFrete(completeAnuncio.getMlId(), "06950000", user, true));
         else completeAnuncio.setCustoFrete(0.0);
 
         completeAnuncio.setCusto(anuncio.getCusto());
@@ -52,9 +59,11 @@ public class AnuncioUseCase implements AnuncioAdapterPort{
     //Somente atualiza um anuncio
     @Override
     @Transactional
-    public Anuncio updateSimple(Anuncio anuncio){
+    public Anuncio updateSimple(Anuncio anuncio, Long userId) {
         var existProd = anuncioEntityPort.findByMlId(anuncio.getMlId());
-        if(Objects.isNull(existProd)) throw new IllegalArgumentException(String.format("Anuncio com id %s não encontrado", anuncio.getMlId()));
+        if (Objects.isNull(existProd))
+            throw new IllegalArgumentException(String.format("Anuncio com id %s não encontrado", anuncio.getMlId()));
+
         existProd.setCsosn(anuncio.getCsosn());
         existProd.setCusto(anuncio.getCusto());
         existProd.setLucro(Anuncio.calculateLucro(existProd));
@@ -65,17 +74,19 @@ public class AnuncioUseCase implements AnuncioAdapterPort{
     //Atualiza dados somente do mercado livre
     @Override
     @Transactional
-    public Anuncio updateSearch(String mlId) throws FailRequestRefreshTokenException {
+    public Anuncio updateSearch(String mlId, Long userId) throws FailRequestRefreshTokenException {
 
-         var existProd = anuncioEntityPort.findByMlId(mlId);
-        if(Objects.isNull(existProd)){
-            throw new IllegalArgumentException(String.format("Anuncio com mlId: %s não encontrado", mlId ));
+        var existProd = anuncioEntityPort.findByMlId(mlId);
+        if (Objects.isNull(existProd)) {
+            throw new IllegalArgumentException(String.format("Anuncio com mlId: %s não encontrado", mlId));
         }
+        User user = getUserOrThrowException(userId);
 
-        Anuncio completeAnuncio = mercadoLivreAdapter.getAnuncio(mlId, true);
-        completeAnuncio.setTaxaML(mercadoLivreAdapter.getTarifas(completeAnuncio.getPrecoDesconto(), completeAnuncio.getCategoria(),completeAnuncio.getListingType(), true));
-        if(completeAnuncio.getPrecoDesconto() >= 80)
-            completeAnuncio.setCustoFrete(mercadoLivreAdapter.getFrete(completeAnuncio.getMlId(),"06950000", true));
+        Anuncio completeAnuncio = mercadoLivreAdapter.getAnuncio(mlId, user, true);
+        completeAnuncio.setTaxaML(mercadoLivreAdapter.getTarifas(completeAnuncio.getPrecoDesconto(),
+                completeAnuncio.getCategoria(), completeAnuncio.getListingType(), user, true));
+        if (completeAnuncio.getPrecoDesconto() >= 80)
+            completeAnuncio.setCustoFrete(mercadoLivreAdapter.getFrete(completeAnuncio.getMlId(), "06950000", user, true));
         else completeAnuncio.setCustoFrete(0.0);
         completeAnuncio.update(existProd);
         completeAnuncio.setCsosn(existProd.getCsosn());
@@ -87,14 +98,16 @@ public class AnuncioUseCase implements AnuncioAdapterPort{
 
     @Override
     @Transactional
-    public List<String> listAllActiveMl() throws FailRequestRefreshTokenException {
-        return mercadoLivreAdapter.listActiveMlIds(true);
+    public List<String> listAllActiveMl(Long userId) throws FailRequestRefreshTokenException {
+        User user = getUserOrThrowException(userId);
+        return mercadoLivreAdapter.listActiveMlIds(user, true);
     }
 
     @Override
     @Transactional
-    public List<String> listAllActiveMlMinusRegistered() throws FailRequestRefreshTokenException {
-        List<String> actives = mercadoLivreAdapter.listActiveMlIds(true);
+    public List<String> listAllActiveMlMinusRegistered(Long userId) throws FailRequestRefreshTokenException {
+        User user = getUserOrThrowException(userId);
+        List<String> actives = mercadoLivreAdapter.listActiveMlIds(user, true);
         Set<String> registeredIds = anuncioEntityPort.listAll()
                 .stream()
                 .map(Anuncio::getMlId)
@@ -107,32 +120,41 @@ public class AnuncioUseCase implements AnuncioAdapterPort{
 
     @Override
     @Transactional
-    public Anuncio findAnuncioByMlId(String mlId){
+    public Anuncio findAnuncioByMlId(String mlId, Long userId) {
+
         return anuncioEntityPort.findByMlId(mlId);
     }
 
     @Override
     @Transactional
-    public Anuncio findAnuncioByMlIdSearch(String mlId) throws FailRequestRefreshTokenException {
-        return mercadoLivreAdapter.getAnuncio(mlId,true);
+    public Anuncio findAnuncioByMlIdSearch(String mlId, Long userId) throws FailRequestRefreshTokenException {
+        User user = getUserOrThrowException(userId);
+        return mercadoLivreAdapter.getAnuncio(mlId, user, true);
     }
 
     @Override
     @Transactional
-    public List<Anuncio> listAll(){
+    public List<Anuncio> listAll(Long userId) {
         return anuncioEntityPort.listAll();
     }
 
+    private User getUserOrThrowException(Long userId) throws IllegalArgumentException {
+        User user = userEntityPort.findById(userId);
+        if (Objects.isNull(user))
+            throw new IllegalArgumentException(String.format("User com id: %s não encontrado", user));
+        return user;
+    }
+
     @Override
     @Transactional
-    public void deleteBy(Long id){
-        if(Objects.isNull(anuncioEntityPort.findById(id)))
+    public void deleteBy(Long id) {
+        if (Objects.isNull(anuncioEntityPort.findById(id)))
             throw new IllegalArgumentException(String.format("Anuncio com id %s não encontrado", id));
 
-        try{
+        try {
             anuncioEntityPort.deleteById(id);
-        }catch (Exception e){
-            throw new IllegalStateException(String.format("Falha ao apagar anuncio com id: %s",id));
+        } catch (Exception e) {
+            throw new IllegalStateException(String.format("Falha ao apagar anuncio com id: %s", id));
         }
     }
 

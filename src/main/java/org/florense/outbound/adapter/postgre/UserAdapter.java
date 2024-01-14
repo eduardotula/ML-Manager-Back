@@ -2,37 +2,37 @@ package org.florense.outbound.adapter.postgre;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.florense.domain.model.AccessCode;
+import org.florense.domain.model.User;
 import org.florense.outbound.adapter.postgre.mappers.AccessCodeEntityMapper;
-import org.florense.outbound.adapter.postgre.repository.AccessCodeRepository;
-import org.florense.outbound.port.postgre.AccessCodePort;
+import org.florense.outbound.adapter.postgre.repository.UserRepository;
+import org.florense.outbound.port.postgre.UserEntityPort;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
-public class AccessCodeAdapter implements AccessCodePort {
+public class UserAdapter implements UserEntityPort {
 
     @Inject
-    AccessCodeRepository repository;
+    UserRepository repository;
     @Inject
     AccessCodeEntityMapper mapper;
 
     @Override
-    public AccessCode createUpdate(AccessCode accessCode){
-        if(accessCode.getId() == null) accessCode.setCreatedAt(LocalDateTime.now());
+    public User createUpdate(User user){
+        if(user.getId() == null) user.setCreatedAt(LocalDateTime.now());
 
-        return mapper.toModel(repository.save(mapper.toEntity(accessCode)));
+        return mapper.toModel(repository.save(mapper.toEntity(user)));
     }
 
     @Override
-    public AccessCode findById(Long id){
+    public User findById(Long id){
         return mapper.toModel(repository.findById(id).orElseGet(null));
     }
 
     @Override
-    public List<AccessCode> listAll() {
+    public List<User> listAll() {
         return repository.findAll().stream().map(mapper::toModel).collect(Collectors.toList());
     }
     @Override

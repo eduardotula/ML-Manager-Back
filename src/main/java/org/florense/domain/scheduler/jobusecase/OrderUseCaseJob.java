@@ -2,6 +2,7 @@ package org.florense.domain.scheduler.jobusecase;
 
 import jakarta.inject.Inject;
 import org.florense.domain.model.Order;
+import org.florense.domain.model.User;
 import org.florense.outbound.adapter.mercadolivre.mlenum.MLStatusEnum;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
 import org.florense.outbound.port.mercadolivre.MercadoLivreVendaPort;
@@ -60,10 +61,10 @@ public class OrderUseCaseJob implements Job {
          Realiza a busca por novas Orders Mercado Livre, cria ou atualiza as Orders mas somente aquelas que
         já existir um Anuncio do produto contido na ordem
      */
-    public List<Order> listAllNewOrders() throws FailRequestRefreshTokenException {
+    public List<Order> listAllNewOrders(User user) throws FailRequestRefreshTokenException {
         Order lasOrder = orderEntityPort.getLastOrder();
         List<MLStatusEnum> statusEnums = Arrays.asList(MLStatusEnum.PAID, MLStatusEnum.CANCELLED);
-        List<Order> orders = mercadoLivreVendaPort.listVendasUntilExistent(statusEnums, lasOrder.getId(), true);
+        List<Order> orders = mercadoLivreVendaPort.listVendasUntilExistent(statusEnums, lasOrder.getId(), user,true);
 
         List<Order> returnOrders = new ArrayList<>();
         orders.forEach(order -> {
