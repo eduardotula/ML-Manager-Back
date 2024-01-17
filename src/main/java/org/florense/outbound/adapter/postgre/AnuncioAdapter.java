@@ -28,7 +28,8 @@ public class AnuncioAdapter implements AnuncioEntityPort {
 
     @Override
     public Anuncio findById(Long id){
-        return mapper.toModel(repository.findById(id).orElse(null));
+        var anuncio = repository.findById(id).orElse(null);
+        return anuncio != null ? mapper.toModel(anuncio) : null;
     }
 
     @Override

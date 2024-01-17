@@ -28,7 +28,8 @@ public class UserAdapter implements UserEntityPort {
 
     @Override
     public User findById(Long id){
-        return mapper.toModel(repository.findById(id).orElseGet(null));
+        var user = repository.findById(id).orElse(null);
+        return user != null ? mapper.toModel(user) : null;
     }
 
     @Override

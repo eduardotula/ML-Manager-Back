@@ -3,6 +3,7 @@ package org.florense.outbound.port.postgre;
 import org.florense.domain.model.Order;
 import org.florense.domain.model.PageParam;
 import org.florense.domain.model.Pagination;
+import org.florense.domain.model.User;
 import org.florense.domain.model.filters.OrderFilter;
 
 public interface OrderEntityPort {
@@ -10,7 +11,7 @@ public interface OrderEntityPort {
 
     Pagination<Order> listByFilters(OrderFilter filter, PageParam pageParam);
 
-    Order getLastOrder();
+    Order getLastOrderByUser(User user);
 
     Order findById(Long id);
 
