@@ -17,7 +17,7 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
 
     Optional<OrderEntity> findByOrderId(Long orderId);
 
-    Optional<OrderEntity> findTopByOrderByIdDesc();
+    OrderEntity findFirstByOrderByIdDesc();
 
     @Query(value = "from order o WHERE " + "(o.orderCreationTime BETWEEN :dataInicial AND :dataFinal)")
     Page<OrderEntity> listByFilters(@Param("dataInicial") LocalDateTime dataInicial,

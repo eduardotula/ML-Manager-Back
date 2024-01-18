@@ -2,6 +2,7 @@ package org.florense.outbound.adapter.postgre;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import org.florense.domain.model.Order;
 import org.florense.domain.model.PageParam;
 import org.florense.domain.model.Pagination;
@@ -51,8 +52,8 @@ public class OrderAdapter implements OrderEntityPort {
 
     @Override
     public Order getLastOrderByUser(User user){
-        var order = repository.findTopByOrderByIdDesc();
-        return order != null ? mapper.toModel(order.orElseGet(null)) : null;
+        var order = repository.findFirstByOrderByIdDesc();
+        return order != null ? mapper.toModel(order) : null;
     }
 
     @Override

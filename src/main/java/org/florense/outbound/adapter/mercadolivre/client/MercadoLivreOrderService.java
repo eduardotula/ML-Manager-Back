@@ -19,19 +19,19 @@ import org.florense.outbound.adapter.mercadolivre.response.MLOrderWrapperRespons
 public interface MercadoLivreOrderService {
 
     @GET
-    @Path("/search/sort=date_desc")
-    @ClientHeaderParam(name = "header_auth", value = "Bearer{token}")
+    @Path("/search")
+    @ClientHeaderParam(name = "Authorization", value = "Bearer {token}")
     MLOrderWrapperResponse  vendasOrderDesc(@QueryParam("seller") String userId,
                                             @QueryParam("offset") int offset,
-                                            @NotBody String bearer) throws RuntimeException;
+                                            @NotBody String token) throws RuntimeException;
 
     @GET
-    @Path("/search/sort=date_desc")
-    @ClientHeaderParam(name = "header_auth", value = "Bearer{token}")
+    @Path("/search?sort=date_desc&")
+    @ClientHeaderParam(name = "Authorization", value = "Bearer {token}")
     MLOrderWrapperResponse vendasOrderDescByStatus(@QueryParam("seller") String userId,
                                                    @QueryParam("order.status") String status,
                                                    @QueryParam("offset") int offset,
-                                                   @NotBody String bearer) throws RuntimeException;
+                                                   @NotBody String token) throws RuntimeException;
 
     @ClientExceptionMapper
     static RuntimeException toException(Response response) {

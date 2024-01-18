@@ -40,7 +40,7 @@ public class OrderScheduler {
 
     public void createScheduleOrdersJobByUser(User user){
         JobKey jobKey = jobKeyGenerator.createJobKey(user);
-        LocalTime runTime = LocalTime.now().plus(orderRefreshDelay, ChronoUnit.MINUTES);
+        LocalTime runTime = LocalTime.now().plus(orderRefreshDelay, ChronoUnit.SECONDS);
         String cron = cronUtils.toCronHour(runTime);
 
         try {

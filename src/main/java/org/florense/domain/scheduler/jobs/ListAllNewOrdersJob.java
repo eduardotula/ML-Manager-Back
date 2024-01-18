@@ -42,6 +42,7 @@ public class ListAllNewOrdersJob implements Job {
     OrderScheduelerJobKeyGenerator nameGenerator;
 
     @Override
+    @Transactional
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
 
         try {
@@ -84,17 +85,14 @@ public class ListAllNewOrdersJob implements Job {
         }
     }
 
-    @Transactional
     public Order getLastOrderByUser(User user){
         return orderEntityPort.getLastOrderByUser(user);
     }
 
-    @Transactional
     public Order findByOrderId(Long orderId){
         return orderEntityPort.findByOrderId(orderId);
     }
 
-    @Transactional
     public Anuncio findAnuncioByMlId(String mlId, long userId){
         return anuncioEntityPort.findByMlId(mlId);
     }

@@ -23,8 +23,6 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
     String appId;
     @ConfigProperty(name = "quarkus.rest-client.ml-api.secret")
     String clientSecret;
-    @ConfigProperty(name = "quarkus.rest-client.ml-api.user-id")
-    String userId;
     private static final int BATCH_SIZE = 50;
 
     @RestClient
@@ -39,7 +37,7 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
             int total = 1;
 
             while (offset < total) {
-                var resp = mercadoLivreOrderService.vendasOrderDesc(userId, offset, user.getAccessCode());
+                var resp = mercadoLivreOrderService.vendasOrderDesc(user.getUserIdML(), offset, user.getAccessCode());
 
                 resp.getOrderResponses().forEach(mlOrderResponse -> {
                     var newOrder = convertMlVendaToOrder(mlOrderResponse);
@@ -72,7 +70,7 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
 
             while (offset < total) {
 
-                var resp = mercadoLivreOrderService.vendasOrderDescByStatus(userId, filterStatus.toString(), offset, user.getAccessCode());
+                var resp = mercadoLivreOrderService.vendasOrderDescByStatus(user.getUserIdML(), filterStatus.toString(), offset, user.getAccessCode());
 
                 for (MLOrderResponse mlOrderResponse : resp.getOrderResponses()) {
                     if(mlOrderResponse.getOrderId().equals(existentOrderId)) return new ArrayList<>(listVendas.values());
