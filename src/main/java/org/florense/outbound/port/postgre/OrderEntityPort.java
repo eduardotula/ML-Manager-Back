@@ -6,8 +6,12 @@ import org.florense.domain.model.Pagination;
 import org.florense.domain.model.User;
 import org.florense.domain.model.filters.OrderFilter;
 
+import java.util.List;
+
 public interface OrderEntityPort {
-    Order saveUpdate(Order order);
+    Order createUpdate(Order order);
+
+    List<Order> createUpdateAll(List<Order> orderList);
 
     Pagination<Order> listByFilters(OrderFilter filter, PageParam pageParam);
 

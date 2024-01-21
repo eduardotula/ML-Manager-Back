@@ -30,6 +30,7 @@ public class Anuncio {
     private double lucro;
     private ListingTypeEnum listingType;
     private User user;
+    private boolean registered;
 
     public void update(Anuncio anuncio){
         this.id = anuncio.getId();

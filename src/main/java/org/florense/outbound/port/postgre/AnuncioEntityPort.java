@@ -5,7 +5,7 @@ import org.florense.domain.model.Anuncio;
 import java.util.List;
 
 public interface AnuncioEntityPort {
-    Anuncio saveUpdate(Anuncio anuncio);
+    Anuncio createUpdate(Anuncio anuncio);
 
     Anuncio findById(Long id);
 

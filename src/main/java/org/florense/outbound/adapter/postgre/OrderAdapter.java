@@ -2,12 +2,12 @@ package org.florense.outbound.adapter.postgre;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import org.florense.domain.model.Order;
 import org.florense.domain.model.PageParam;
 import org.florense.domain.model.Pagination;
 import org.florense.domain.model.User;
 import org.florense.domain.model.filters.OrderFilter;
+import org.florense.outbound.adapter.postgre.entity.OrderEntity;
 import org.florense.outbound.adapter.postgre.mappers.OrderEntityMapper;
 import org.florense.outbound.adapter.postgre.repository.OrderRepository;
 import org.florense.outbound.port.postgre.OrderEntityPort;
@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -27,7 +28,7 @@ public class OrderAdapter implements OrderEntityPort {
     OrderEntityMapper mapper;
 
     @Override
-    public Order saveUpdate(Order order){
+    public Order createUpdate(Order order){
         var orderEntity = mapper.toEntity(order);
         var now = LocalDateTime.now();
         if(orderEntity.getCreatedAt() == null) orderEntity.setCreatedAt(now);
@@ -37,6 +38,21 @@ public class OrderAdapter implements OrderEntityPort {
         });
 
         return mapper.toModel(repository.save(orderEntity));
+    }
+
+    @Override
+    public List<Order> createUpdateAll(List<Order> orderList){
+
+        List<OrderEntity> orderEntitys = orderList.stream().map(mapper::toEntity).collect(Collectors.toList());
+        var now = LocalDateTime.now();
+        orderEntitys.forEach(orderEntity -> {
+            if(orderEntity.getCreatedAt() == null) orderEntity.setCreatedAt(now);
+            orderEntity.getVendas().forEach(venda -> {
+                if(venda.getCreatedAt() == null) venda.setCreatedAt(now);
+                venda.setOrder(orderEntity);
+            });
+        });
+        return repository.saveAll(orderEntitys).stream().map(mapper::toModel).collect(Collectors.toList());
     }
 
     @Override

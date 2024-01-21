@@ -29,7 +29,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
     @Override
     @Transactional
     public Anuncio createUpdate(Anuncio anuncio, Long userId) {
-        return anuncioEntityPort.saveUpdate(anuncio);
+        return anuncioEntityPort.createUpdate(anuncio);
     }
 
 
@@ -53,7 +53,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         completeAnuncio.setCsosn(anuncio.getCsosn());
         completeAnuncio.setLucro(Anuncio.calculateLucro(completeAnuncio));
 
-        return anuncioEntityPort.saveUpdate(completeAnuncio);
+        return anuncioEntityPort.createUpdate(completeAnuncio);
     }
 
     //Somente atualiza um anuncio
@@ -68,7 +68,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         existProd.setCusto(anuncio.getCusto());
         existProd.setLucro(Anuncio.calculateLucro(existProd));
 
-        return anuncioEntityPort.saveUpdate(existProd);
+        return anuncioEntityPort.createUpdate(existProd);
     }
 
     //Atualiza dados somente do mercado livre
@@ -93,7 +93,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         completeAnuncio.setCusto(existProd.getCusto());
         completeAnuncio.setLucro(Anuncio.calculateLucro(completeAnuncio));
 
-        return anuncioEntityPort.saveUpdate(completeAnuncio);
+        return anuncioEntityPort.createUpdate(completeAnuncio);
     }
 
     @Override

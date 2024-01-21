@@ -42,4 +42,5 @@ public class AnuncioDto {
     private LocalDateTime createdAt;
     private ListingTypeEnum listingType;
     private double lucro;
+    private boolean registered;
 }

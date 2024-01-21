@@ -39,7 +39,9 @@ public class MercadoLivreAnuncioAdapter extends MercadoLivreAdapter implements M
         } catch (RuntimeException e) {
             if (e.getCause() instanceof UnauthorizedAcessKeyException) {
                 refreshAccessToken(appId, clientSecret, user);
-                if (retry) getAnuncio(mlId, user, false);
+                if (retry){
+                    return getAnuncio(mlId, user, false);
+                }
             }
         }
         return null;
@@ -53,7 +55,9 @@ public class MercadoLivreAnuncioAdapter extends MercadoLivreAdapter implements M
         } catch (RuntimeException e) {
             if (e.getCause() instanceof UnauthorizedAcessKeyException) {
                 refreshAccessToken(appId, clientSecret, user);
-                if (retry) getTarifas(preco, categoria, typeEnum, user, false);
+                if (retry){
+                    return getTarifas(preco, categoria, typeEnum, user, false);
+                }
             }
         }
         return null;
@@ -69,7 +73,9 @@ public class MercadoLivreAnuncioAdapter extends MercadoLivreAdapter implements M
         } catch (RuntimeException e) {
             if (e.getCause() instanceof UnauthorizedAcessKeyException) {
                 refreshAccessToken(appId, clientSecret, user);
-                if (retry) getFrete(mlId, cep, user, false);
+                if (retry){
+                    return getFrete(mlId, cep, user, false);
+                }
             }
         }
         return null;
@@ -93,7 +99,9 @@ public class MercadoLivreAnuncioAdapter extends MercadoLivreAdapter implements M
         } catch (RuntimeException e) {
             if (e.getCause() instanceof UnauthorizedAcessKeyException) {
                 refreshAccessToken(appId, clientSecret, user);
-                if (retry) listActiveMlIds(user, false);
+                if (retry) {
+                    return listActiveMlIds(user, false);
+                }
             }
         }
         return new ArrayList<>();

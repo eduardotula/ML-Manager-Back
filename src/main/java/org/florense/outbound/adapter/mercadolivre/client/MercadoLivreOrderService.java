@@ -3,6 +3,7 @@ package org.florense.outbound.adapter.mercadolivre.client;
 import io.quarkus.rest.client.reactive.ClientExceptionMapper;
 import io.quarkus.rest.client.reactive.NotBody;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.QueryParam;
@@ -23,13 +24,15 @@ public interface MercadoLivreOrderService {
     @ClientHeaderParam(name = "Authorization", value = "Bearer {token}")
     MLOrderWrapperResponse  vendasOrderDesc(@QueryParam("seller") String userId,
                                             @QueryParam("offset") int offset,
+                                            @QueryParam("sort") String sort,
                                             @NotBody String token) throws RuntimeException;
 
     @GET
-    @Path("/search?sort=date_desc&")
+    @Path("/search")
     @ClientHeaderParam(name = "Authorization", value = "Bearer {token}")
     MLOrderWrapperResponse vendasOrderDescByStatus(@QueryParam("seller") String userId,
                                                    @QueryParam("order.status") String status,
+                                                   @QueryParam("sort") String sort,
                                                    @QueryParam("offset") int offset,
                                                    @NotBody String token) throws RuntimeException;
 

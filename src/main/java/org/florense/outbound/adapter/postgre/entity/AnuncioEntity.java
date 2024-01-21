@@ -57,4 +57,7 @@ public class AnuncioEntity {
     @JoinColumn(name = "user_id_fk")
     private UserEntity user;
 
+    @Column(name = "registered")
+    private boolean registered;
+
 }
