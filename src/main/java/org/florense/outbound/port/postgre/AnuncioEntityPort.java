@@ -11,7 +11,7 @@ public interface AnuncioEntityPort {
 
     Anuncio findByMlId(String mlId);
 
-    List<Anuncio> listAll();
+    List<Anuncio> listAllRegistered();
 
     void deleteById(Long id);
 }

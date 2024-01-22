@@ -6,8 +6,10 @@ import jakarta.transaction.Transactional;
 import org.florense.domain.model.Anuncio;
 import org.florense.domain.model.User;
 import org.florense.inbound.port.AnuncioAdapterPort;
+import org.florense.outbound.adapter.mercadolivre.MercadoLivreAnuncioAdapter;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
 import org.florense.outbound.port.mercadolivre.MercadoLivreAnuncioPort;
+import org.florense.outbound.port.mercadolivre.MercadoLivreVendaPort;
 import org.florense.outbound.port.postgre.AnuncioEntityPort;
 import org.florense.outbound.port.postgre.UserEntityPort;
 
@@ -24,7 +26,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
     @Inject
     UserEntityPort userEntityPort;
     @Inject
-    MercadoLivreAnuncioPort mercadoLivreAdapter;
+    MercadoLivreAnuncioAdapter mercadoLivreAnuncioPort;
 
     @Override
     @Transactional
@@ -42,11 +44,11 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
             throw new IllegalArgumentException(String.format("Anuncio com id: %s já cadastrado", anuncio.getMlId()));
         User user = getUserOrThrowException(userId);
 
-        Anuncio completeAnuncio = mercadoLivreAdapter.getAnuncio(anuncio.getMlId(), user, true);
-        completeAnuncio.setTaxaML(mercadoLivreAdapter.getTarifas(completeAnuncio.getPrecoDesconto(),
+        Anuncio completeAnuncio = mercadoLivreAnuncioPort.getAnuncio(anuncio.getMlId(), user, true);
+        completeAnuncio.setTaxaML(mercadoLivreAnuncioPort.getTarifas(completeAnuncio.getPrecoDesconto(),
                 completeAnuncio.getCategoria(), completeAnuncio.getListingType(), user, true));
         if (completeAnuncio.getPrecoDesconto() >= 80)
-            completeAnuncio.setCustoFrete(mercadoLivreAdapter.getFrete(completeAnuncio.getMlId(), "06950000", user, true));
+            completeAnuncio.setCustoFrete(mercadoLivreAnuncioPort.getFrete(completeAnuncio.getMlId(), "06950000", user, true));
         else completeAnuncio.setCustoFrete(0.0);
 
         completeAnuncio.setCusto(anuncio.getCusto());
@@ -82,11 +84,11 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         }
         User user = getUserOrThrowException(userId);
 
-        Anuncio completeAnuncio = mercadoLivreAdapter.getAnuncio(mlId, user, true);
-        completeAnuncio.setTaxaML(mercadoLivreAdapter.getTarifas(completeAnuncio.getPrecoDesconto(),
+        Anuncio completeAnuncio = mercadoLivreAnuncioPort.getAnuncio(mlId, user, true);
+        completeAnuncio.setTaxaML(mercadoLivreAnuncioPort.getTarifas(completeAnuncio.getPrecoDesconto(),
                 completeAnuncio.getCategoria(), completeAnuncio.getListingType(), user, true));
         if (completeAnuncio.getPrecoDesconto() >= 80)
-            completeAnuncio.setCustoFrete(mercadoLivreAdapter.getFrete(completeAnuncio.getMlId(), "06950000", user, true));
+            completeAnuncio.setCustoFrete(mercadoLivreAnuncioPort.getFrete(completeAnuncio.getMlId(), "06950000", user, true));
         else completeAnuncio.setCustoFrete(0.0);
         completeAnuncio.update(existProd);
         completeAnuncio.setCsosn(existProd.getCsosn());
@@ -100,15 +102,15 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
     @Transactional
     public List<String> listAllActiveMl(Long userId) throws FailRequestRefreshTokenException {
         User user = getUserOrThrowException(userId);
-        return mercadoLivreAdapter.listActiveMlIds(user, true);
+        return mercadoLivreAnuncioPort.listActiveMlIds(user, true);
     }
 
     @Override
     @Transactional
     public List<String> listAllActiveMlMinusRegistered(Long userId) throws FailRequestRefreshTokenException {
         User user = getUserOrThrowException(userId);
-        List<String> actives = mercadoLivreAdapter.listActiveMlIds(user, true);
-        Set<String> registeredIds = anuncioEntityPort.listAll()
+        List<String> actives = mercadoLivreAnuncioPort.listActiveMlIds(user, true);
+        Set<String> registeredIds = anuncioEntityPort.listAllRegistered()
                 .stream()
                 .map(Anuncio::getMlId)
                 .collect(Collectors.toSet());
@@ -129,19 +131,19 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
     @Transactional
     public Anuncio findAnuncioByMlIdSearch(String mlId, Long userId) throws FailRequestRefreshTokenException {
         User user = getUserOrThrowException(userId);
-        return mercadoLivreAdapter.getAnuncio(mlId, user, true);
+        return mercadoLivreAnuncioPort.getAnuncio(mlId, user, true);
     }
 
     @Override
     @Transactional
     public List<Anuncio> listAll(Long userId) {
-        return anuncioEntityPort.listAll();
+        return anuncioEntityPort.listAllRegistered();
     }
 
     private User getUserOrThrowException(Long userId) throws IllegalArgumentException {
         User user = userEntityPort.findById(userId);
         if (Objects.isNull(user))
-            throw new IllegalArgumentException(String.format("User com id: %s não encontrado", user));
+            throw new IllegalArgumentException(String.format("User com id: %s não encontrado", userId));
         return user;
     }
 

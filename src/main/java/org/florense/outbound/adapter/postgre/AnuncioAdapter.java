@@ -39,8 +39,8 @@ public class AnuncioAdapter implements AnuncioEntityPort {
     }
 
     @Override
-    public List<Anuncio> listAll(){
-        return repository.findByOrderByIdAsc().stream().map(mapper::toModel).collect(Collectors.toList());
+    public List<Anuncio> listAllRegistered(){
+        return repository.findWhereRegisteredByOrderByIdAsc().stream().map(mapper::toModel).collect(Collectors.toList());
     }
 
     @Override

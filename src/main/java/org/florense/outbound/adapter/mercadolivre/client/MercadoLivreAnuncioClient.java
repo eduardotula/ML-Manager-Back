@@ -6,7 +6,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam;
-import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import org.florense.outbound.adapter.mercadolivre.exceptions.UnauthorizedAcessKeyException;
 import org.florense.outbound.adapter.mercadolivre.response.MercadoLivreAnuncioResponse;
@@ -16,7 +15,7 @@ import java.util.Map;
 @ApplicationScoped
 @Path("/")
 @RegisterRestClient(configKey = "ml-api")
-public interface MercadoLivreAnuncioService {
+public interface MercadoLivreAnuncioClient {
 
     @GET
     @Path("items/{mlId}")

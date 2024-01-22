@@ -9,5 +9,6 @@ public interface AnuncioRepository extends JpaRepository<AnuncioEntity, Long> {
 
 
     List<AnuncioEntity> findByMlId(String mlId);
-    List<AnuncioEntity> findByOrderByIdAsc();
+    List<AnuncioEntity> findWhereRegisteredByOrderByIdAsc();
+
 }

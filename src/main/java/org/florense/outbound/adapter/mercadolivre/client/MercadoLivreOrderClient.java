@@ -3,13 +3,11 @@ package org.florense.outbound.adapter.mercadolivre.client;
 import io.quarkus.rest.client.reactive.ClientExceptionMapper;
 import io.quarkus.rest.client.reactive.NotBody;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam;
-import org.eclipse.microprofile.rest.client.annotation.RegisterClientHeaders;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import org.florense.outbound.adapter.mercadolivre.exceptions.UnauthorizedAcessKeyException;
 import org.florense.outbound.adapter.mercadolivre.response.MLOrderWrapperResponse;
@@ -17,7 +15,7 @@ import org.florense.outbound.adapter.mercadolivre.response.MLOrderWrapperRespons
 @ApplicationScoped
 @Path("/orders")
 @RegisterRestClient(configKey = "ml-api")
-public interface MercadoLivreOrderService {
+public interface MercadoLivreOrderClient {
 
     @GET
     @Path("/search")
@@ -25,6 +23,7 @@ public interface MercadoLivreOrderService {
     MLOrderWrapperResponse  vendasOrderDesc(@QueryParam("seller") String userId,
                                             @QueryParam("offset") int offset,
                                             @QueryParam("sort") String sort,
+                                            @QueryParam("limit") int limit,
                                             @NotBody String token) throws RuntimeException;
 
     @GET
@@ -34,6 +33,7 @@ public interface MercadoLivreOrderService {
                                                    @QueryParam("order.status") String status,
                                                    @QueryParam("sort") String sort,
                                                    @QueryParam("offset") int offset,
+                                                   @QueryParam("limit") int limit,
                                                    @NotBody String token) throws RuntimeException;
 
     @ClientExceptionMapper

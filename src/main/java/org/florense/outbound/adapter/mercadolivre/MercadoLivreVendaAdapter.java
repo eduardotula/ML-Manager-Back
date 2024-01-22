@@ -5,11 +5,12 @@ import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.florense.domain.model.*;
-import org.florense.outbound.adapter.mercadolivre.client.MercadoLivreOrderService;
+import org.florense.outbound.adapter.mercadolivre.client.MercadoLivreOrderClient;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
 import org.florense.outbound.adapter.mercadolivre.exceptions.UnauthorizedAcessKeyException;
 import org.florense.outbound.adapter.mercadolivre.mlenum.MLStatusEnum;
 import org.florense.outbound.adapter.mercadolivre.response.MLOrderResponse;
+import org.florense.outbound.adapter.mercadolivre.response.MLOrderWrapperResponse;
 import org.florense.outbound.port.mercadolivre.MercadoLivreVendaPort;
 
 import java.util.*;
@@ -24,17 +25,17 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
 
     @RestClient
     @Inject
-    MercadoLivreOrderService mercadoLivreOrderService;
+    MercadoLivreOrderClient mercadoLivreOrderClient;
 
     @Override
     public List<Order> listAllVendas(User user, boolean retry) throws FailRequestRefreshTokenException {
         try {
-            Map<Long, Order> listVendas = new HashMap<>();
+            Map<Long, Order> listVendas = new LinkedHashMap<>();
             int offset = 0;
             int total = 1;
 
             while (offset < total) {
-                var resp = mercadoLivreOrderService.vendasOrderDesc(user.getUserIdML(), offset, "date_desc", user.getAccessCode());
+                MLOrderWrapperResponse resp = mercadoLivreOrderClient.vendasOrderDesc(user.getUserIdML(), offset, "date_desc", BATCH_SIZE, user.getAccessCode());
 
                 resp.getOrderResponses().forEach(mlOrderResponse -> {
                     var newOrder = convertMlVendaToOrder(mlOrderResponse, user);
@@ -42,9 +43,10 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
                     if (Objects.nonNull(existingOrder)) existingOrder.getVendas().addAll(newOrder.getVendas());
 
                 });
+                total = resp.getTotal();
                 offset += BATCH_SIZE;
             }
-            return new ArrayList<>(listVendas.values());
+            return convertToReturn(listVendas);
 
         } catch (RuntimeException e) {
             if (e.getCause() instanceof UnauthorizedAcessKeyException) {
@@ -60,7 +62,7 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
     @Override
     public List<Order> listVendasUntilExistent(List<MLStatusEnum> status, Long existentOrderId, User user, boolean retry) throws FailRequestRefreshTokenException {
         try {
-            Map<Long, Order> listVendas = new HashMap<>();
+            Map<Long, Order> listVendas = new LinkedHashMap<>();
             int offset = 0;
             int total = 1;
             StringBuilder filterStatus = new StringBuilder();
@@ -69,21 +71,22 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
 
             while (offset < total) {
 
-                var resp = mercadoLivreOrderService.vendasOrderDescByStatus(user.getUserIdML(),
-                        filterStatus.toString(), "date_desc", offset, user.getAccessCode());
+                var resp = mercadoLivreOrderClient.vendasOrderDescByStatus(user.getUserIdML(),
+                        filterStatus.toString(), "date_desc", offset, BATCH_SIZE, user.getAccessCode());
 
                 for (MLOrderResponse mlOrderResponse : resp.getOrderResponses()) {
-                    if (mlOrderResponse.getOrderId().equals(existentOrderId))
-                        return new ArrayList<>(listVendas.values());
+                    if (mlOrderResponse.getOrderId().equals(existentOrderId)){
+                        return convertToReturn(listVendas);
+                    }
 
                     var newOrder = convertMlVendaToOrder(mlOrderResponse, user);
                     var existingOrder = listVendas.put(mlOrderResponse.getShippingId(), newOrder);
                     if (Objects.nonNull(existingOrder)) existingOrder.getVendas().addAll(newOrder.getVendas());
                 }
-
+                total = resp.getTotal();
                 offset += BATCH_SIZE;
             }
-            return new ArrayList<>(listVendas.values());
+            return convertToReturn(listVendas);
 
         } catch (RuntimeException e) {
             if (e.getCause() instanceof UnauthorizedAcessKeyException) {
@@ -94,6 +97,15 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
             }
         }
         throw new IllegalStateException("Falha ao Buscar vendas");
+    }
+
+    private List<Order> convertToReturn(Map<Long, Order> orderMap){
+        List<Order> returnList = new LinkedList<>();
+        for (Map.Entry<Long, Order> entry : orderMap.entrySet()) {
+            returnList.add(entry.getValue());
+        }
+        Collections.reverse(returnList);
+        return returnList;
     }
 
     private Order convertMlVendaToOrder(MLOrderResponse mlOrderResponse, User user) {

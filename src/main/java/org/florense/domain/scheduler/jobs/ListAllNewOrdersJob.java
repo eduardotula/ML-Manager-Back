@@ -103,8 +103,7 @@ public class ListAllNewOrdersJob implements Job {
     private void updateNextRunTime(JobExecutionContext jobExecutionContext, User user) {
         ScheduleJob scheduleJob = schedulerJobEntityPort.findByJobName(nameGenerator.createJobKey(user).getName());
         if (scheduleJob != null) {
-            scheduleJob.setNextRunTime(jobExecutionContext.
-                    getNextFireTime().toInstant().
+            scheduleJob.setNextRunTime(jobExecutionContext.getTrigger().getNextFireTime().toInstant().
                     atZone(ZoneId.systemDefault()).toLocalDateTime());
             schedulerJobEntityPort.createUpdate(scheduleJob);
         }

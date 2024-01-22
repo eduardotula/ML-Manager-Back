@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
-@Path("/users")
+@Path("users")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class UserAdapter implements AccessCodePort {

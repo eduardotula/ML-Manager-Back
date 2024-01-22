@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RequestScoped
-@Path("anuncio-management/anuncios")
+@Path("anuncios")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class AnuncioAdapter {
@@ -49,7 +49,7 @@ public class AnuncioAdapter {
     }
 
     @PUT
-    @Path("/search")
+    @Path("{ml-id}/search")
     public AnuncioDto searchExitProd(@PathParam("ml-id") String mlID, @QueryParam("user-id") Long userId) throws FailRequestRefreshTokenException {
         return anuncioDtoMapper.toDto(anuncioUseCase.updateSearch(mlID, userId));
     }
@@ -80,7 +80,7 @@ public class AnuncioAdapter {
 
     @GET
     @Path("/mlId/{ml-id}/ml-api")
-    public AnuncioDto findAnuncioByMlIdSearch(@PathParam("mlId") String mlId, @QueryParam("user-id") Long userId) throws FailRequestRefreshTokenException {
+    public AnuncioDto findAnuncioByMlIdSearch(@PathParam("ml-id") String mlId, @QueryParam("user-id") Long userId) throws FailRequestRefreshTokenException {
         return anuncioDtoMapper.toDto(anuncioUseCase.findAnuncioByMlIdSearch(mlId, userId));
     }
 
