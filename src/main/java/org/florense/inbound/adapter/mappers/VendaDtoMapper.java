@@ -10,11 +10,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "jakarta")
 public interface VendaDtoMapper {
 
-    @Mapping(source = "anuncio.mlId", target = "mlId")
-    @Mapping(source = "anuncio.descricao", target = "descricao")
     VendaDto toDto(Venda venda);
 
-    @Mapping(source = "mlId", target = "anuncio.mlId")
-    @Mapping(source = "descricao", target = "anuncio.descricao")
     Venda toModel(VendaDto vendaDto);
 }

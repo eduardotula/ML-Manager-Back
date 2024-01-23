@@ -14,8 +14,6 @@ public class VendaDto {
 
     private Long id;
     private int quantidade;
-    private String mlId;
-    private String descricao;
     private double precoDesconto;
     private double taxaML;
     private double custoFrete;
@@ -23,6 +21,8 @@ public class VendaDto {
     private double lucro;
     private boolean completo;
     private String status;
+
+    private AnuncioVendaDto anuncio;
 
     private LocalDateTime createdAt;
 }
