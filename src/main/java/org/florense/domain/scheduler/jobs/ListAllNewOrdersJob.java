@@ -97,7 +97,7 @@ public class ListAllNewOrdersJob implements Job {
     }
 
     public Anuncio findAnuncioByMlId(String mlId, long userId){
-        return anuncioEntityPort.findByMlId(mlId);
+        return anuncioEntityPort.findByMlId(mlId, User.builder().id(userId).build());
     }
 
     private void updateNextRunTime(JobExecutionContext jobExecutionContext, User user) {

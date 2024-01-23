@@ -9,13 +9,9 @@ import org.florense.domain.model.Pagination;
 import org.florense.domain.model.User;
 import org.florense.domain.model.filters.OrderFilter;
 import org.florense.outbound.adapter.mercadolivre.MercadoLivreAnuncioAdapter;
-import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
 import org.florense.outbound.port.mercadolivre.MercadoLivreVendaPort;
-import org.florense.outbound.port.postgre.AnuncioEntityPort;
 import org.florense.outbound.port.postgre.OrderEntityPort;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @RequestScoped
@@ -28,8 +24,8 @@ public class OrderUseCase {
     MercadoLivreVendaPort mercadoLivreVendaPort;
 
     @Transactional
-    public Pagination<Order> listOrderByFilters(OrderFilter filter, PageParam pageParam){
-        return orderEntityPort.listByFilters(filter, pageParam);
+    public Pagination<Order> listOrderByFilters(Long userId,OrderFilter filter, PageParam pageParam){
+        return orderEntityPort.listByFilters(userId, filter, pageParam);
     }
 
     @Transactional

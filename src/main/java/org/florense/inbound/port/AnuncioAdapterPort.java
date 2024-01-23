@@ -44,5 +44,8 @@ public interface AnuncioAdapterPort {
     List<Anuncio> listAll(Long userId);
 
     @Transactional
+    List<Anuncio> listAllRegistered(Long userId);
+
+    @Transactional
     void deleteBy(Long id);
 }

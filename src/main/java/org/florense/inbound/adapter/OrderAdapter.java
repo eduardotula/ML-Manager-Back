@@ -2,6 +2,7 @@ package org.florense.inbound.adapter;
 
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.florense.domain.model.Order;
@@ -45,10 +46,11 @@ public class OrderAdapter {
                                                       @QueryParam("sortField") @DefaultValue("id") String sortField,
                                                       @QueryParam("sortType") @DefaultValue("ASC") String sortType,
                                                       @QueryParam("dataInicial") LocalDateTime dataInicial,
-                                                      @QueryParam("dataFinal") LocalDateTime dataFinal) {
+                                                      @QueryParam("dataFinal") LocalDateTime dataFinal,
+                                                      @QueryParam("user-id") @NotNull(message = "user-id não informado") Long userId) {
         PageParam pageParam = new PageParam(page, pageSize, sortField, sortType);
         OrderFilter filter = new OrderFilter(dataInicial, dataFinal);
-        Pagination<Order> pagination = orderUseCase.listOrderByFilters(filter, pageParam);
+        Pagination<Order> pagination = orderUseCase.listOrderByFilters(userId,filter, pageParam);
         Pagination<OrderDto> paginationDto = pagination.to(orderDtoMapper::toDto);
         var respo = new PaginationResponse<>(paginationDto, filter);
         respo.getMetaInfo().setSearch(mapper.toMap(filter));

@@ -3,6 +3,7 @@ package org.florense.outbound.adapter.postgre;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.florense.domain.model.Anuncio;
+import org.florense.domain.model.User;
 import org.florense.outbound.adapter.postgre.entity.AnuncioEntity;
 import org.florense.outbound.adapter.postgre.mappers.AnuncioEntityMapper;
 import org.florense.outbound.adapter.postgre.repository.AnuncioRepository;
@@ -22,7 +23,7 @@ public class AnuncioAdapter implements AnuncioEntityPort {
 
     @Override
     public Anuncio createUpdate(Anuncio anuncio){
-        if(anuncio.getId() == null) anuncio.setCreatedAt(LocalDateTime.now());
+        if(anuncio.getId() == null || anuncio.getCreatedAt() == null) anuncio.setCreatedAt(LocalDateTime.now());
         return mapper.toModel(repository.save(mapper.toEntity(anuncio)));
     }
 
@@ -33,14 +34,18 @@ public class AnuncioAdapter implements AnuncioEntityPort {
     }
 
     @Override
-    public Anuncio findByMlId(String mlId){
-        List<AnuncioEntity> prd = repository.findByMlId(mlId);
+    public Anuncio findByMlId(String mlId, User user){
+        List<AnuncioEntity> prd = repository.findByMlIdAndUserId(mlId, user.getId());
         return mapper.toModel(!prd.isEmpty() ? prd.get(0) : null);
     }
 
     @Override
-    public List<Anuncio> listAllRegistered(){
-        return repository.findWhereRegisteredByOrderByIdAsc().stream().map(mapper::toModel).collect(Collectors.toList());
+    public List<Anuncio> listAll(User user){
+        return repository.findByOrderByIdAsc(user.getId()).stream().map(mapper::toModel).collect(Collectors.toList());
+    }
+    @Override
+    public List<Anuncio> listAllRegistered(User user){
+        return repository.findRegisteredByOrderByIdAsc(user.getId()).stream().map(mapper::toModel).collect(Collectors.toList());
     }
 
     @Override

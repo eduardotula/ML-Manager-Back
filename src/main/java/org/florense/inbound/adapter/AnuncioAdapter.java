@@ -56,7 +56,10 @@ public class AnuncioAdapter {
 
     @GET
     @Path("")
-    public List<AnuncioDto> listAll(@QueryParam("user-id")long userId) {
+    public List<AnuncioDto> listAll(@QueryParam("user-id")long userId, @QueryParam("registered") @DefaultValue("false") boolean registered) {
+        if(registered)
+            return anuncioUseCase.listAllRegistered(userId).stream().map(anuncioDtoMapper::toDto).collect(Collectors.toList());
+
         return anuncioUseCase.listAll(userId).stream().map(anuncioDtoMapper::toDto).collect(Collectors.toList());
     }
 
@@ -74,7 +77,7 @@ public class AnuncioAdapter {
 
     @GET
     @Path("/mlId/{ml-id}")
-    public AnuncioDto findAnuncioByMlId(@QueryParam("ml-id") String mlId, @QueryParam("user-id") Long userId) {
+    public AnuncioDto findAnuncioByMlId(@PathParam("ml-id") String mlId, @QueryParam("user-id") Long userId) {
         return anuncioDtoMapper.toDto(anuncioUseCase.findAnuncioByMlId(mlId, userId));
     }
 

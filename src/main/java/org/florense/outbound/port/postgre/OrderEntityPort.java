@@ -13,7 +13,8 @@ public interface OrderEntityPort {
 
     List<Order> createUpdateAll(List<Order> orderList);
 
-    Pagination<Order> listByFilters(OrderFilter filter, PageParam pageParam);
+
+    Pagination<Order> listByFilters(Long userId, OrderFilter filter, PageParam pageParam);
 
     Order getLastOrderByUser(User user);
 

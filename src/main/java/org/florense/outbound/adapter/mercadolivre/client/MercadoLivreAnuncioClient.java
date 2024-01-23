@@ -20,7 +20,7 @@ public interface MercadoLivreAnuncioClient {
     @GET
     @Path("items/{mlId}")
     @ClientHeaderParam(name = "Authorization", value = "Bearer {token}")
-    MercadoLivreAnuncioResponse anuncio(@PathParam("mlId") String mlId, @NotBody String bearer) throws RuntimeException;
+    MercadoLivreAnuncioResponse anuncio(@PathParam("mlId") String mlId, @NotBody String token) throws RuntimeException;
 
     @GET
     @Path("/sites/MLB/listing_prices")
@@ -28,20 +28,20 @@ public interface MercadoLivreAnuncioClient {
     Map<String, Object> getListingPrices(@QueryParam("price") Double price,
                                          @QueryParam("listing_type_id") String listingTypeId,
                                          @QueryParam("category_id") String categoryId,
-                                         @NotBody String bearer) throws RuntimeException;
+                                         @NotBody String token) throws RuntimeException;
 
     @GET
     @Path("/items/{mlId}/shipping_options")
     @ClientHeaderParam(name = "Authorization", value = "Bearer {token}")
     Map<String, Object> getFretePrice(@PathParam("mlId") String mlId, @QueryParam("zip_code") String zipCode,
-                                      @NotBody String bearer) throws RuntimeException;
+                                      @NotBody String token) throws RuntimeException;
 
     @GET
     @Path("/users/{userId}/items/search")
     @ClientHeaderParam(name = "Authorization", value = "Bearer {token}")
     Map<String, Object> listMlIds(@PathParam("userId") String userId, @QueryParam("status") String status,
                                   @QueryParam("offset") int offset,
-                                  @NotBody String bearer) throws RuntimeException;
+                                  @NotBody String token) throws RuntimeException;
 
 
     @ClientExceptionMapper
