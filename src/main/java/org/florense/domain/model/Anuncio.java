@@ -5,6 +5,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -30,7 +31,8 @@ public class Anuncio {
     private double lucro;
     private ListingTypeEnum listingType;
     private User user;
-    private boolean registered;
+    private boolean complete;
+    private List<Url> pictures;
 
     public void update(Anuncio anuncio){
         this.id = anuncio.getId();

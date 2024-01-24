@@ -12,5 +12,5 @@ public class AnuncioVendaDto {
     private Long id;
     private String mlId;
     private String descricao;
-    private boolean registered;
+    private boolean complete;
 }

@@ -38,6 +38,9 @@ public interface AnuncioAdapterPort {
     Anuncio findAnuncioByMlId(String mlId, Long userId);
 
     @Transactional
+    Anuncio findAnyAnuncioByMlId(String mlId, Long userId);
+
+    @Transactional
     Anuncio findAnuncioByMlIdSearch(String mlId, Long userId) throws FailRequestRefreshTokenException;
 
     @Transactional

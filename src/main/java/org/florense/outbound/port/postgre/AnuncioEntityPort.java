@@ -9,12 +9,16 @@ public interface AnuncioEntityPort {
     Anuncio createUpdate(Anuncio anuncio);
 
     Anuncio findById(Long id);
+    Anuncio findAnyById(Long id);
 
     Anuncio findByMlId(String mlId, User user);
+    Anuncio findAnyByMlId(String mlId, User user);
 
     List<Anuncio> listAll(User user);
 
     List<Anuncio> listAllRegistered(User user);
+
+    void disableById(Long id);
 
     void deleteById(Long id);
 }

@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.florense.domain.model.ListingTypeEnum;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -57,7 +56,10 @@ public class AnuncioEntity {
     @JoinColumn(name = "user_id_fk")
     private UserEntity user;
 
-    @Column(name = "registered")
-    private boolean registered;
+    @OneToMany(mappedBy = "anuncio",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UrlEntity> pictures;
+
+    @Column(name = "complete")
+    private boolean complete;
 
 }

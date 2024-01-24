@@ -56,29 +56,27 @@ public class AnuncioAdapter {
 
     @GET
     @Path("")
-    public List<AnuncioDto> listAll(@QueryParam("user-id")long userId, @QueryParam("registered") @DefaultValue("false") boolean registered) {
-        if(registered)
+    public List<AnuncioDto> listAll(@QueryParam("user-id")long userId, @QueryParam("complete") @DefaultValue("false") boolean complete) {
+        if(complete)
             return anuncioUseCase.listAllRegistered(userId).stream().map(anuncioDtoMapper::toDto).collect(Collectors.toList());
 
         return anuncioUseCase.listAll(userId).stream().map(anuncioDtoMapper::toDto).collect(Collectors.toList());
     }
 
     @GET
-    @Path("/status-active")
-    public List<String> listAllActiveMl(@QueryParam("user-id") Long userId) throws FailRequestRefreshTokenException {
-        return anuncioUseCase.listAllActiveMl(userId);
-    }
-
-    @GET
-    @Path("/list-all-active-minus-registered")
+    @Path("/list-all-active-minus-complete")
     public List<String> listAllActiveMlMinusRegistered(@QueryParam("user-id") Long userId) throws FailRequestRefreshTokenException {
         return anuncioUseCase.listAllActiveMlMinusRegistered(userId);
     }
 
     @GET
     @Path("/mlId/{ml-id}")
-    public AnuncioDto findAnuncioByMlId(@PathParam("ml-id") String mlId, @QueryParam("user-id") Long userId) {
-        return anuncioDtoMapper.toDto(anuncioUseCase.findAnuncioByMlId(mlId, userId));
+    public AnuncioDto findAnuncioByMlId(@PathParam("ml-id") String mlId, @QueryParam("user-id") Long userId,
+                                        @QueryParam("complete") @DefaultValue("true") boolean complete) {
+        if(complete)
+            return anuncioDtoMapper.toDto(anuncioUseCase.findAnuncioByMlId(mlId, userId));
+        else
+            return anuncioDtoMapper.toDto(anuncioUseCase.findAnyAnuncioByMlId(mlId, userId));
     }
 
     @GET

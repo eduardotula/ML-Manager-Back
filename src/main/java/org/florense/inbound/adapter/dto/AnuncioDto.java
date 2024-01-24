@@ -5,6 +5,7 @@ import lombok.*;
 import org.florense.domain.model.ListingTypeEnum;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -42,5 +43,6 @@ public class AnuncioDto {
     private LocalDateTime createdAt;
     private ListingTypeEnum listingType;
     private double lucro;
-    private boolean registered;
+    private List<UrlDto> pictures;
+    private boolean complete;
 }

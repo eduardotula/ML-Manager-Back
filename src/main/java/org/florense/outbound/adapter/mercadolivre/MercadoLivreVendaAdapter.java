@@ -114,7 +114,7 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
                 0.0, 0.0, 0.0, completo, mlOrderResponse.getStatus(), null, null, null);
         var vendas = new ArrayList<Venda>();
         var anuncio = new Anuncio(null, mlOrderResponse.getMlId(), "", "", "", mlOrderResponse.getTitle(), "", 0.0, "", mlOrderResponse.getPrecoDesconto(), mlOrderResponse.getSaleFee(),
-                0.0, "active", null, 0.0, ListingTypeEnum.classico, user, false);
+                0.0, "active", null, 0.0, ListingTypeEnum.classico, user, false, new ArrayList<>());
 
         anuncio.setMlId(mlOrderResponse.getMlId());
         venda.setAnuncio(anuncio);

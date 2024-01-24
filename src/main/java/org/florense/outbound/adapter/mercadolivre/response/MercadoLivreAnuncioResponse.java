@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +30,8 @@ public class MercadoLivreAnuncioResponse {
     private String sku;
     private String status;
     private String listing_type_id;
+    @JsonIgnore
+    private List<String> pictures;
 
     @JsonSetter("attributes")
     private void setTheAttributes(List<Map<String, Object>> list){
@@ -38,6 +41,12 @@ public class MercadoLivreAnuncioResponse {
             if(at.get("id").equals("SELLER_SKU")) this.sku = (String) at.get("value_name");
             else if(at.get("id").equals("GTIN")) this.gtin = (String)at.get("value_name");
         });
+    }
+
+    @JsonSetter("pictures")
+    private void setFotosUrls(List<Map<String, String>> list){
+        this.pictures = new LinkedList<>();
+        list.forEach(p -> pictures.add(p.get("url")));
     }
 
 }

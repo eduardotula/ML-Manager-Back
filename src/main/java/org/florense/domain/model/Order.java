@@ -23,10 +23,10 @@ public class Order {
 
     public void updateVendasByMatchingByMlId(List<Venda> newVendas){
         newVendas.forEach(newVenda ->{
-            var registered = this.vendas.stream().filter(old -> Objects.equals(old.getAnuncio().getMlId(),
+            var incomplete = this.vendas.stream().filter(old -> Objects.equals(old.getAnuncio().getMlId(),
                     newVenda.getAnuncio().getMlId())).findFirst();
 
-            registered.ifPresent(venda -> newVenda.setId(venda.getOrderId()));
+            incomplete.ifPresent(venda -> newVenda.setId(venda.getOrderId()));
         });
     }
 }

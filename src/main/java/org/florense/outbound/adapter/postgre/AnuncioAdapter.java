@@ -29,14 +29,26 @@ public class AnuncioAdapter implements AnuncioEntityPort {
 
     @Override
     public Anuncio findById(Long id){
-        var anuncio = repository.findById(id).orElse(null);
+        var anuncio = repository.find(id).orElse(null);
         return anuncio != null ? mapper.toModel(anuncio) : null;
+    }
+
+    @Override
+    public Anuncio findAnyById(Long id) {
+       var anuncio = repository.findAnyById(id).orElse(null);
+       return anuncio != null ? mapper.toModel(anuncio) : null;
     }
 
     @Override
     public Anuncio findByMlId(String mlId, User user){
         List<AnuncioEntity> prd = repository.findByMlIdAndUserId(mlId, user.getId());
         return mapper.toModel(!prd.isEmpty() ? prd.get(0) : null);
+    }
+
+    @Override
+    public Anuncio findAnyByMlId(String mlId, User user){
+        var anuncio = repository.findAnyByMlId(mlId, user.getId()).orElse(null);
+        return anuncio != null ? mapper.toModel(anuncio) : null;
     }
 
     @Override
@@ -49,8 +61,19 @@ public class AnuncioAdapter implements AnuncioEntityPort {
     }
 
     @Override
+    public void disableById(Long id){
+        var anuncio = repository.findAnyById(id).orElse(null);
+        if(anuncio != null){
+            anuncio.setComplete(false);
+            repository.save(anuncio);
+        }
+    }
+
+    @Override
     public void deleteById(Long id){
         repository.deleteById(id);
     }
+
+
 
 }

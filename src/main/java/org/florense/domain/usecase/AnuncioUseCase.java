@@ -59,7 +59,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         completeAnuncio.setCsosn(anuncio.getCsosn());
         completeAnuncio.setLucro(Anuncio.calculateLucro(completeAnuncio));
         completeAnuncio.setUser(user);
-        completeAnuncio.setRegistered(true);
+        completeAnuncio.setComplete(true);
 
         return anuncioEntityPort.createUpdate(completeAnuncio);
     }
@@ -70,7 +70,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
     public Anuncio updateSimple(Anuncio anuncio, Long userId) {
         User user = getUserOrThrowException(userId);
 
-        var existProd = anuncioEntityPort.findByMlId(anuncio.getMlId(), user);
+        var existProd = anuncioEntityPort.findAnyByMlId(anuncio.getMlId(), user);
         if (Objects.isNull(existProd))
             throw new IllegalArgumentException(String.format("Anuncio com id %s não encontrado", anuncio.getMlId()));
 
@@ -79,7 +79,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         existProd.setLucro(Anuncio.calculateLucro(existProd));
         existProd.setUser(user);
         verifyIfAnuncioMatchesUserOrThrowException(existProd, user);
-        existProd.setRegistered(true);
+        existProd.setComplete(true);
 
         return anuncioEntityPort.createUpdate(existProd);
     }
@@ -105,6 +105,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         completeAnuncio.setCusto(existProd.getCusto());
         completeAnuncio.setLucro(Anuncio.calculateLucro(completeAnuncio));
         completeAnuncio.setUser(user);
+        completeAnuncio.setComplete(true);
         verifyIfAnuncioMatchesUserOrThrowException(completeAnuncio, user);
 
         return anuncioEntityPort.createUpdate(completeAnuncio);
@@ -137,6 +138,12 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
     public Anuncio findAnuncioByMlId(String mlId, Long userId) {
         User user = getUserOrThrowException(userId);
         return anuncioEntityPort.findByMlId(mlId, user);
+    }
+    @Override
+    @Transactional
+    public Anuncio findAnyAnuncioByMlId(String mlId, Long userId) {
+        User user = getUserOrThrowException(userId);
+        return anuncioEntityPort.findAnyByMlId(mlId, user);
     }
 
     @Override
@@ -176,11 +183,11 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
     @Override
     @Transactional
     public void deleteBy(Long id) {
-        if (Objects.isNull(anuncioEntityPort.findById(id)))
+        if (Objects.isNull(anuncioEntityPort.findAnyById(id)))
             throw new IllegalArgumentException(String.format("Anuncio com id %s não encontrado", id));
 
         try {
-            anuncioEntityPort.deleteById(id);
+            anuncioEntityPort.disableById(id);
         } catch (Exception e) {
             throw new IllegalStateException(String.format("Falha ao apagar anuncio com id: %s", id));
         }
