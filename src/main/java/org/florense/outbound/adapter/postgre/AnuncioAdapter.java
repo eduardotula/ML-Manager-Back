@@ -24,7 +24,9 @@ public class AnuncioAdapter implements AnuncioEntityPort {
     @Override
     public Anuncio createUpdate(Anuncio anuncio){
         if(anuncio.getId() == null || anuncio.getCreatedAt() == null) anuncio.setCreatedAt(LocalDateTime.now());
-        return mapper.toModel(repository.save(mapper.toEntity(anuncio)));
+        var anuncioEntity = mapper.toEntity(anuncio);
+
+        return mapper.toModel(repository.save(anuncioEntity));
     }
 
     @Override

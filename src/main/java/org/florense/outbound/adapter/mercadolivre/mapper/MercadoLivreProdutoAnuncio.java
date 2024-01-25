@@ -35,8 +35,4 @@ public interface MercadoLivreProdutoAnuncio {
         return urls;
     }
 
-    @AfterMapping
-    default void setSetAnuncioPictures(@MappingTarget Anuncio anuncio) {
-        anuncio.getPictures().stream().forEach(picture -> picture.setAnuncioId(anuncio.getId()));
-    }
 }
