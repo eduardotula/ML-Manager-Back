@@ -21,7 +21,7 @@ public class AnuncioEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "ml_id", unique = true)
+    @Column(name = "ml_id")
     private String mlId;
     @Column(name = "sku")
     private String sku;

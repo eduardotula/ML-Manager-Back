@@ -13,7 +13,7 @@ public interface VendaDtoMapper {
 
     Venda toModel(VendaDto vendaDto);
 
-    @BeforeMapping
+    @AfterMapping
     default void processPicture(Venda venda, @MappingTarget VendaDto vendaDto){
         var fotos = venda.getAnuncio().getPictures();
         if(!fotos.isEmpty()){

@@ -92,7 +92,7 @@ public class MercadoLivreAnuncioAdapter extends MercadoLivreAdapter implements M
                 Map<String, Object> resp = mercadoLivreAnuncioClient.listMlIds(user.getUserIdML(), "active", offset, user.getAccessCode());
                 allActiveIds.addAll((Collection<String>) resp.get("results"));
                 offset += BATCH_SIZE;
-                total = (Integer) ((Map<String, Object>) resp.get("paging")).get("total");
+                total = ((Number) ((Map<String, Object>) resp.get("paging")).get("total")).intValue();
             }
 
             return allActiveIds;

@@ -10,11 +10,10 @@ import org.florense.domain.model.filters.OrderFilter;
 import org.florense.outbound.adapter.postgre.entity.OrderEntity;
 import org.florense.outbound.adapter.postgre.mappers.OrderEntityMapper;
 import org.florense.outbound.adapter.postgre.repository.OrderRepository;
-import org.florense.outbound.port.postgre.OrderEntityPort;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-
+import org.florense.outbound.port.postgre.OrderEntityPort;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,11 +30,7 @@ public class OrderAdapter implements OrderEntityPort {
     public Order createUpdate(Order order){
         var orderEntity = mapper.toEntity(order);
         var now = LocalDateTime.now();
-        if(orderEntity.getCreatedAt() == null) orderEntity.setCreatedAt(now);
-        orderEntity.getVendas().forEach(venda -> {
-            if(venda.getCreatedAt() == null) venda.setCreatedAt(now);
-            venda.setOrder(orderEntity);
-        });
+        executeBeforeSave(orderEntity,now);
 
         return mapper.toModel(repository.save(orderEntity));
     }
@@ -45,14 +40,17 @@ public class OrderAdapter implements OrderEntityPort {
 
         List<OrderEntity> orderEntitys = orderList.stream().map(mapper::toEntity).collect(Collectors.toList());
         var now = LocalDateTime.now();
-        orderEntitys.forEach(orderEntity -> {
-            if(orderEntity.getCreatedAt() == null) orderEntity.setCreatedAt(now);
-            orderEntity.getVendas().forEach(venda -> {
-                if(venda.getCreatedAt() == null) venda.setCreatedAt(now);
-                venda.setOrder(orderEntity);
-            });
-        });
+        orderEntitys.forEach(orderEntity -> executeBeforeSave(orderEntity,now));
         return repository.saveAll(orderEntitys).stream().map(mapper::toModel).collect(Collectors.toList());
+    }
+
+    @Override
+    public void executeBeforeSave(OrderEntity orderEntity, LocalDateTime now){
+        if(orderEntity.getCreatedAt() == null) orderEntity.setCreatedAt(now);
+        orderEntity.getVendas().forEach(venda -> {
+            if(venda.getCreatedAt() == null) venda.setCreatedAt(now);
+            venda.setOrder(orderEntity);
+        });
     }
 
     @Override

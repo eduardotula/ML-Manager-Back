@@ -33,4 +33,6 @@ public class UserEntity {
     private String refreshToken;
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+    @Column(name = "cep", columnDefinition = "VARCHAR(20)")
+    private String cep;
 }

@@ -24,4 +24,6 @@ public class UserDto {
     @NotEmpty(message = "refreshToken não pode estar vazio")
     private String refreshToken;
     private LocalDateTime createdAt;
+    @NotEmpty(message = "cep não pode estar vazio")
+    private String cep;
 }

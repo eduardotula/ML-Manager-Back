@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
 
 @ApplicationScoped
@@ -40,17 +41,17 @@ public class OrderScheduler {
 
     public void createScheduleOrdersJobByUser(User user){
         JobKey jobKey = jobKeyGenerator.createJobKey(user);
-        LocalTime runTime = LocalTime.now().plusMinutes(orderRefreshDelay);
         String cron = cronUtils.toCronTimeRepeatEveryMinute(orderRefreshDelay);
 
+        LocalDateTime localDateTimeRunTime = null;
         try {
-            jobScheduler.createJob(jobKey, cron, ListAllNewOrdersJob.class, user);
+            localDateTimeRunTime = jobScheduler.createJob(jobKey, cron, ListAllNewOrdersJob.class, user);
         } catch (SchedulerException e) {
             throw new RuntimeException(e);
         }
 
+
         ScheduleJob scheduleJob = schedulerJobEntityPort.findByJobName(jobKey.getName());
-        LocalDateTime localDateTimeRunTime = LocalDateTime.of(LocalDate.now(), runTime);
         if(scheduleJob == null){
             scheduleJob = ScheduleJob.builder().jobName(jobKey.getName()).jobGroupName(jobKey.getGroup())
                     .nextRunTime(localDateTimeRunTime).build();
@@ -62,7 +63,6 @@ public class OrderScheduler {
         schedulerJobEntityPort.createUpdate(scheduleJob);
     }
 
-    @Transactional
     public void createJobsOnStartUp(@Observes StartupEvent event){
         List<User> users = userEntityPort.listAll();
         for (User user : users) {

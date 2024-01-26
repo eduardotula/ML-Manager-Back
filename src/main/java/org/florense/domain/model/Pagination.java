@@ -31,7 +31,11 @@ public class Pagination<T> {
         pagination.setSortField(this.sortField);
         pagination.setSortType(this.sortType);
         pagination.setTotalPages(this.totalPages);
-        this.results.forEach(t -> pagination.getResults().add(converter.apply(t)));
+        try{
+            this.results.forEach(t -> pagination.getResults().add(converter.apply(t)));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         return pagination;
     }
 }

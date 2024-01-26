@@ -17,4 +17,5 @@ public class User {
     private String accessCode;
     private String refreshToken;
     private LocalDateTime createdAt;
+    private String cep;
 }

@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface MercadoLivreVendaPort {
 
-    List<Order> listAllVendas(User user, boolean retry) throws FailRequestRefreshTokenException;
+    List<Order> listAllOrders(User user, boolean retry) throws FailRequestRefreshTokenException;
 
-    List<Order> listVendasUntilExistent(List<MLStatusEnum> status, Long existentOrderId, User user, boolean retry) throws FailRequestRefreshTokenException;
+    List<Order> listOrdersUntilExistent(List<MLStatusEnum> status, Long existentOrderId, User user, boolean retry) throws FailRequestRefreshTokenException;
 }

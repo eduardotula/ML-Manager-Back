@@ -2,6 +2,7 @@ package org.florense.outbound.adapter.mercadolivre;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.florense.domain.model.*;
@@ -11,7 +12,9 @@ import org.florense.outbound.adapter.mercadolivre.exceptions.UnauthorizedAcessKe
 import org.florense.outbound.adapter.mercadolivre.mlenum.MLStatusEnum;
 import org.florense.outbound.adapter.mercadolivre.response.MLOrderResponse;
 import org.florense.outbound.adapter.mercadolivre.response.MLOrderWrapperResponse;
+import org.florense.outbound.port.mercadolivre.MercadoLivreAnuncioPort;
 import org.florense.outbound.port.mercadolivre.MercadoLivreVendaPort;
+import org.florense.outbound.port.postgre.AnuncioEntityPort;
 
 import java.util.*;
 
@@ -22,37 +25,42 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
     @ConfigProperty(name = "quarkus.rest-client.ml-api.secret")
     String clientSecret;
     private static final int BATCH_SIZE = 50;
+    @Inject
+    AnuncioEntityPort anuncioEntityPort;
+    @Inject
+    MercadoLivreAnuncioPort mercadoLivreAnuncioPort;
 
     @RestClient
     @Inject
     MercadoLivreOrderClient mercadoLivreOrderClient;
 
     @Override
-    public List<Order> listAllVendas(User user, boolean retry) throws FailRequestRefreshTokenException {
+    public List<Order> listAllOrders(User user, boolean retry) throws FailRequestRefreshTokenException {
         try {
-            Map<Long, Order> listVendas = new LinkedHashMap<>();
+            Map<Long, Order> listOrders = new LinkedHashMap<>();
             int offset = 0;
             int total = 1;
 
             while (offset < total) {
                 MLOrderWrapperResponse resp = mercadoLivreOrderClient.vendasOrderDesc(user.getUserIdML(), offset, "date_desc", BATCH_SIZE, user.getAccessCode());
 
-                resp.getOrderResponses().forEach(mlOrderResponse -> {
-                    var newOrder = convertMlVendaToOrder(mlOrderResponse, user);
-                    var existingOrder = listVendas.put(mlOrderResponse.getShippingId(), newOrder);
+                for (MLOrderResponse orderRespons : resp.getOrderResponses()) {
+                    var newOrder = convertMlOrderResponseToOrder(orderRespons, user);
+                    var existingOrder = listOrders.put(orderRespons.getShippingId(), newOrder);
                     if (Objects.nonNull(existingOrder)) existingOrder.getVendas().addAll(newOrder.getVendas());
 
-                });
+                }
                 total = resp.getTotal();
                 offset += BATCH_SIZE;
             }
-            return convertToReturn(listVendas);
+            return convertToReturn(listOrders);
 
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             if (e.getCause() instanceof UnauthorizedAcessKeyException) {
                 refreshAccessToken(appId, clientSecret, user);
                 if (retry) {
-                    return listAllVendas(user, false);
+                    return listAllOrders(user, false);
                 }
             }
         }
@@ -60,7 +68,7 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
     }
 
     @Override
-    public List<Order> listVendasUntilExistent(List<MLStatusEnum> status, Long existentOrderId, User user, boolean retry) throws FailRequestRefreshTokenException {
+    public List<Order> listOrdersUntilExistent(List<MLStatusEnum> status, Long existentOrderId, User user, boolean retry) throws FailRequestRefreshTokenException {
         try {
             Map<Long, Order> listVendas = new LinkedHashMap<>();
             int offset = 0;
@@ -75,11 +83,11 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
                         filterStatus.toString(), "date_desc", offset, BATCH_SIZE, user.getAccessCode());
 
                 for (MLOrderResponse mlOrderResponse : resp.getOrderResponses()) {
-                    if (mlOrderResponse.getOrderId().equals(existentOrderId)){
+                    if (mlOrderResponse.getOrderId().equals(existentOrderId)) {
                         return convertToReturn(listVendas);
                     }
 
-                    var newOrder = convertMlVendaToOrder(mlOrderResponse, user);
+                    var newOrder = convertMlOrderResponseToOrder(mlOrderResponse, user);
                     var existingOrder = listVendas.put(mlOrderResponse.getShippingId(), newOrder);
                     if (Objects.nonNull(existingOrder)) existingOrder.getVendas().addAll(newOrder.getVendas());
                 }
@@ -88,18 +96,19 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
             }
             return convertToReturn(listVendas);
 
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             if (e.getCause() instanceof UnauthorizedAcessKeyException) {
                 refreshAccessToken(appId, clientSecret, user);
                 if (retry) {
-                    return listAllVendas(user, false);
+                    return listAllOrders(user, false);
                 }
             }
         }
         throw new IllegalStateException("Falha ao Buscar vendas");
     }
 
-    private List<Order> convertToReturn(Map<Long, Order> orderMap){
+    private List<Order> convertToReturn(Map<Long, Order> orderMap) {
         List<Order> returnList = new LinkedList<>();
         for (Map.Entry<Long, Order> entry : orderMap.entrySet()) {
             returnList.add(entry.getValue());
@@ -108,17 +117,24 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
         return returnList;
     }
 
-    private Order convertMlVendaToOrder(MLOrderResponse mlOrderResponse, User user) {
+    //Esta aqui para evitar timeout em transaction anterior
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public Order convertMlOrderResponseToOrder(MLOrderResponse mlOrderResponse, User user) throws FailRequestRefreshTokenException {
         boolean completo = mlOrderResponse.getCompleto() != null;
-        Venda venda = new Venda(null, mlOrderResponse.getQuantity(), mlOrderResponse.getPrecoDesconto(), mlOrderResponse.getSaleFee(),
-                0.0, 0.0, 0.0, completo, mlOrderResponse.getStatus(), null, null, null);
-        var vendas = new ArrayList<Venda>();
-        var anuncio = new Anuncio(null, mlOrderResponse.getMlId(), "", "", "", mlOrderResponse.getTitle(), "", 0.0, "", mlOrderResponse.getPrecoDesconto(), mlOrderResponse.getSaleFee(),
-                0.0, "active", null, 0.0, ListingTypeEnum.classico, user, false, new ArrayList<>());
 
-        anuncio.setMlId(mlOrderResponse.getMlId());
-        venda.setAnuncio(anuncio);
-        vendas.add(venda);
+        Double custoFrete = mercadoLivreAnuncioPort.getFrete(mlOrderResponse.getMlId(), user.getCep(), user, true);
+        Anuncio existingAnuncio = anuncioEntityPort.findAnyByMlId(mlOrderResponse.getMlId(), user);
+        if (Objects.isNull(existingAnuncio)) {
+            existingAnuncio = new Anuncio(null, mlOrderResponse.getMlId(), "", "", "", mlOrderResponse.getTitle(), "", 0.0, "", mlOrderResponse.getPrecoDesconto(), mlOrderResponse.getSaleFee(),
+                    custoFrete, "active", null, 0.0, ListingTypeEnum.classico, user, false, new ArrayList<>());
+
+        }
+
+        Venda venda = new Venda(null, mlOrderResponse.getQuantity(), mlOrderResponse.getPrecoDesconto(), mlOrderResponse.getSaleFee(),
+                custoFrete, existingAnuncio.getCusto(), Anuncio.calculateLucro(existingAnuncio), completo, mlOrderResponse.getStatus(),
+                mlOrderResponse.getOrderId(), existingAnuncio, null);
+
+        List<Venda> vendas = new ArrayList<>(List.of(venda));
 
         return new Order(null, mlOrderResponse.getOrderId(), mlOrderResponse.getShippingId(),
                 vendas, mlOrderResponse.getOrderCreationTime().toLocalDateTime(), null);

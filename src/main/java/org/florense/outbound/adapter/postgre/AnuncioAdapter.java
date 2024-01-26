@@ -23,10 +23,21 @@ public class AnuncioAdapter implements AnuncioEntityPort {
 
     @Override
     public Anuncio createUpdate(Anuncio anuncio){
-        if(anuncio.getId() == null || anuncio.getCreatedAt() == null) anuncio.setCreatedAt(LocalDateTime.now());
         var anuncioEntity = mapper.toEntity(anuncio);
-
+        executeBeforeSave(anuncioEntity);
         return mapper.toModel(repository.save(anuncioEntity));
+    }
+
+    @Override
+    public List<Anuncio> createUpdateAll(List<Anuncio> anuncios){
+        List<AnuncioEntity> orderEntitys = anuncios.stream().map(mapper::toEntity).collect(Collectors.toList());
+        orderEntitys.forEach(this::executeBeforeSave);
+        return repository.saveAll(orderEntitys).stream().map(mapper::toModel).collect(Collectors.toList());
+    }
+
+    @Override
+    public void executeBeforeSave(AnuncioEntity anuncio){
+        if(anuncio.getId() == null || anuncio.getCreatedAt() == null) anuncio.setCreatedAt(LocalDateTime.now());
     }
 
     @Override

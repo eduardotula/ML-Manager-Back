@@ -30,7 +30,7 @@ public class MLOrderResponse {
     private double precoDesconto;
     @JsonProperty("fulfilled")
     private Boolean completo;
-    @JsonProperty("sale_fee")
+    @JsonIgnore
     private double saleFee;
 
     @JsonIgnore
@@ -48,7 +48,8 @@ public class MLOrderResponse {
             this.title = "";
         }else{
             var orderItems = list.get(0);
-            this.quantity = (Integer) orderItems.get("quantity");
+            this.quantity = ((Number) orderItems.get("quantity")).intValue();
+            this.saleFee = ((Number) orderItems.get("sale_fee")).doubleValue();
 
             var item = (Map<String, Object>)list.get(0).get("item");
             this.mlId = (String) item.get("id");

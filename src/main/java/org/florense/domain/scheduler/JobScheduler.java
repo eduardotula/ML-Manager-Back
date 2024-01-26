@@ -5,6 +5,8 @@ import jakarta.inject.Inject;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -15,7 +17,7 @@ public class JobScheduler {
     @Inject
     Scheduler quartz;
 
-    public Date createJob(JobKey jobKey, String cron, Class<? extends Job> job, Object... jobParameters) throws SchedulerException {
+    public LocalDateTime createJob(JobKey jobKey, String cron, Class<? extends Job> job, Object... jobParameters) throws SchedulerException {
         var activateJob = JobBuilder.newJob(job).withIdentity(jobKey).build();
 
         for (Object jobParameter : jobParameters)
@@ -24,7 +26,9 @@ public class JobScheduler {
         var activationTrigger = TriggerBuilder.newTrigger().withSchedule(
                 CronScheduleBuilder.cronSchedule(cron)).build();
 
-        return quartz.scheduleJob(activateJob, activationTrigger);
+        Date runTime = quartz.scheduleJob(activateJob, activationTrigger);
+
+        return runTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
     public List<String> getScheduledJobs() {

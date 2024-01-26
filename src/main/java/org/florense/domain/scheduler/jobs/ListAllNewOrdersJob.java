@@ -41,12 +41,12 @@ public class ListAllNewOrdersJob implements Job {
         try {
             User user = (User) jobExecutionContext.getJobDetail().getJobDataMap().get("User");
             Order lastOrder = getLastOrderByUser(user);
-            List<Order> orders = null;
+            List<Order> orders;
             if (lastOrder != null) {
                 List<MLStatusEnum> statusEnums = Arrays.asList(MLStatusEnum.PAID, MLStatusEnum.CANCELLED);
-                orders = mercadoLivreVendaPort.listVendasUntilExistent(statusEnums, lastOrder.getOrderId(), user, true);
+                orders = mercadoLivreVendaPort.listOrdersUntilExistent(statusEnums, lastOrder.getOrderId(), user, true);
             } else {
-                orders = mercadoLivreVendaPort.listAllVendas(user, true);
+                orders = mercadoLivreVendaPort.listAllOrders(user, true);
             }
 
             updateNextRunTime(jobExecutionContext, user);
@@ -70,8 +70,8 @@ public class ListAllNewOrdersJob implements Job {
                         venda.setAnuncio(existingAnuncio);
                     }else{
                         Anuncio anuncio = venda.getAnuncio();
-                        venda.setAnuncio(anuncioEntityPort.createUpdate(anuncio));
-
+                        anuncio.setComplete(false);
+                        venda.setAnuncio(createAnuncio(anuncio));
                     }
 
                     venda.setDataFromAnuncio(venda.getAnuncio());
@@ -80,12 +80,16 @@ public class ListAllNewOrdersJob implements Job {
                 });
 
             });
-
             orderEntityPort.createUpdateAll(returnOrders);
 
         } catch (FailRequestRefreshTokenException e) {
             throw new JobExecutionException(e);
         }
+    }
+
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public Anuncio createAnuncio(Anuncio anuncio){
+        return anuncioEntityPort.createUpdate(anuncio);
     }
 
     public Order getLastOrderByUser(User user){
@@ -97,7 +101,7 @@ public class ListAllNewOrdersJob implements Job {
     }
 
     public Anuncio findAnuncioByMlId(String mlId, long userId){
-        return anuncioEntityPort.findByMlId(mlId, User.builder().id(userId).build());
+        return anuncioEntityPort.findAnyByMlId(mlId, User.builder().id(userId).build());
     }
 
     private void updateNextRunTime(JobExecutionContext jobExecutionContext, User user) {
