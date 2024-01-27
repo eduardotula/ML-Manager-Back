@@ -16,6 +16,7 @@ import org.florense.outbound.port.mercadolivre.MercadoLivreAnuncioPort;
 import org.florense.outbound.port.mercadolivre.MercadoLivreVendaPort;
 import org.florense.outbound.port.postgre.AnuncioEntityPort;
 
+import java.time.ZoneId;
 import java.util.*;
 
 @ApplicationScoped
@@ -137,7 +138,7 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
         List<Venda> vendas = new ArrayList<>(List.of(venda));
 
         return new Order(null, mlOrderResponse.getOrderId(), mlOrderResponse.getShippingId(),
-                vendas, mlOrderResponse.getOrderCreationTime().toLocalDateTime(), null);
+                vendas, mlOrderResponse.getOrderCreationTime().withZoneSameLocal(ZoneId.systemDefault()).toLocalDateTime(), null);
     }
 
 }
