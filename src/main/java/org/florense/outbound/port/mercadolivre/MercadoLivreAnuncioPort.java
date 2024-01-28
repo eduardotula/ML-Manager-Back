@@ -1,5 +1,6 @@
 package org.florense.outbound.port.mercadolivre;
 
+import jakarta.resource.spi.IllegalStateException;
 import org.florense.domain.model.Anuncio;
 import org.florense.domain.model.User;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
@@ -10,11 +11,11 @@ import java.util.List;
 public interface MercadoLivreAnuncioPort {
 
 
-    Anuncio getAnuncio(String mlId, User user, boolean retry) throws FailRequestRefreshTokenException;
+    Anuncio getAnuncio(String mlId, User user, boolean retry) throws FailRequestRefreshTokenException, IllegalStateException;
 
-    Double getTarifas(Double preco, String categoria, ListingTypeEnum typeEnum, User user, boolean retry) throws FailRequestRefreshTokenException;
+    double getTarifas(double preco, String categoria, ListingTypeEnum typeEnum, User user, boolean retry) throws FailRequestRefreshTokenException, IllegalStateException;
 
-    Double getFrete(String mlId, String cep, User user, boolean retry) throws FailRequestRefreshTokenException;
+    double getFrete(String mlId,User user, boolean retry) throws FailRequestRefreshTokenException, IllegalStateException;
 
     List<String> listActiveMlIds(User user, boolean retry) throws FailRequestRefreshTokenException;
 }

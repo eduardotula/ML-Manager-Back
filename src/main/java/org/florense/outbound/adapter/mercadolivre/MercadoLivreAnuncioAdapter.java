@@ -2,6 +2,7 @@ package org.florense.outbound.adapter.mercadolivre;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.resource.spi.IllegalStateException;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.florense.domain.model.Anuncio;
@@ -32,7 +33,7 @@ public class MercadoLivreAnuncioAdapter extends MercadoLivreAdapter implements M
     private static final int BATCH_SIZE = 50;
 
     @Override
-    public Anuncio getAnuncio(String mlId, User user, boolean retry) throws FailRequestRefreshTokenException {
+    public Anuncio getAnuncio(String mlId, User user, boolean retry) throws FailRequestRefreshTokenException, IllegalStateException {
         try {
             var p = mercadoLivreAnuncioClient.anuncio(mlId, user.getAccessCode());
             return mapper.toAnuncio(p);
@@ -44,11 +45,11 @@ public class MercadoLivreAnuncioAdapter extends MercadoLivreAdapter implements M
                 }
             }
         }
-        return null;
+        throw new IllegalStateException(String.format("Falha ao obter anuncio %s", mlId));
     }
 
     @Override
-    public Double getTarifas(Double preco, String categoria, ListingTypeEnum typeEnum, User user, boolean retry) throws FailRequestRefreshTokenException {
+    public double getTarifas(double preco, String categoria, ListingTypeEnum typeEnum, User user, boolean retry) throws FailRequestRefreshTokenException, IllegalStateException {
         try {
             Map<String, Object> tarifa = mercadoLivreAnuncioClient.getListingPrices(preco, typeEnum.getValue(), categoria, user.getAccessCode());
             return ((Number) tarifa.get("sale_fee_amount")).doubleValue();
@@ -60,25 +61,25 @@ public class MercadoLivreAnuncioAdapter extends MercadoLivreAdapter implements M
                 }
             }
         }
-        return null;
+        throw new IllegalStateException(String.format("Falha ao obter tarifas categoria %s", categoria));
     }
 
     @Override
-    public Double getFrete(String mlId, String cep, User user, boolean retry) throws FailRequestRefreshTokenException {
+    public double getFrete(String mlId, User user, boolean retry) throws FailRequestRefreshTokenException, IllegalStateException {
         try {
-            Map<String, Object> frete = mercadoLivreAnuncioClient.getFretePrice(mlId, cep, user.getAccessCode());
+            Map<String, Object> frete = mercadoLivreAnuncioClient.getFretePrice(mlId, user.getCep(), user.getAccessCode());
             List<Object> options = (List<Object>) frete.get("options");
             Map<String, Object> option = (Map<String, Object>) options.get(0);
             return ((Number) option.get("list_cost")).doubleValue();
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             if (e.getCause() instanceof UnauthorizedAcessKeyException) {
                 refreshAccessToken(appId, clientSecret, user);
                 if (retry) {
-                    return getFrete(mlId, cep, user, false);
+                    return getFrete(mlId,user, false);
                 }
             }
         }
-        return null;
+        throw new IllegalStateException(String.format("Falha ao obter frete mlId %s", mlId));
     }
 
     @Override

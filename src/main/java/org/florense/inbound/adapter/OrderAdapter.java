@@ -41,8 +41,8 @@ public class OrderAdapter {
 
     @GET
     @Path("")
-    public PaginationResponse<OrderDto> listByFilters(@QueryParam("page") @DefaultValue("0") Integer page,
-                                                      @QueryParam("pageSize") @DefaultValue("50") Integer pageSize,
+    public PaginationResponse<OrderDto> listByFilters(@QueryParam("page") @DefaultValue("0") int page,
+                                                      @QueryParam("pageSize") @DefaultValue("50") int pageSize,
                                                       @QueryParam("sortField") @DefaultValue("id") String sortField,
                                                       @QueryParam("sortType") @DefaultValue("ASC") String sortType,
                                                       @QueryParam("dataInicial") LocalDateTime dataInicial,

@@ -25,7 +25,7 @@ public interface MercadoLivreAnuncioClient {
     @GET
     @Path("/sites/MLB/listing_prices")
     @ClientHeaderParam(name = "Authorization", value = "Bearer {token}")
-    Map<String, Object> getListingPrices(@QueryParam("price") Double price,
+    Map<String, Object> getListingPrices(@QueryParam("price") double price,
                                          @QueryParam("listing_type_id") String listingTypeId,
                                          @QueryParam("category_id") String categoryId,
                                          @NotBody String token) throws RuntimeException;

@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 public class ScheduleJob {
 
-    private Integer id;
+    private int id;
 
     private String jobName;
 

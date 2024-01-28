@@ -1,5 +1,6 @@
 package org.florense.inbound.port;
 
+import jakarta.resource.spi.IllegalStateException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
@@ -18,7 +19,7 @@ public interface AnuncioAdapterPort {
 
     //Cria e atualiza com mercado livre
     @Transactional
-    Anuncio createMlSearch(Anuncio anuncio, Long userId) throws FailRequestRefreshTokenException;
+    Anuncio createMlSearch(Anuncio anuncio, Long userId) throws FailRequestRefreshTokenException, IllegalStateException;
 
     //Somente atualiza um anuncio
     @Transactional
@@ -26,7 +27,7 @@ public interface AnuncioAdapterPort {
 
     //Atualiza dados somente do mercado livre
     @Transactional
-    Anuncio updateSearch(String mlId, Long userId) throws FailRequestRefreshTokenException;
+    Anuncio updateSearch(String mlId, Long userId) throws FailRequestRefreshTokenException, IllegalStateException;
 
     @Transactional
     List<String> listAllActiveMl(Long userId) throws FailRequestRefreshTokenException;
@@ -41,7 +42,7 @@ public interface AnuncioAdapterPort {
     Anuncio findAnyAnuncioByMlId(String mlId, Long userId);
 
     @Transactional
-    Anuncio findAnuncioByMlIdSearch(String mlId, Long userId) throws FailRequestRefreshTokenException;
+    Anuncio findAnuncioByMlIdSearch(String mlId, Long userId) throws FailRequestRefreshTokenException, IllegalStateException;
 
     @Transactional
     List<Anuncio> listAll(Long userId);
@@ -50,5 +51,5 @@ public interface AnuncioAdapterPort {
     List<Anuncio> listAllRegistered(Long userId);
 
     @Transactional
-    void deleteBy(Long id);
+    void deleteBy(Long id) throws IllegalStateException;
 }

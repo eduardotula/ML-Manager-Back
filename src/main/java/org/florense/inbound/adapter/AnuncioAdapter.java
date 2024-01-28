@@ -2,6 +2,7 @@ package org.florense.inbound.adapter;
 
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
+import jakarta.resource.spi.IllegalStateException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.ws.rs.*;
@@ -36,7 +37,7 @@ public class AnuncioAdapter {
 
     @POST
     @Path("/simple")
-    public AnuncioDto createAnuncioSearch(@Valid AnuncioDtoSimple simple, @QueryParam("user-id") Long userId) throws FailRequestRefreshTokenException {
+    public AnuncioDto createAnuncioSearch(@Valid AnuncioDtoSimple simple, @QueryParam("user-id") Long userId) throws FailRequestRefreshTokenException, IllegalStateException {
         Anuncio anuncioDtoSimple = Anuncio.builder().csosn(simple.getCsosn()).mlId(simple.getMlId()).custo(simple.getCusto()).build();
         return anuncioDtoMapper.toDto(anuncioUseCase.createMlSearch(anuncioDtoSimple, userId));
     }
@@ -50,7 +51,7 @@ public class AnuncioAdapter {
 
     @PUT
     @Path("{ml-id}/search")
-    public AnuncioDto searchExitProd(@PathParam("ml-id") String mlID, @QueryParam("user-id") Long userId) throws FailRequestRefreshTokenException {
+    public AnuncioDto searchExitProd(@PathParam("ml-id") String mlID, @QueryParam("user-id") Long userId) throws FailRequestRefreshTokenException, IllegalStateException {
         return anuncioDtoMapper.toDto(anuncioUseCase.updateSearch(mlID, userId));
     }
 
@@ -81,13 +82,13 @@ public class AnuncioAdapter {
 
     @GET
     @Path("/mlId/{ml-id}/ml-api")
-    public AnuncioDto findAnuncioByMlIdSearch(@PathParam("ml-id") String mlId, @QueryParam("user-id") Long userId) throws FailRequestRefreshTokenException {
+    public AnuncioDto findAnuncioByMlIdSearch(@PathParam("ml-id") String mlId, @QueryParam("user-id") Long userId) throws FailRequestRefreshTokenException, IllegalStateException {
         return anuncioDtoMapper.toDto(anuncioUseCase.findAnuncioByMlIdSearch(mlId, userId));
     }
 
     @DELETE
     @Path("/{id}")
-    public void deleteById(@PathParam("id") Long id) {
+    public void deleteById(@PathParam("id") Long id) throws IllegalStateException {
         anuncioUseCase.deleteBy(id);
     }
 }

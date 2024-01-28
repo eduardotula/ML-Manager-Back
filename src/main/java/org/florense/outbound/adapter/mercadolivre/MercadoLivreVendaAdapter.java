@@ -2,6 +2,7 @@ package org.florense.outbound.adapter.mercadolivre;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.resource.spi.IllegalStateException;
 import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
@@ -36,7 +37,7 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
     MercadoLivreOrderClient mercadoLivreOrderClient;
 
     @Override
-    public List<Order> listAllOrders(User user, boolean retry) throws FailRequestRefreshTokenException {
+    public List<Order> listAllOrders(User user, boolean retry) throws FailRequestRefreshTokenException, IllegalStateException {
         try {
             Map<Long, Order> listOrders = new LinkedHashMap<>();
             int offset = 0;
@@ -69,7 +70,7 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
     }
 
     @Override
-    public List<Order> listOrdersUntilExistent(List<MLStatusEnum> status, Long existentOrderId, User user, boolean retry) throws FailRequestRefreshTokenException {
+    public List<Order> listOrdersUntilExistent(List<MLStatusEnum> status, Long existentOrderId, User user, boolean retry) throws FailRequestRefreshTokenException, IllegalStateException {
         try {
             Map<Long, Order> listVendas = new LinkedHashMap<>();
             int offset = 0;
@@ -120,25 +121,32 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
 
     //Esta aqui para evitar timeout em transaction anterior
     @Transactional(Transactional.TxType.REQUIRES_NEW)
-    public Order convertMlOrderResponseToOrder(MLOrderResponse mlOrderResponse, User user) throws FailRequestRefreshTokenException {
+    public Order convertMlOrderResponseToOrder(MLOrderResponse mlOrderResponse, User user) throws FailRequestRefreshTokenException, IllegalStateException {
         boolean completo = mlOrderResponse.getCompleto() != null;
 
-        Double custoFrete = mercadoLivreAnuncioPort.getFrete(mlOrderResponse.getMlId(), user.getCep(), user, true);
         Anuncio existingAnuncio = anuncioEntityPort.findAnyByMlId(mlOrderResponse.getMlId(), user);
         if (Objects.isNull(existingAnuncio)) {
             existingAnuncio = new Anuncio(null, mlOrderResponse.getMlId(), "", "", "", mlOrderResponse.getTitle(), "", 0.0, "", mlOrderResponse.getPrecoDesconto(), mlOrderResponse.getSaleFee(),
-                    custoFrete, "active", null, 0.0, ListingTypeEnum.classico, user, false, new ArrayList<>());
+                    0.0, "active", null, 0.0, ListingTypeEnum.classico, user, false, new ArrayList<>());
 
         }
 
+        System.out.println(mlOrderResponse.getQuantity());
+        System.out.println(mlOrderResponse.getPrecoDesconto());
+        System.out.println(mlOrderResponse.getSaleFee());
+        System.out.println(mlOrderResponse.getStatus());
+        System.out.println(existingAnuncio.getCusto());
+        System.out.println(mlOrderResponse.getOrderId());
+
         Venda venda = new Venda(null, mlOrderResponse.getQuantity(), mlOrderResponse.getPrecoDesconto(), mlOrderResponse.getSaleFee(),
-                custoFrete, existingAnuncio.getCusto(), Anuncio.calculateLucro(existingAnuncio), completo, mlOrderResponse.getStatus(),
+                0.0, existingAnuncio.getCusto(), 0.0, completo, mlOrderResponse.getStatus(),
                 mlOrderResponse.getOrderId(), existingAnuncio, null);
 
         List<Venda> vendas = new ArrayList<>(List.of(venda));
 
+        var d = mlOrderResponse.getOrderCreationTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         return new Order(null, mlOrderResponse.getOrderId(), mlOrderResponse.getShippingId(),
-                vendas, mlOrderResponse.getOrderCreationTime().withZoneSameLocal(ZoneId.systemDefault()).toLocalDateTime(), null);
+                vendas, d, null);
     }
 
 }

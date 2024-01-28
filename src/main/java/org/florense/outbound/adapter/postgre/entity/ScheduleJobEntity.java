@@ -19,7 +19,7 @@ public class ScheduleJobEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private int id;
 
     @NotNull
     @Column(name = "job_name", columnDefinition = "VARCHAR(300)")

@@ -41,7 +41,8 @@ public class OrderScheduler {
 
     public void createScheduleOrdersJobByUser(User user){
         JobKey jobKey = jobKeyGenerator.createJobKey(user);
-        String cron = cronUtils.toCronTimeRepeatEveryMinute(orderRefreshDelay);
+        //String cron = cronUtils.toCronTimeRepeatEveryMinute(orderRefreshDelay);
+        String cron = "0 */2 * ? * *";
 
         LocalDateTime localDateTimeRunTime = null;
         try {

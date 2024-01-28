@@ -2,6 +2,7 @@ package org.florense.domain.usecase;
 
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
+import jakarta.resource.spi.IllegalStateException;
 import jakarta.transaction.Transactional;
 import org.florense.domain.model.Anuncio;
 import org.florense.domain.model.User;
@@ -40,7 +41,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
     //Cria e atualiza com mercado livre
     @Override
     @Transactional
-    public Anuncio createMlSearch(Anuncio anuncio, Long userId) throws FailRequestRefreshTokenException {
+    public Anuncio createMlSearch(Anuncio anuncio, Long userId) throws FailRequestRefreshTokenException, IllegalStateException {
         User user = getUserOrThrowException(userId);
 
         var existProd = anuncioEntityPort.findByMlId(anuncio.getMlId(), user);
@@ -52,7 +53,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         completeAnuncio.setTaxaML(mercadoLivreAnuncioPort.getTarifas(completeAnuncio.getPrecoDesconto(),
                 completeAnuncio.getCategoria(), completeAnuncio.getListingType(), user, true));
         if (completeAnuncio.getPrecoDesconto() >= 80)
-            completeAnuncio.setCustoFrete(mercadoLivreAnuncioPort.getFrete(completeAnuncio.getMlId(), "06950000", user, true));
+            completeAnuncio.setCustoFrete(mercadoLivreAnuncioPort.getFrete(completeAnuncio.getMlId(),  user, true));
         else completeAnuncio.setCustoFrete(0.0);
 
         completeAnuncio.setCusto(anuncio.getCusto());
@@ -87,7 +88,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
     //Atualiza dados somente do mercado livre
     @Override
     @Transactional
-    public Anuncio updateSearch(String mlId, Long userId) throws FailRequestRefreshTokenException {
+    public Anuncio updateSearch(String mlId, Long userId) throws FailRequestRefreshTokenException, IllegalStateException {
         User user = getUserOrThrowException(userId);
         var existProd = anuncioEntityPort.findByMlId(mlId, user);
         if (Objects.isNull(existProd)) {
@@ -98,7 +99,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         completeAnuncio.setTaxaML(mercadoLivreAnuncioPort.getTarifas(completeAnuncio.getPrecoDesconto(),
                 completeAnuncio.getCategoria(), completeAnuncio.getListingType(), user, true));
         if (completeAnuncio.getPrecoDesconto() >= 80)
-            completeAnuncio.setCustoFrete(mercadoLivreAnuncioPort.getFrete(completeAnuncio.getMlId(), "06950000", user, true));
+            completeAnuncio.setCustoFrete(mercadoLivreAnuncioPort.getFrete(completeAnuncio.getMlId(), user, true));
         else completeAnuncio.setCustoFrete(0.0);
         completeAnuncio.update(existProd);
         completeAnuncio.setCsosn(existProd.getCsosn());
@@ -148,7 +149,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
 
     @Override
     @Transactional
-    public Anuncio findAnuncioByMlIdSearch(String mlId, Long userId) throws FailRequestRefreshTokenException {
+    public Anuncio findAnuncioByMlIdSearch(String mlId, Long userId) throws FailRequestRefreshTokenException, IllegalStateException {
         User user = getUserOrThrowException(userId);
         return mercadoLivreAnuncioPort.getAnuncio(mlId, user, true);
     }
@@ -182,7 +183,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
 
     @Override
     @Transactional
-    public void deleteBy(Long id) {
+    public void deleteBy(Long id) throws IllegalStateException {
         if (Objects.isNull(anuncioEntityPort.findAnyById(id)))
             throw new IllegalArgumentException(String.format("Anuncio com id %s não encontrado", id));
 

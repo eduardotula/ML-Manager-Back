@@ -8,8 +8,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PageParam {
-    private Integer page;
-    private Integer pageSize;
+    private int page;
+    private int pageSize;
     private String sortField;
     private String sortType;
 }

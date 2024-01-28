@@ -2,13 +2,11 @@ package org.florense.domain.scheduler.jobs;
 
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import org.florense.domain.model.Anuncio;
-import org.florense.domain.model.Order;
-import org.florense.domain.model.ScheduleJob;
-import org.florense.domain.model.User;
+import org.florense.domain.model.*;
 import org.florense.domain.util.OrderScheduelerJobKeyGenerator;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
 import org.florense.outbound.adapter.mercadolivre.mlenum.MLStatusEnum;
+import org.florense.outbound.port.mercadolivre.MercadoLivreAnuncioPort;
 import org.florense.outbound.port.mercadolivre.MercadoLivreVendaPort;
 import org.florense.outbound.port.postgre.AnuncioEntityPort;
 import org.florense.outbound.port.postgre.OrderEntityPort;
@@ -30,6 +28,8 @@ public class ListAllNewOrdersJob implements Job {
     OrderEntityPort orderEntityPort;
     @Inject
     AnuncioEntityPort anuncioEntityPort;
+    @Inject
+    MercadoLivreAnuncioPort mercadoLivreAnuncioPort;
 
     @Inject
     OrderScheduelerJobKeyGenerator nameGenerator;
@@ -52,7 +52,7 @@ public class ListAllNewOrdersJob implements Job {
             updateNextRunTime(jobExecutionContext, user);
 
             List<Order> returnOrders = new LinkedList<>();
-            orders.forEach(order -> {
+            for (Order order : orders) {
 
                 //Procura se o mesmo pedido já existe e prepara para atualizar
                 var existingOrder = findByOrderId(order.getOrderId());
@@ -60,9 +60,10 @@ public class ListAllNewOrdersJob implements Job {
                     order.setId(existingOrder.getId());
                     order.updateVendasByMatchingByMlId(existingOrder.getVendas());
                 }
-
                 //Reliza a atualização de um pedido ou cria, caso produto não existir é criado um produto temporario
-                order.getVendas().forEach(venda -> {
+                for (Venda venda : order.getVendas()) {
+
+                    if(venda.getPrecoDesconto() >= 80) venda.setCustoFrete(mercadoLivreAnuncioPort.getFrete(venda.getAnuncio().getMlId(), user,true));
 
                     var existingAnuncio = findAnuncioByMlId(venda.getAnuncio().getMlId(), user.getId());
 
@@ -73,16 +74,14 @@ public class ListAllNewOrdersJob implements Job {
                         anuncio.setComplete(false);
                         venda.setAnuncio(createAnuncio(anuncio));
                     }
-
                     venda.setDataFromAnuncio(venda.getAnuncio());
+                    venda.setCusto(Anuncio.calculateLucro(venda.getAnuncio()));
                     returnOrders.add(order);
-
-                });
-
-            });
+                }
+            }
             orderEntityPort.createUpdateAll(returnOrders);
 
-        } catch (FailRequestRefreshTokenException e) {
+        } catch (Exception e) {
             throw new JobExecutionException(e);
         }
     }

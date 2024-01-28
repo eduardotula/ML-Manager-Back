@@ -13,7 +13,7 @@ public class AnuncioDtoSimple {
     @NotBlank
     private String mlId;
     @NotNull
-    private Double custo;
+    private double custo;
     @NotNull
     private String csosn;
 }

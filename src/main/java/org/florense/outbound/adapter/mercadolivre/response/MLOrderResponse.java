@@ -38,7 +38,7 @@ public class MLOrderResponse {
     @JsonIgnore
     private String title;
     @JsonIgnore
-    private Integer quantity;
+    private int quantity;
 
     @JsonProperty("order_items")
     private void setOrderItems(List<Map<String, Object>> list){
