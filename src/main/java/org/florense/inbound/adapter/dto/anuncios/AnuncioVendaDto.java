@@ -1,4 +1,4 @@
-package org.florense.inbound.adapter.dto;
+package org.florense.inbound.adapter.dto.anuncios;
 
 import lombok.*;
 

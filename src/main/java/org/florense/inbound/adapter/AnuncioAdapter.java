@@ -4,15 +4,13 @@ import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.resource.spi.IllegalStateException;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.florense.domain.model.Anuncio;
 import org.florense.domain.usecase.AnuncioUseCase;
-import org.florense.inbound.adapter.dto.AnuncioDto;
-import org.florense.inbound.adapter.dto.AnuncioDtoSimple;
+import org.florense.inbound.adapter.dto.anuncios.AnuncioDto;
+import org.florense.inbound.adapter.dto.anuncios.AnuncioDtoSimple;
 import org.florense.inbound.adapter.mappers.AnuncioDtoMapper;
-import org.florense.inbound.port.AnuncioAdapterPort;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
 
 import java.util.List;
@@ -29,21 +27,15 @@ public class AnuncioAdapter {
     @Inject
     AnuncioDtoMapper anuncioDtoMapper;
 
-    @PUT
-    @Path("")
-    public AnuncioDto updateAnuncio(@Valid AnuncioDto anuncioDto, @QueryParam("user-id") Long userId) {
-        return anuncioDtoMapper.toDto(anuncioUseCase.createUpdate(anuncioDtoMapper.toModel(anuncioDto), userId));
-    }
-
     @POST
-    @Path("/simple")
+    @Path("")
     public AnuncioDto createAnuncioSearch(@Valid AnuncioDtoSimple simple, @QueryParam("user-id") Long userId) throws FailRequestRefreshTokenException, IllegalStateException {
         Anuncio anuncioDtoSimple = Anuncio.builder().csosn(simple.getCsosn()).mlId(simple.getMlId()).custo(simple.getCusto()).build();
         return anuncioDtoMapper.toDto(anuncioUseCase.createMlSearch(anuncioDtoSimple, userId));
     }
 
     @PUT
-    @Path("/simple")
+    @Path("")
     public AnuncioDto updateAnuncioSimple(@Valid AnuncioDtoSimple simple, @QueryParam("user-id") Long userId) {
         Anuncio anuncioDtoSimple = Anuncio.builder().csosn(simple.getCsosn()).mlId(simple.getMlId()).custo(simple.getCusto()).build();
         return anuncioDtoMapper.toDto(anuncioUseCase.updateSimple(anuncioDtoSimple, userId));

@@ -8,13 +8,17 @@ import jakarta.ws.rs.core.MediaType;
 import org.florense.domain.model.Order;
 import org.florense.domain.model.PageParam;
 import org.florense.domain.model.Pagination;
+import org.florense.domain.model.Venda;
 import org.florense.domain.model.filters.OrderFilter;
+import org.florense.domain.model.filters.VendaFilter;
 import org.florense.domain.usecase.OrderUseCase;
 import org.florense.domain.util.Json;
 import org.florense.inbound.adapter.dto.OrderDto;
+import org.florense.inbound.adapter.dto.VendaDto;
 import org.florense.inbound.adapter.mappers.OrderDtoMapper;
+import org.florense.inbound.adapter.mappers.VendaDtoMapper;
 import org.florense.inbound.responses.PaginationResponse;
-import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
+import org.jboss.resteasy.reactive.ResponseStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,13 +35,10 @@ public class OrderAdapter {
     @Inject
     OrderDtoMapper orderDtoMapper;
     @Inject
+    VendaDtoMapper vendaDtoMapper;
+    @Inject
     Json mapper;
 
-//    @PUT
-//    @Path("/")
-//    public OrderDto updateAnuncio(@Valid AnuncioDto anuncioDto){
-//        return orderDtoMapper.toDto(orderUseCase.createUpdate(orderDtoMapper.toModel(anuncioDto)));
-//    }
 
     @GET
     @Path("")
@@ -50,13 +51,39 @@ public class OrderAdapter {
                                                       @QueryParam("user-id") @NotNull(message = "user-id não informado") Long userId) {
         PageParam pageParam = new PageParam(page, pageSize, sortField, sortType);
         OrderFilter filter = new OrderFilter(dataInicial, dataFinal);
-        Pagination<Order> pagination = orderUseCase.listOrderByFilters(userId,filter, pageParam);
+        Pagination<Order> pagination = orderUseCase.listOrderByFilters(userId, filter, pageParam);
         Pagination<OrderDto> paginationDto = pagination.to(orderDtoMapper::toDto);
         var respo = new PaginationResponse<>(paginationDto, filter);
         respo.getMetaInfo().setSearch(mapper.toMap(filter));
         return respo;
     }
 
+    @PATCH
+    @Path("/users/{user-id}/refresh")
+    @ResponseStatus(200)
+    public void refreshOrders(@PathParam("user-id") @NotNull(message = "userId não infomado") Long userId) {
+        orderUseCase.searchNewOrders(userId);
+    }
+
+    @GET
+    @Path("/vendas/anuncios/{id}")
+    public PaginationResponse<VendaDto> listVendasAnuncioByFilters(
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("pageSize") @DefaultValue("50") int pageSize,
+            @QueryParam("sortField") @DefaultValue("id") String sortField,
+            @QueryParam("sortType") @DefaultValue("ASC") String sortType,
+            @QueryParam("dataInicial") LocalDateTime dataInicial,
+            @QueryParam("dataFinal") LocalDateTime dataFinal,
+            @QueryParam("include-cancelled") @DefaultValue("false") boolean includeCancelled,
+            @PathParam("id") Long anuncioId) {
+        PageParam pageParam = new PageParam(page, pageSize, sortField, sortType);
+        VendaFilter filter = new VendaFilter(dataInicial, dataFinal, includeCancelled);
+        Pagination<Venda> pagination = orderUseCase.listVendasByAnuncio(anuncioId, filter, pageParam);
+        Pagination<VendaDto> paginationDto = pagination.to(vendaDtoMapper::toDto);
+        var respo = new PaginationResponse<>(paginationDto, filter);
+        respo.getMetaInfo().setSearch(mapper.toMap(filter));
+        return respo;
+    }
 
     @DELETE
     @Path("/{id}")

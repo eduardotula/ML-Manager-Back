@@ -5,12 +5,15 @@ import jakarta.inject.Inject;
 import jakarta.resource.spi.IllegalStateException;
 import jakarta.transaction.Transactional;
 import org.florense.domain.model.Anuncio;
+import org.florense.domain.model.Order;
 import org.florense.domain.model.User;
 import org.florense.inbound.port.AnuncioAdapterPort;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
 import org.florense.outbound.port.mercadolivre.MercadoLivreAnuncioPort;
 import org.florense.outbound.port.postgre.AnuncioEntityPort;
+import org.florense.outbound.port.postgre.OrderEntityPort;
 import org.florense.outbound.port.postgre.UserEntityPort;
+import org.florense.outbound.port.postgre.VendaEntityPort;
 
 import java.util.List;
 import java.util.Objects;
@@ -26,17 +29,8 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
     UserEntityPort userEntityPort;
     @Inject
     MercadoLivreAnuncioPort mercadoLivreAnuncioPort;
-
-
-    @Override
-    @Transactional
-    public Anuncio createUpdate(Anuncio anuncio, Long userId) {
-        User user = getUserOrThrowException(userId);
-        anuncio.setUser(user);
-        verifyIfAnuncioMatchesUserOrThrowException(anuncio, user);
-        return anuncioEntityPort.createUpdate(anuncio);
-    }
-
+    @Inject
+    OrderEntityPort orderEntityPort;
 
     //Cria e atualiza com mercado livre
     @Override
@@ -47,7 +41,6 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         var existProd = anuncioEntityPort.findByMlId(anuncio.getMlId(), user);
         if (existProd != null)
             throw new IllegalArgumentException(String.format("Anuncio com id: %s já cadastrado", anuncio.getMlId()));
-
 
         Anuncio completeAnuncio = mercadoLivreAnuncioPort.getAnuncio(anuncio.getMlId(), user, true);
         completeAnuncio.setTaxaML(mercadoLivreAnuncioPort.getTarifas(completeAnuncio.getPrecoDesconto(),
@@ -80,6 +73,13 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         existProd.setLucro(Anuncio.calculateLucro(existProd));
         existProd.setUser(user);
         verifyIfAnuncioMatchesUserOrThrowException(existProd, user);
+
+        if(!existProd.isComplete()){
+            List<Order> orders = orderEntityPort.listAllOrdersByAnuncio(existProd);
+            orders.forEach(order -> order.getVendas().forEach(venda -> {
+                venda.setDataFromAnuncio(venda.getAnuncio());
+            }));
+        }
         existProd.setComplete(true);
 
         return anuncioEntityPort.createUpdate(existProd);

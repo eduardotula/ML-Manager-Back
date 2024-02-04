@@ -2,6 +2,7 @@ package org.florense.inbound.adapter.dto;
 
 
 import lombok.*;
+import org.florense.inbound.adapter.dto.anuncios.AnuncioVendaDto;
 
 import java.time.LocalDateTime;
 

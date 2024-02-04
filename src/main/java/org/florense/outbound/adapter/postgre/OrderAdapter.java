@@ -2,10 +2,7 @@ package org.florense.outbound.adapter.postgre;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import org.florense.domain.model.Order;
-import org.florense.domain.model.PageParam;
-import org.florense.domain.model.Pagination;
-import org.florense.domain.model.User;
+import org.florense.domain.model.*;
 import org.florense.domain.model.filters.OrderFilter;
 import org.florense.outbound.adapter.postgre.entity.OrderEntity;
 import org.florense.outbound.adapter.postgre.mappers.OrderEntityMapper;
@@ -15,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.florense.outbound.port.postgre.OrderEntityPort;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -84,6 +82,11 @@ public class OrderAdapter implements OrderEntityPort {
     @Override
     public void deleteById(Long id){
         repository.deleteById(id);
+    }
+
+    @Override
+    public List<Order> listAllOrdersByAnuncio(Anuncio anuncio){
+        return new ArrayList<>();
     }
 
 }

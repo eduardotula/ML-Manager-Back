@@ -3,15 +3,16 @@ package org.florense.domain.usecase;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import org.florense.domain.model.Order;
-import org.florense.domain.model.PageParam;
-import org.florense.domain.model.Pagination;
-import org.florense.domain.model.User;
+import org.florense.domain.model.*;
 import org.florense.domain.model.filters.OrderFilter;
-import org.florense.outbound.adapter.mercadolivre.MercadoLivreAnuncioAdapter;
-import org.florense.outbound.port.mercadolivre.MercadoLivreVendaPort;
+import org.florense.domain.model.filters.VendaFilter;
+import org.florense.domain.scheduler.jobs.ListAllNewOrders;
+import org.florense.outbound.port.postgre.AnuncioEntityPort;
 import org.florense.outbound.port.postgre.OrderEntityPort;
+import org.florense.outbound.port.postgre.UserEntityPort;
+import org.florense.outbound.port.postgre.VendaEntityPort;
 
+import java.util.List;
 import java.util.Objects;
 
 @RequestScoped
@@ -19,13 +20,29 @@ public class OrderUseCase {
     @Inject
     OrderEntityPort orderEntityPort;
     @Inject
-    MercadoLivreAnuncioAdapter mercadoLivreAnuncioPort;
+    ListAllNewOrders listAllNewOrders;
     @Inject
-    MercadoLivreVendaPort mercadoLivreVendaPort;
+    VendaEntityPort vendaEntityPort;
+    @Inject
+    UserEntityPort userEntityPort;
+    @Inject
+    AnuncioEntityPort anuncioEntityPort;
 
     @Transactional
     public Pagination<Order> listOrderByFilters(Long userId,OrderFilter filter, PageParam pageParam){
         return orderEntityPort.listByFilters(userId, filter, pageParam);
+    }
+
+    public void searchNewOrders(Long userId){
+        User user = userEntityPort.findById(userId);
+        if(Objects.isNull(user)) throw new IllegalArgumentException(String.format("User com id %d não encontrado",userId));
+        listAllNewOrders.execute(user);
+    }
+
+    public Pagination<Venda> listVendasByAnuncio(Long anuncioId, VendaFilter filter, PageParam pageParam){
+        Anuncio anuncio = anuncioEntityPort.findById(anuncioId);
+        if(Objects.isNull(anuncio)) throw new IllegalArgumentException(String.format("Anuncio com id %d não encontrado",anuncioId));
+        return vendaEntityPort.listByAnuncio(anuncio, filter, pageParam);
     }
 
     @Transactional

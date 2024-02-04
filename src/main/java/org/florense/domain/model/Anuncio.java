@@ -40,8 +40,8 @@ public class Anuncio {
     }
 
     public static double calculateLucro(Anuncio anuncio){
-        BigDecimal porcenNf = new BigDecimal(6);
-        if(anuncio.getCsosn().equals("102")) new BigDecimal(11);
+        BigDecimal porcenNf = new BigDecimal("6.92");
+        if(anuncio.getCsosn().equals("102")) new BigDecimal("10.40");
         porcenNf = porcenNf.setScale(2,  RoundingMode.HALF_UP);
         porcenNf = porcenNf.divide(new BigDecimal(100), RoundingMode.HALF_UP);
 

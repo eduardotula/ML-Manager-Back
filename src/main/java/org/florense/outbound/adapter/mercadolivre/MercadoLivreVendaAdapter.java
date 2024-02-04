@@ -128,15 +128,7 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
         if (Objects.isNull(existingAnuncio)) {
             existingAnuncio = new Anuncio(null, mlOrderResponse.getMlId(), "", "", "", mlOrderResponse.getTitle(), "", 0.0, "", mlOrderResponse.getPrecoDesconto(), mlOrderResponse.getSaleFee(),
                     0.0, "active", null, 0.0, ListingTypeEnum.classico, user, false, new ArrayList<>());
-
         }
-
-        System.out.println(mlOrderResponse.getQuantity());
-        System.out.println(mlOrderResponse.getPrecoDesconto());
-        System.out.println(mlOrderResponse.getSaleFee());
-        System.out.println(mlOrderResponse.getStatus());
-        System.out.println(existingAnuncio.getCusto());
-        System.out.println(mlOrderResponse.getOrderId());
 
         Venda venda = new Venda(null, mlOrderResponse.getQuantity(), mlOrderResponse.getPrecoDesconto(), mlOrderResponse.getSaleFee(),
                 0.0, existingAnuncio.getCusto(), 0.0, completo, mlOrderResponse.getStatus(),

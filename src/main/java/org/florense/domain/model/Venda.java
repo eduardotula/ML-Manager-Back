@@ -29,6 +29,5 @@ public class Venda {
         this.custoFrete = anuncio.getCustoFrete();
         this.custo = anuncio.getCusto();
         this.lucro = Anuncio.calculateLucro(anuncio);
-
     }
 }

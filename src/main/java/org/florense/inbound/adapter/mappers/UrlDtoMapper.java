@@ -1,9 +1,7 @@
 package org.florense.inbound.adapter.mappers;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import org.florense.domain.model.Anuncio;
 import org.florense.domain.model.Url;
-import org.florense.inbound.adapter.dto.AnuncioDto;
 import org.florense.inbound.adapter.dto.UrlDto;
 import org.mapstruct.Mapper;
 

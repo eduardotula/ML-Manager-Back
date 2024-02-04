@@ -1,9 +1,6 @@
 package org.florense.outbound.port.postgre;
 
-import org.florense.domain.model.Order;
-import org.florense.domain.model.PageParam;
-import org.florense.domain.model.Pagination;
-import org.florense.domain.model.User;
+import org.florense.domain.model.*;
 import org.florense.domain.model.filters.OrderFilter;
 import org.florense.outbound.adapter.postgre.entity.OrderEntity;
 
@@ -14,7 +11,6 @@ public interface OrderEntityPort {
     Order createUpdate(Order order);
 
     List<Order> createUpdateAll(List<Order> orderList);
-
 
     void executeBeforeSave(OrderEntity orderEntity, LocalDateTime now);
 
@@ -27,4 +23,6 @@ public interface OrderEntityPort {
     Order findByOrderId(Long orderId);
 
     void deleteById(Long id);
+
+    List<Order> listAllOrdersByAnuncio(Anuncio anuncio);
 }
