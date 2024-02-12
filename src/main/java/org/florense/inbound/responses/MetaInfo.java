@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -37,5 +38,6 @@ public class MetaInfo {
     public static class SortInfo {
         private String sortField;
         private String sortType;
+        private List<String> avaliableSortingFields;
     }
 }

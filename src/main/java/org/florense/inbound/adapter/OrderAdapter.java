@@ -48,10 +48,11 @@ public class OrderAdapter {
                                                       @QueryParam("sortType") @DefaultValue("ASC") String sortType,
                                                       @QueryParam("dataInicial") LocalDateTime dataInicial,
                                                       @QueryParam("dataFinal") LocalDateTime dataFinal,
+                                                      @QueryParam("descricao") String descricao,
                                                       @QueryParam("user-id") @NotNull(message = "user-id não informado") Long userId) {
-        PageParam pageParam = new PageParam(page, pageSize, sortField, sortType);
-        OrderFilter filter = new OrderFilter(dataInicial, dataFinal);
-        Pagination<Order> pagination = orderUseCase.listOrderByFilters(userId, filter, pageParam);
+        PageParam pageParam = new PageParam(page, pageSize, sortField, sortType, OrderFilter.getAvaliableSortTypes());
+        OrderFilter filter = new OrderFilter(dataInicial, dataFinal, descricao, pageParam);
+        Pagination<Order> pagination = orderUseCase.listOrderByFilters(userId, filter);
         Pagination<OrderDto> paginationDto = pagination.to(orderDtoMapper::toDto);
         var respo = new PaginationResponse<>(paginationDto, filter);
         respo.getMetaInfo().setSearch(mapper.toMap(filter));
@@ -76,9 +77,9 @@ public class OrderAdapter {
             @QueryParam("dataFinal") LocalDateTime dataFinal,
             @QueryParam("include-cancelled") @DefaultValue("false") boolean includeCancelled,
             @PathParam("id") Long anuncioId) {
-        PageParam pageParam = new PageParam(page, pageSize, sortField, sortType);
-        VendaFilter filter = new VendaFilter(dataInicial, dataFinal, includeCancelled);
-        Pagination<Venda> pagination = orderUseCase.listVendasByAnuncio(anuncioId, filter, pageParam);
+        PageParam pageParam = new PageParam(page, pageSize, sortField, sortType, VendaFilter.getAvaliableSortTypes());
+        VendaFilter filter = new VendaFilter(dataInicial, dataFinal, includeCancelled, pageParam);
+        Pagination<Venda> pagination = orderUseCase.listVendasByAnuncio(anuncioId, filter);
         Pagination<VendaDto> paginationDto = pagination.to(vendaDtoMapper::toDto);
         var respo = new PaginationResponse<>(paginationDto, filter);
         respo.getMetaInfo().setSearch(mapper.toMap(filter));

@@ -24,18 +24,16 @@ public class VendaAdapter implements VendaEntityPort {
     VendaEntityMapper vendaEntityMapper;
 
     @Override
-    public Pagination<Venda> listByAnuncio(Anuncio anuncio, VendaFilter filter, PageParam pageParam){
-        Pageable pageable = PageRequest.of(pageParam.getPage(), pageParam.getPageSize());
-        Sort.Direction sortDirection = pageParam.getSortType().equalsIgnoreCase(Sort.Direction.ASC.toString()) ? Sort.Direction.ASC : Sort.Direction.DESC;
+    public Pagination<Venda> listByAnuncio(Anuncio anuncio, VendaFilter filter){
+        Pageable pageable = PageRequest.of(filter.getPageParam().getPage(), filter.getPageParam().getPageSize());
 
-        if(Objects.equals(pageParam.getSortField(), "id")) pageParam.setSortField(String.format("v.%s",pageParam.getSortField()));
         String status = filter.isIncludeCancelled() ?
                 String.format("%s and %s", MLStatusEnum.PAID.getIdentifier(), MLStatusEnum.CANCELLED.getIdentifier()) : MLStatusEnum.PAID.getIdentifier();
 
         var page = vendaRepository.listByFilters(filter.getOrderCreationInicial(), filter.getOrderCreationFinal(), anuncio.getId(), status,
-                Sort.by(sortDirection,pageParam.getSortField()), pageable);
+                filter.getSort(), pageable);
 
-        return new Pagination<>(pageParam.getPage(), pageParam.getPageSize(), page.getTotalPages(), (int) page.getTotalElements(), pageParam.getSortField(),
-                pageParam.getSortType(), page.stream().map(vendaEntityMapper::toModel).collect(Collectors.toList()));
+        return new Pagination<>(filter.getPageParam().getPage(), filter.getPageParam().getPageSize(), page.getTotalPages(), (int) page.getTotalElements(), filter.getPageParam().getSortField(),
+                filter.getPageParam().getSortType().name(), filter.getPageParam().getAvaliableSortTypes(),page.stream().map(vendaEntityMapper::toModel).collect(Collectors.toList()));
     }
 }

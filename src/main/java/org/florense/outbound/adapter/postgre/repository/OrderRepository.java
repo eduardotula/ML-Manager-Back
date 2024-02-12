@@ -19,12 +19,21 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
 
     OrderEntity findFirstByOrderByIdDesc();
 
-    @Query(value = "from orderM o join o.vendas v " +
-            "WHERE (cast(:dataInicial as timestamp) IS NULL OR (o.orderCreationTime BETWEEN :dataInicial AND :dataFinal))" +
+    @Query(value = "from orderM o " +
+            " join o.vendas v " +
+            " join v.anuncio a " +
+            "WHERE (cast(:dataInicial as timestamp) IS NULL OR (o.orderCreationTime BETWEEN :dataInicial AND :dataFinal)) " +
+            " AND (:descricao IS NULL OR a.descricao LIKE cast('%'||cast(:descricao as text)||'%' as text)) " +
             " AND v.anuncio.user.id = :userId ")
     Page<OrderEntity> listByFilters(@Param("dataInicial") LocalDateTime dataInicial,
                                     @Param("dataFinal") LocalDateTime dataFinal,
                                     @Param("userId") Long userId,
+                                    @Param("descricao") String descricao,
                                     Sort sort,
                                     Pageable pageable);
+    @Query(value = "from orderM o " +
+            " join o.vendas v " +
+            " join v.anuncio a " +
+            " where a.id = :anuncioId")
+    List<OrderEntity> listOrdersByAnuncio(@Param("anuncioId") Long anuncioId);
 }

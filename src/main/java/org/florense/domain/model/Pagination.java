@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 @Getter
@@ -20,6 +21,7 @@ public class Pagination<T> {
     private Integer totalElements;
     private String sortField;
     private String sortType;
+    private List<String> avaliableSortingFilds;
     private List<T> results;
 
     public <F> Pagination<F> to(Function<T, F> converter){
@@ -31,11 +33,9 @@ public class Pagination<T> {
         pagination.setSortField(this.sortField);
         pagination.setSortType(this.sortType);
         pagination.setTotalPages(this.totalPages);
-        try{
-            this.results.forEach(t -> pagination.getResults().add(converter.apply(t)));
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        pagination.setAvaliableSortingFilds(this.avaliableSortingFilds);
+        this.results.forEach(t -> pagination.getResults().add(converter.apply(t)));
+
         return pagination;
     }
 }

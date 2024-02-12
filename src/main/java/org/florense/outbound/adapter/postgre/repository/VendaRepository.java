@@ -11,11 +11,11 @@ import java.time.LocalDateTime;
 
 public interface VendaRepository extends JpaRepository<VendaEntity, Long> {
 
-    @Query(value = "from venda v " +
-            " join v.order o" +
-            " join v.anuncio a" +
+    @Query(value = "from venda venda " +
+            " join venda.order o" +
+            " join venda.anuncio a" +
             " WHERE (cast(:dataInicial as timestamp) IS NULL OR (o.orderCreationTime BETWEEN :dataInicial AND :dataFinal)) " +
-            " and v.status = :status " +
+            " and venda.status = :status " +
             " and a.id = :anuncioId")
     Page<VendaEntity> listByFilters(@Param("dataInicial") LocalDateTime dataInicial,
                                       @Param("dataFinal") LocalDateTime dataFinal,

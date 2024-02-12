@@ -52,16 +52,15 @@ public class OrderAdapter implements OrderEntityPort {
     }
 
     @Override
-    public Pagination<Order> listByFilters(Long userId, OrderFilter filter, PageParam pageParam){
-        Pageable pageable = PageRequest.of(pageParam.getPage(), pageParam.getPageSize());
-        Sort.Direction sortDirection = pageParam.getSortType().equalsIgnoreCase(Sort.Direction.ASC.toString()) ? Sort.Direction.ASC : Sort.Direction.DESC;
+    public Pagination<Order> listByFilters(Long userId, OrderFilter filter){
+        Pageable pageable = PageRequest.of(filter.getPageParam().getPage(), filter.getPageParam().getPageSize());
 
-        if(pageParam.getSortField() == "id") pageParam.setSortField(String.format("o.%s",pageParam.getSortField()));
-        var page = repository.listByFilters(filter.getOrderCreationInicial(), filter.getOrderCreationFinal(), userId,
-                Sort.by(sortDirection,pageParam.getSortField()), pageable);
+        var page = repository.listByFilters(filter.getOrderCreationInicial(), filter.getOrderCreationFinal(), userId, filter.getDescricao(),
+                filter.getSort(), pageable);
 
-        return new Pagination<Order>(pageParam.getPage(), pageParam.getPageSize(),page.getTotalPages(), (int)page.getTotalElements(), pageParam.getSortField(),
-                pageParam.getSortType(), page.stream().map(mapper::toModel).collect(Collectors.toList()));
+        return new Pagination<>(filter.getPageParam().getPage(), filter.getPageParam().getPageSize(), page.getTotalPages(),
+                (int) page.getTotalElements(), filter.getPageParam().getSortField(),
+                filter.getPageParam().getSortType().name(), filter.getPageParam().getAvaliableSortTypes(), page.stream().map(mapper::toModel).collect(Collectors.toList()));
     }
 
     @Override
@@ -86,7 +85,7 @@ public class OrderAdapter implements OrderEntityPort {
 
     @Override
     public List<Order> listAllOrdersByAnuncio(Anuncio anuncio){
-        return new ArrayList<>();
+        return repository.listOrdersByAnuncio(anuncio.getId()).stream().map(mapper::toModel).collect(Collectors.toList());
     }
 
 }

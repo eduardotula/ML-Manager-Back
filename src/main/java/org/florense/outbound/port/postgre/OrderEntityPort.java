@@ -14,7 +14,7 @@ public interface OrderEntityPort {
 
     void executeBeforeSave(OrderEntity orderEntity, LocalDateTime now);
 
-    Pagination<Order> listByFilters(Long userId, OrderFilter filter, PageParam pageParam);
+    Pagination<Order> listByFilters(Long userId, OrderFilter filter);
 
     Order getLastOrderByUser(User user);
 

@@ -29,8 +29,8 @@ public class OrderUseCase {
     AnuncioEntityPort anuncioEntityPort;
 
     @Transactional
-    public Pagination<Order> listOrderByFilters(Long userId,OrderFilter filter, PageParam pageParam){
-        return orderEntityPort.listByFilters(userId, filter, pageParam);
+    public Pagination<Order> listOrderByFilters(Long userId,OrderFilter filter){
+        return orderEntityPort.listByFilters(userId, filter);
     }
 
     public void searchNewOrders(Long userId){
@@ -39,10 +39,10 @@ public class OrderUseCase {
         listAllNewOrders.execute(user);
     }
 
-    public Pagination<Venda> listVendasByAnuncio(Long anuncioId, VendaFilter filter, PageParam pageParam){
+    public Pagination<Venda> listVendasByAnuncio(Long anuncioId, VendaFilter filter){
         Anuncio anuncio = anuncioEntityPort.findById(anuncioId);
         if(Objects.isNull(anuncio)) throw new IllegalArgumentException(String.format("Anuncio com id %d não encontrado",anuncioId));
-        return vendaEntityPort.listByAnuncio(anuncio, filter, pageParam);
+        return vendaEntityPort.listByAnuncio(anuncio, filter);
     }
 
     @Transactional

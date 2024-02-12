@@ -77,8 +77,12 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         if(!existProd.isComplete()){
             List<Order> orders = orderEntityPort.listAllOrdersByAnuncio(existProd);
             orders.forEach(order -> order.getVendas().forEach(venda -> {
-                venda.setDataFromAnuncio(venda.getAnuncio());
+                if(venda.getCusto() == 0){
+                    venda.setCusto(existProd.getCusto());
+                    venda.setLucro(Anuncio.calculateLucro(venda.getAnuncio()));
+                }
             }));
+            orderEntityPort.createUpdateAll(orders);
         }
         existProd.setComplete(true);
 

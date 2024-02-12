@@ -7,5 +7,5 @@ import org.florense.domain.model.Venda;
 import org.florense.domain.model.filters.VendaFilter;
 
 public interface VendaEntityPort {
-    Pagination<Venda> listByAnuncio(Anuncio anuncio, VendaFilter filter, PageParam pageParam);
+    Pagination<Venda> listByAnuncio(Anuncio anuncio, VendaFilter filter);
 }
