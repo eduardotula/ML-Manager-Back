@@ -17,5 +17,5 @@ public interface MercadoLivreAnuncioPort {
 
     double getFrete(String mlId,User user, boolean retry) throws FailRequestRefreshTokenException, IllegalStateException;
 
-    List<String> listActiveMlIds(User user, boolean retry) throws FailRequestRefreshTokenException;
+    List<String> listAllAnunciosMercadoLivre(User user, boolean isActive, boolean retry) throws FailRequestRefreshTokenException;
 }

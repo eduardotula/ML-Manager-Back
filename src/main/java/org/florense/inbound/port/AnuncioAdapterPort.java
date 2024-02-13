@@ -23,10 +23,7 @@ public interface AnuncioAdapterPort {
     Anuncio updateSearch(String mlId, Long userId) throws FailRequestRefreshTokenException, IllegalStateException;
 
     @Transactional
-    List<String> listAllActiveMl(Long userId) throws FailRequestRefreshTokenException;
-
-    @Transactional
-    List<String> listAllActiveMlMinusRegistered(Long userId) throws FailRequestRefreshTokenException;
+    List<String> listAllAnunciosMercadoLivre(Long userId, boolean isActive) throws FailRequestRefreshTokenException;
 
     @Transactional
     Anuncio findAnuncioByMlId(String mlId, Long userId);

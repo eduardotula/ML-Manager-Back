@@ -57,9 +57,10 @@ public class AnuncioAdapter {
     }
 
     @GET
-    @Path("/list-all-active-minus-complete")
-    public List<String> listAllActiveMlMinusRegistered(@QueryParam("user-id") Long userId) throws FailRequestRefreshTokenException {
-        return anuncioUseCase.listAllActiveMlMinusRegistered(userId);
+    @Path("/mercado-livre")
+    public List<String> listAllAnunciosMercadoLivre(@QueryParam("user-id") Long userId,
+                                                    @QueryParam("include-paused") @DefaultValue("false") boolean includePaused) throws FailRequestRefreshTokenException {
+        return anuncioUseCase.listAllAnunciosMercadoLivre(userId, includePaused);
     }
 
     @GET

@@ -83,14 +83,14 @@ public class MercadoLivreAnuncioAdapter extends MercadoLivreAdapter implements M
     }
 
     @Override
-    public List<String> listActiveMlIds(User user, boolean retry) throws FailRequestRefreshTokenException {
+    public List<String> listAllAnunciosMercadoLivre(User user, boolean includePaused, boolean retry) throws FailRequestRefreshTokenException {
         try {
             List<String> allActiveIds = new LinkedList<>();
             int offset = 0;
             int total = 1;
-
+            String status = includePaused ? "" : "active";
             while (offset < total) {
-                Map<String, Object> resp = mercadoLivreAnuncioClient.listMlIds(user.getUserIdML(), "active", offset, user.getAccessCode());
+                Map<String, Object> resp = mercadoLivreAnuncioClient.listMlIds(user.getUserIdML(), status, offset, user.getAccessCode());
                 allActiveIds.addAll((Collection<String>) resp.get("results"));
                 offset += BATCH_SIZE;
                 total = ((Number) ((Map<String, Object>) resp.get("paging")).get("total")).intValue();
@@ -101,7 +101,7 @@ public class MercadoLivreAnuncioAdapter extends MercadoLivreAdapter implements M
             if (e.getCause() instanceof UnauthorizedAcessKeyException) {
                 refreshAccessToken(appId, clientSecret, user);
                 if (retry) {
-                    return listActiveMlIds(user, false);
+                    return listAllAnunciosMercadoLivre(user, includePaused,false);
                 }
             }
         }

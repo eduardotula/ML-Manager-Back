@@ -13,7 +13,6 @@ import org.florense.outbound.port.mercadolivre.MercadoLivreAnuncioPort;
 import org.florense.outbound.port.postgre.AnuncioEntityPort;
 import org.florense.outbound.port.postgre.OrderEntityPort;
 import org.florense.outbound.port.postgre.UserEntityPort;
-import org.florense.outbound.port.postgre.VendaEntityPort;
 
 import java.util.List;
 import java.util.Objects;
@@ -118,24 +117,9 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
 
     @Override
     @Transactional
-    public List<String> listAllActiveMl(Long userId) throws FailRequestRefreshTokenException {
+    public List<String> listAllAnunciosMercadoLivre(Long userId, boolean includePaused) throws FailRequestRefreshTokenException {
         User user = getUserOrThrowException(userId);
-        return mercadoLivreAnuncioPort.listActiveMlIds(user, true);
-    }
-
-    @Override
-    @Transactional
-    public List<String> listAllActiveMlMinusRegistered(Long userId) throws FailRequestRefreshTokenException {
-        User user = getUserOrThrowException(userId);
-        List<String> actives = mercadoLivreAnuncioPort.listActiveMlIds(user, true);
-        Set<String> registeredIds = anuncioEntityPort.listAllRegistered(user)
-                .stream()
-                .map(Anuncio::getMlId)
-                .collect(Collectors.toSet());
-
-        return actives.stream()
-                .filter(mlId -> !registeredIds.contains(mlId))
-                .collect(Collectors.toList());
+        return mercadoLivreAnuncioPort.listAllAnunciosMercadoLivre(user, includePaused,true);
     }
 
     @Override
