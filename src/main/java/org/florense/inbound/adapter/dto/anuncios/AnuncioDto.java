@@ -42,6 +42,7 @@ public class AnuncioDto {
     private String status;
     @NotNull
     private LocalDateTime createdAt;
+    private double imposto;
     private ListingTypeEnum listingType;
     private double lucro;
     private List<UrlDto> pictures;

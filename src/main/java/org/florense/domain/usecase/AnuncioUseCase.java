@@ -78,6 +78,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
             orders.forEach(order -> order.getVendas().forEach(venda -> {
                 if(venda.getCusto() == 0){
                     venda.setCusto(existProd.getCusto());
+
                     venda.setLucro(Anuncio.calculateLucro(venda.getAnuncio()));
                 }
             }));
