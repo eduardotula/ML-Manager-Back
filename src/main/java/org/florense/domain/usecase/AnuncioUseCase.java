@@ -5,8 +5,11 @@ import jakarta.inject.Inject;
 import jakarta.resource.spi.IllegalStateException;
 import jakarta.transaction.Transactional;
 import org.florense.domain.model.Anuncio;
+import org.florense.domain.model.ListingTypeEnum;
 import org.florense.domain.model.Order;
 import org.florense.domain.model.User;
+import org.florense.inbound.adapter.dto.consultas.AnuncioSimulation;
+import org.florense.inbound.adapter.dto.consultas.AnuncioSimulationResponse;
 import org.florense.inbound.port.AnuncioAdapterPort;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
 import org.florense.outbound.port.mercadolivre.MercadoLivreAnuncioPort;
@@ -16,8 +19,6 @@ import org.florense.outbound.port.postgre.UserEntityPort;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RequestScoped
 public class AnuncioUseCase implements AnuncioAdapterPort {
@@ -183,4 +184,14 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         }
     }
 
+    @Override
+    @Transactional
+    public AnuncioSimulationResponse simulateAnuncio(AnuncioSimulation anuncioSimulation) throws IllegalStateException, FailRequestRefreshTokenException {
+        User user = getUserOrThrowException(anuncioSimulation.getUserId());
+        double taxaML = mercadoLivreAnuncioPort.getTarifas(anuncioSimulation.getValorVenda(),anuncioSimulation.getCategoria(),
+                anuncioSimulation.getTipoAnuncio(),user,true);
+        double imposto = Anuncio.calculateImposto(anuncioSimulation.getCsosn(),anuncioSimulation.getValorVenda());
+        double lucro = Anuncio.calculateLucro(anuncioSimulation.getCusto(),taxaML, anuncioSimulation.getCustoFrete(), imposto, anuncioSimulation.getValorVenda());
+        return new AnuncioSimulationResponse(lucro);
+    }
 }

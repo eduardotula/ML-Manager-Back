@@ -4,12 +4,17 @@ import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.resource.spi.IllegalStateException;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.florense.domain.model.Anuncio;
+import org.florense.domain.model.ListingTypeEnum;
 import org.florense.domain.usecase.AnuncioUseCase;
 import org.florense.inbound.adapter.dto.anuncios.AnuncioDto;
 import org.florense.inbound.adapter.dto.anuncios.AnuncioDtoSimple;
+import org.florense.inbound.adapter.dto.consultas.AnuncioSimulation;
+import org.florense.inbound.adapter.dto.consultas.AnuncioSimulationResponse;
 import org.florense.inbound.adapter.mappers.AnuncioDtoMapper;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
 
@@ -83,5 +88,21 @@ public class AnuncioAdapter {
     @Path("/{id}")
     public void deleteById(@PathParam("id") Long id) throws IllegalStateException {
         anuncioUseCase.deleteBy(id);
+    }
+
+    @GET
+    @Path("/simulation")
+    public AnuncioSimulationResponse simulateAnuncio(@QueryParam("categoria") @NotNull String categoria,
+                                                     @QueryParam("valor-venda") @NotNull double valorVenda,
+                                                     @QueryParam("custo") @NotNull double custo,
+                                                     @QueryParam("custo-frete") @NotNull double custoFrete,
+                                                     @QueryParam("csosn") @NotNull String csosn,
+                                                     @Pattern(regexp = "classico|premium",message = "campo tipo do anuncio, valores permitidos: classico, premium", flags = Pattern.Flag.CASE_INSENSITIVE)
+                                                     @QueryParam("tipo-anuncio") String tipoAnuncio,
+                                                     @QueryParam("user-id") @NotNull Long userId
+                                                     ) throws IllegalStateException, FailRequestRefreshTokenException {
+        ListingTypeEnum listingTypeEnum = tipoAnuncio.equalsIgnoreCase("classico") ? ListingTypeEnum.classico : ListingTypeEnum.premium;
+        AnuncioSimulation anuncioSimulation = new AnuncioSimulation(categoria,valorVenda,custo,custoFrete, csosn, listingTypeEnum, userId);
+        return this.anuncioUseCase.simulateAnuncio(anuncioSimulation);
     }
 }

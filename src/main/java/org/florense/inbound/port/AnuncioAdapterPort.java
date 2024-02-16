@@ -3,6 +3,8 @@ package org.florense.inbound.port;
 import jakarta.resource.spi.IllegalStateException;
 import jakarta.transaction.Transactional;
 import org.florense.domain.model.Anuncio;
+import org.florense.inbound.adapter.dto.consultas.AnuncioSimulation;
+import org.florense.inbound.adapter.dto.consultas.AnuncioSimulationResponse;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
 
 import java.util.List;
@@ -42,4 +44,7 @@ public interface AnuncioAdapterPort {
 
     @Transactional
     void deleteBy(Long id) throws IllegalStateException;
+
+    @Transactional
+    AnuncioSimulationResponse simulateAnuncio(AnuncioSimulation anuncioSimulation) throws IllegalStateException, FailRequestRefreshTokenException;
 }
