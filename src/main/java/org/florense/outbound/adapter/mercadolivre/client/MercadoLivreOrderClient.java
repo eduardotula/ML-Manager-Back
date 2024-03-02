@@ -12,6 +12,9 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import org.florense.outbound.adapter.mercadolivre.exceptions.UnauthorizedAcessKeyException;
 import org.florense.outbound.adapter.mercadolivre.response.MLOrderWrapperResponse;
 
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+
 @ApplicationScoped
 @Path("/orders")
 @RegisterRestClient(configKey = "ml-api")
@@ -21,6 +24,9 @@ public interface MercadoLivreOrderClient {
     @Path("/search")
     @ClientHeaderParam(name = "Authorization", value = "Bearer {token}")
     MLOrderWrapperResponse  vendasOrderDesc(@QueryParam("seller") String userId,
+                                            @QueryParam("order.date_created.from")String dataInicial,
+                                            @QueryParam("order.date_created.to") String dataFinal,
+                                            @QueryParam("order.status") String status,
                                             @QueryParam("offset") int offset,
                                             @QueryParam("sort") String sort,
                                             @QueryParam("limit") int limit,

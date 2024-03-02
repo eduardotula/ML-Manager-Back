@@ -6,13 +6,12 @@ import jakarta.transaction.Transactional;
 import org.florense.domain.model.*;
 import org.florense.domain.model.filters.OrderFilter;
 import org.florense.domain.model.filters.VendaFilter;
-import org.florense.domain.scheduler.jobs.ListAllNewOrders;
+import org.florense.domain.scheduler.jobs.listallneworders.ListAllNewOrders;
 import org.florense.outbound.port.postgre.AnuncioEntityPort;
 import org.florense.outbound.port.postgre.OrderEntityPort;
 import org.florense.outbound.port.postgre.UserEntityPort;
 import org.florense.outbound.port.postgre.VendaEntityPort;
 
-import java.util.List;
 import java.util.Objects;
 
 @RequestScoped

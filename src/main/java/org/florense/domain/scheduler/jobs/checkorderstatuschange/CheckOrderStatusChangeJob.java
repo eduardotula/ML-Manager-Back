@@ -1,27 +1,23 @@
-package org.florense.domain.scheduler.jobs;
+package org.florense.domain.scheduler.jobs.checkorderstatuschange;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import org.florense.domain.model.*;
+import org.florense.domain.model.ScheduleJob;
+import org.florense.domain.model.User;
 import org.florense.domain.util.OrderScheduelerJobKeyGenerator;
-import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
-import org.florense.outbound.adapter.mercadolivre.mlenum.MLStatusEnum;
-import org.florense.outbound.port.mercadolivre.MercadoLivreAnuncioPort;
-import org.florense.outbound.port.mercadolivre.MercadoLivreVendaPort;
-import org.florense.outbound.port.postgre.AnuncioEntityPort;
-import org.florense.outbound.port.postgre.OrderEntityPort;
 import org.florense.outbound.port.postgre.SchedulerJobEntityPort;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 import java.time.ZoneId;
-import java.util.*;
 
-public class ListAllNewOrdersJob implements Job {
+@ApplicationScoped
+public class CheckOrderStatusChangeJob implements Job {
 
     @Inject
-    ListAllNewOrders listAllNewOrders;
+    CheckOrderStatusChange checkOrderStatusChange;
     @Inject
     SchedulerJobEntityPort schedulerJobEntityPort;
     @Inject
@@ -33,15 +29,14 @@ public class ListAllNewOrdersJob implements Job {
         try{
             User user = (User) jobExecutionContext.getJobDetail().getJobDataMap().get("User");
             updateNextRunTime(jobExecutionContext, user);
-            listAllNewOrders.execute(user);
+            checkOrderStatusChange.execute(user);
         }catch (Exception e){
             throw new JobExecutionException(e);
         }
-
     }
 
     private void updateNextRunTime(JobExecutionContext jobExecutionContext, User user) {
-        ScheduleJob scheduleJob = schedulerJobEntityPort.findByJobName(nameGenerator.createJobKey(user).getName());
+        ScheduleJob scheduleJob = schedulerJobEntityPort.findByJobName(nameGenerator.createSearchOrderKey(user).getName());
         if (scheduleJob != null) {
             scheduleJob.setNextRunTime(jobExecutionContext.getTrigger().getNextFireTime().toInstant().
                     atZone(ZoneId.systemDefault()).toLocalDateTime());

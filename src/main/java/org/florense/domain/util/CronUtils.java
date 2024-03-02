@@ -17,6 +17,10 @@ public class CronUtils {
         return String.format("0 */%d * ? * * * ", minute);
     }
 
+    public String toCronTimeRepeatEveryHour(int hours){
+        return String.format("* * 0/%d ? * * * ", hours);
+    }
+
     public String toCronHourSingleUse(LocalDateTime localDateTime) {
         return String.format("%s %s %s %s %s ? %s",
                 localDateTime.getSecond(), localDateTime.getMinute(), localDateTime.getHour(),

@@ -13,11 +13,14 @@ import org.florense.outbound.adapter.mercadolivre.exceptions.UnauthorizedAcessKe
 import org.florense.outbound.adapter.mercadolivre.mlenum.MLStatusEnum;
 import org.florense.outbound.adapter.mercadolivre.response.MLOrderResponse;
 import org.florense.outbound.adapter.mercadolivre.response.MLOrderWrapperResponse;
-import org.florense.outbound.port.mercadolivre.MercadoLivreAnuncioPort;
 import org.florense.outbound.port.mercadolivre.MercadoLivreVendaPort;
 import org.florense.outbound.port.postgre.AnuncioEntityPort;
 
+import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @ApplicationScoped
@@ -26,25 +29,37 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
     String appId;
     @ConfigProperty(name = "quarkus.rest-client.ml-api.secret")
     String clientSecret;
+    @ConfigProperty(name = "scheduler.job.order.search_order_limit_months")
+    int searchLimit = 3;
     private static final int BATCH_SIZE = 50;
     @Inject
     AnuncioEntityPort anuncioEntityPort;
-    @Inject
-    MercadoLivreAnuncioPort mercadoLivreAnuncioPort;
 
     @RestClient
     @Inject
     MercadoLivreOrderClient mercadoLivreOrderClient;
 
     @Override
-    public List<Order> listAllOrders(User user, boolean retry) throws FailRequestRefreshTokenException, IllegalStateException {
+    public List<Order> listAllordersByDate(User user, List<MLStatusEnum> status, LocalDateTime startDate, LocalDateTime endDate, boolean retry) throws FailRequestRefreshTokenException, IllegalStateException {
         try {
             Map<Long, Order> listOrders = new LinkedHashMap<>();
             int offset = 0;
             int total = 1;
 
+            StringBuilder filterStatus = new StringBuilder();
+            status.forEach(mlStatusEnum -> filterStatus.append(mlStatusEnum.getIdentifier() + ","));
+            filterStatus.setLength(filterStatus.length() - 1);
+
+            Period period = Period.between(startDate.toLocalDate(), endDate.toLocalDate());
+            int months = period.getYears() * 12 + period.getMonths();
+            if(months > searchLimit) startDate = startDate.minusMonths(searchLimit);
+
             while (offset < total) {
-                MLOrderWrapperResponse resp = mercadoLivreOrderClient.vendasOrderDesc(user.getUserIdML(), offset, "date_desc", BATCH_SIZE, user.getAccessCode());
+                var start = ZonedDateTime.of(startDate.toLocalDate(),startDate.toLocalTime(),ZoneId.systemDefault());
+                var end = ZonedDateTime.of(endDate.toLocalDate(),endDate.toLocalTime(),ZoneId.systemDefault());
+                MLOrderWrapperResponse resp = mercadoLivreOrderClient.vendasOrderDesc(
+                        user.getUserIdML(), DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(start), DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(end),
+                        filterStatus.toString(), offset, "date_asc", BATCH_SIZE, user.getAccessCode());
 
                 for (MLOrderResponse orderRespons : resp.getOrderResponses()) {
                     var newOrder = convertMlOrderResponseToOrder(orderRespons, user);
@@ -62,7 +77,7 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
             if (e.getCause() instanceof UnauthorizedAcessKeyException) {
                 refreshAccessToken(appId, clientSecret, user);
                 if (retry) {
-                    return listAllOrders(user, false);
+                    return listAllordersByDate(user,status,startDate,endDate,false);
                 }
             }
         }
@@ -76,11 +91,10 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
             int offset = 0;
             int total = 1;
             StringBuilder filterStatus = new StringBuilder();
-            status.forEach(mlStatusEnum -> filterStatus.append(mlStatusEnum + ","));
+            status.forEach(mlStatusEnum -> filterStatus.append(mlStatusEnum.getIdentifier() + ","));
             filterStatus.setLength(filterStatus.length() - 1);
 
             while (offset < total) {
-
                 var resp = mercadoLivreOrderClient.vendasOrderDescByStatus(user.getUserIdML(),
                         filterStatus.toString(), "date_desc", offset, BATCH_SIZE, user.getAccessCode());
 
@@ -103,7 +117,7 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
             if (e.getCause() instanceof UnauthorizedAcessKeyException) {
                 refreshAccessToken(appId, clientSecret, user);
                 if (retry) {
-                    return listAllOrders(user, false);
+                    return listOrdersUntilExistent(status, existentOrderId, user, false);
                 }
             }
         }

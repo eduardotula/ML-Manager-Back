@@ -1,20 +1,16 @@
-package org.florense.domain.scheduler.jobs;
+package org.florense.domain.scheduler.jobs.listallneworders;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.florense.domain.model.*;
-import org.florense.domain.util.OrderScheduelerJobKeyGenerator;
 import org.florense.outbound.adapter.mercadolivre.mlenum.MLStatusEnum;
 import org.florense.outbound.port.mercadolivre.MercadoLivreAnuncioPort;
 import org.florense.outbound.port.mercadolivre.MercadoLivreVendaPort;
 import org.florense.outbound.port.postgre.AnuncioEntityPort;
 import org.florense.outbound.port.postgre.OrderEntityPort;
-import org.florense.outbound.port.postgre.SchedulerJobEntityPort;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 
-import java.time.ZoneId;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,13 +34,12 @@ public class ListAllNewOrders {
         try {
             Order lastOrder = getLastOrderByUser(user);
             List<Order> orders;
-            if (lastOrder != null) {
-                List<MLStatusEnum> statusEnums = Arrays.asList(MLStatusEnum.PAID, MLStatusEnum.CANCELLED);
-                orders = mercadoLivreVendaPort.listOrdersUntilExistent(statusEnums, lastOrder.getOrderId(), user, true);
-            } else {
-                orders = mercadoLivreVendaPort.listAllOrders(user, true);
-            }
+            List<MLStatusEnum> statusEnums = Arrays.asList(MLStatusEnum.PAID, MLStatusEnum.CANCELLED);
 
+            LocalDateTime endDate = LocalDateTime.now();
+            LocalDateTime startDate = LocalDateTime.of(1990,1,1,1,0);
+            if (lastOrder != null) orders = mercadoLivreVendaPort.listOrdersUntilExistent(statusEnums, lastOrder.getOrderId(), user, true);
+            else orders = mercadoLivreVendaPort.listAllordersByDate(user, statusEnums, startDate, endDate,true);
 
             List<Order> returnOrders = new LinkedList<>();
             for (Order order : orders) {

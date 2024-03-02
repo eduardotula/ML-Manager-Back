@@ -4,23 +4,18 @@ import io.quarkus.runtime.StartupEvent;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.florense.domain.model.ScheduleJob;
 import org.florense.domain.model.User;
+import org.florense.domain.scheduler.jobs.checkorderstatuschange.CheckOrderStatusChangeJob;
 import org.florense.domain.util.CronUtils;
 import org.florense.domain.util.OrderScheduelerJobKeyGenerator;
 import org.florense.outbound.port.postgre.SchedulerJobEntityPort;
 import org.florense.outbound.port.postgre.UserEntityPort;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
-import org.florense.domain.scheduler.jobs.ListAllNewOrdersJob;
+import org.florense.domain.scheduler.jobs.listallneworders.ListAllNewOrdersJob;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.List;
 
 @ApplicationScoped
@@ -32,6 +27,8 @@ public class OrderScheduler {
     int orderRefreshDelay;
     @Inject
     OrderScheduelerJobKeyGenerator jobKeyGenerator;
+    @ConfigProperty(name = "scheduler.job.order.search_order_limit_months")
+    int orderRefreshDelayStausChangeHours;
     @Inject
     JobScheduler jobScheduler;
     @Inject
@@ -39,35 +36,40 @@ public class OrderScheduler {
     @Inject
     CronUtils cronUtils;
 
-    public void createScheduleOrdersJobByUser(User user){
-        JobKey jobKey = jobKeyGenerator.createJobKey(user);
-        String cron = cronUtils.toCronTimeRepeatEveryMinute(orderRefreshDelay);
-        //String cron = "0 */2 * ? * *";
-
-        LocalDateTime localDateTimeRunTime = null;
+    public void createScheduleOrdersJobByUser(List<User> users){
         try {
-            localDateTimeRunTime = jobScheduler.createJob(jobKey, cron, ListAllNewOrdersJob.class, user);
+            for (User user: users){
+                JobKey jobKey = jobKeyGenerator.createSearchOrderKey(user);
+                String cron = cronUtils.toCronTimeRepeatEveryMinute(orderRefreshDelay);
+                //String cron = "0 */2 * ? * *";
+
+                ScheduleJob scheduleJob = jobScheduler.createJob(jobKey, cron, ListAllNewOrdersJob.class, user);
+                schedulerJobEntityPort.createUpdate(scheduleJob);
+            }
+
         } catch (SchedulerException e) {
             throw new RuntimeException(e);
         }
+    }
 
-
-        ScheduleJob scheduleJob = schedulerJobEntityPort.findByJobName(jobKey.getName());
-        if(scheduleJob == null){
-            scheduleJob = ScheduleJob.builder().jobName(jobKey.getName()).jobGroupName(jobKey.getGroup())
-                    .nextRunTime(localDateTimeRunTime).build();
+    public void createSchedulerCheckOrderStatus(List<User> users){
+        try{
+            for(User user: users){
+                JobKey jobKey = jobKeyGenerator.createStatusChangeOrder(user);
+                String cron = cronUtils.toCronTimeRepeatEveryHour(orderRefreshDelayStausChangeHours);
+                //String cron = "0 */2 * ? * *";
+                ScheduleJob scheduleJob = jobScheduler.createJob(jobKey, cron, CheckOrderStatusChangeJob.class, user);
+                schedulerJobEntityPort.createUpdate(scheduleJob);
+            }
+        }catch (Exception e){
+            throw new RuntimeException(e);
         }
-        else{
-            scheduleJob.setNextRunTime(localDateTimeRunTime);
-        }
-
-        schedulerJobEntityPort.createUpdate(scheduleJob);
     }
 
     public void createJobsOnStartUp(@Observes StartupEvent event){
+        schedulerJobEntityPort.deleteAll();
         List<User> users = userEntityPort.listAll();
-        for (User user : users) {
-            createScheduleOrdersJobByUser(user);
-        }
+//        createScheduleOrdersJobByUser(users);
+//        createSchedulerCheckOrderStatus(users);
     }
 }

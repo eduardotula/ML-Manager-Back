@@ -2,6 +2,7 @@ package org.florense.domain.scheduler;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import org.florense.domain.model.ScheduleJob;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 
@@ -17,7 +18,7 @@ public class JobScheduler {
     @Inject
     Scheduler quartz;
 
-    public LocalDateTime createJob(JobKey jobKey, String cron, Class<? extends Job> job, Object... jobParameters) throws SchedulerException {
+    public ScheduleJob createJob(JobKey jobKey, String cron, Class<? extends Job> job, Object... jobParameters) throws SchedulerException {
         var activateJob = JobBuilder.newJob(job).withIdentity(jobKey).build();
 
         for (Object jobParameter : jobParameters)
@@ -27,8 +28,10 @@ public class JobScheduler {
                 CronScheduleBuilder.cronSchedule(cron)).build();
 
         Date runTime = quartz.scheduleJob(activateJob, activationTrigger);
+        LocalDateTime localDateTimeRunTime = runTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 
-        return runTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        return ScheduleJob.builder().jobName(jobKey.getName()).jobGroupName(jobKey.getGroup())
+                .nextRunTime(localDateTimeRunTime).build();
     }
 
     public List<String> getScheduledJobs() {

@@ -7,7 +7,11 @@ import org.quartz.JobKey;
 @ApplicationScoped
 public class OrderScheduelerJobKeyGenerator {
 
-    public JobKey createJobKey(User user){
+    public JobKey createSearchOrderKey(User user){
         return new JobKey(String.format("%s_searchOrders", user.getName()), "searchOrders");
+    }
+
+    public JobKey createStatusChangeOrder(User user){
+        return new JobKey(String.format("%s_searchOrdersStatusChange", user.getName()), "searchOrdersStatusChange");
     }
 }
