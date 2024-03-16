@@ -45,9 +45,13 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         Anuncio completeAnuncio = mercadoLivreAnuncioPort.getAnuncio(anuncio.getMlId(), user, true);
         completeAnuncio.setTaxaML(mercadoLivreAnuncioPort.getTarifas(completeAnuncio.getPrecoDesconto(),
                 completeAnuncio.getCategoria(), completeAnuncio.getListingType(), user, true));
-        if (completeAnuncio.getPrecoDesconto() >= 80)
-            completeAnuncio.setCustoFrete(mercadoLivreAnuncioPort.getFrete(completeAnuncio.getMlId(),  user, true));
-        else completeAnuncio.setCustoFrete(0.0);
+        if (completeAnuncio.getPrecoDesconto() >= 80){
+            try {
+                completeAnuncio.setCustoFrete(mercadoLivreAnuncioPort.getFrete(completeAnuncio.getMlId(), completeAnuncio.getStatus(), user, true));
+            } catch (MercadoLivreException e) {
+                completeAnuncio.setCustoFrete(0.0);
+            }
+        } else completeAnuncio.setCustoFrete(0.0);
 
         completeAnuncio.setCusto(anuncio.getCusto());
         completeAnuncio.setCsosn(anuncio.getCsosn());
@@ -103,9 +107,13 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         Anuncio completeAnuncio = mercadoLivreAnuncioPort.getAnuncio(mlId, user, true);
         completeAnuncio.setTaxaML(mercadoLivreAnuncioPort.getTarifas(completeAnuncio.getPrecoDesconto(),
                 completeAnuncio.getCategoria(), completeAnuncio.getListingType(), user, true));
-        if (completeAnuncio.getPrecoDesconto() >= 80)
-            completeAnuncio.setCustoFrete(mercadoLivreAnuncioPort.getFrete(completeAnuncio.getMlId(), user, true));
-        else completeAnuncio.setCustoFrete(0.0);
+        if (completeAnuncio.getPrecoDesconto() >= 80){
+            try {
+                completeAnuncio.setCustoFrete(mercadoLivreAnuncioPort.getFrete(completeAnuncio.getMlId(),completeAnuncio.getStatus(), user, true));
+            } catch (MercadoLivreException ignored) {
+                ignored.getClientException();
+            }
+        } else completeAnuncio.setCustoFrete(0.0);
         completeAnuncio.update(existProd);
         completeAnuncio.setCsosn(existProd.getCsosn());
         completeAnuncio.setCusto(existProd.getCusto());

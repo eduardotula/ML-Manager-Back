@@ -18,14 +18,18 @@ public class MercadoLivreResponseExceptionMapper implements ResponseExceptionMap
     public MercadoLivreClientException toThrowable(Response response) {
         String output = response.readEntity(String.class);
         MercadoLivreClientException mercadoLivreClientException = new MercadoLivreClientException();
+
         try {
             mercadoLivreClientException = objectMapperUtil.mapper.readValue(output, MercadoLivreClientException.class);
         } catch (JsonProcessingException e) {
             mercadoLivreClientException.setMessage("Falha ao processar resposta de erro");
         }
         mercadoLivreClientException.setCompleteError(output);
+        if(response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()){
+            if(output.contains("invalid access token"))
+                mercadoLivreClientException.setRefreshToken(true);
+        }
 
-        if(mercadoLivreClientException.getMessage().equalsIgnoreCase("invalid_token")) mercadoLivreClientException.setRefreshToken(true);
         return mercadoLivreClientException;
     }
 }

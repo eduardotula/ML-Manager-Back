@@ -66,8 +66,10 @@ public class MercadoLivreAnuncioAdapter extends MercadoLivreAdapter implements M
     }
 
     @Override
-    public double getFrete(String mlId, User user, boolean retry) throws FailRequestRefreshTokenException, MercadoLivreException {
+    public double getFrete(String mlId, String anuncioStatus, User user, boolean retry) throws FailRequestRefreshTokenException, MercadoLivreException {
         try {
+            if(anuncioStatus.equalsIgnoreCase("paused")) throw new MercadoLivreException("Anuncio pausado", "getFrete", MLErrorTypesEnum.DEFAULT, null);
+
             Map<String, Object> frete = mercadoLivreAnuncioClient.getFretePrice(mlId, user.getCep(), user.getAccessCode());
             List<Object> options = (List<Object>) frete.get("options");
             Map<String, Object> option = (Map<String, Object>) options.get(0);
@@ -76,7 +78,7 @@ public class MercadoLivreAnuncioAdapter extends MercadoLivreAdapter implements M
             if (e.isRefreshToken()) {
                 refreshAccessToken(appId, clientSecret, user);
                 if (retry) {
-                    return getFrete(mlId,user, false);
+                    return getFrete(mlId, anuncioStatus,user, false);
                 }
                 //Caso produto esteja no full e desativado
             }else if(e.getDetail().equalsIgnoreCase("non available fbm origins for these items")){

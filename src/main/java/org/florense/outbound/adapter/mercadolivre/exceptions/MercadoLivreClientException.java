@@ -1,6 +1,7 @@
 package org.florense.outbound.adapter.mercadolivre.exceptions;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,6 +15,7 @@ import java.util.Map;
 @NoArgsConstructor
 @Getter
 @Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class MercadoLivreClientException extends Exception{
 
     private String message;

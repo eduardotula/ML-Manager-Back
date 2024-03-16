@@ -67,6 +67,7 @@ public class Anuncio {
     }
 
     public static double calculateLucro(double custo, double taxaML, double custoFrete, double imposto, double precoDesconto){
+        if (precoDesconto >= 80) custoFrete = 0.0;
         BigDecimal nfTaxa = new BigDecimal(Double.toString(imposto));
         double custoTotal = custo + taxaML + custoFrete + nfTaxa.doubleValue();
         var lucroBig = new BigDecimal(precoDesconto - custoTotal);
