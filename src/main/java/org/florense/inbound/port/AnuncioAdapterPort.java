@@ -6,6 +6,7 @@ import org.florense.domain.model.Anuncio;
 import org.florense.inbound.adapter.dto.consultas.AnuncioSimulation;
 import org.florense.inbound.adapter.dto.consultas.AnuncioSimulationResponse;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
+import org.florense.outbound.adapter.mercadolivre.exceptions.MercadoLivreException;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ public interface AnuncioAdapterPort {
 
     //Cria e atualiza com mercado livre
     @Transactional
-    Anuncio createMlSearch(Anuncio anuncio, Long userId) throws FailRequestRefreshTokenException, IllegalStateException;
+    Anuncio createMlSearch(Anuncio anuncio, Long userId) throws FailRequestRefreshTokenException, MercadoLivreException;
 
     //Somente atualiza um anuncio
     @Transactional
@@ -22,7 +23,7 @@ public interface AnuncioAdapterPort {
 
     //Atualiza dados somente do mercado livre
     @Transactional
-    Anuncio updateSearch(String mlId, Long userId) throws FailRequestRefreshTokenException, IllegalStateException;
+    Anuncio updateSearch(String mlId, Long userId) throws FailRequestRefreshTokenException, MercadoLivreException;
 
     @Transactional
     List<String> listAllAnunciosMercadoLivre(Long userId, boolean isActive) throws FailRequestRefreshTokenException;
@@ -34,7 +35,7 @@ public interface AnuncioAdapterPort {
     Anuncio findAnyAnuncioByMlId(String mlId, Long userId);
 
     @Transactional
-    Anuncio findAnuncioByMlIdSearch(String mlId, Long userId) throws FailRequestRefreshTokenException, IllegalStateException;
+    Anuncio findAnuncioByMlIdSearch(String mlId, Long userId) throws FailRequestRefreshTokenException, MercadoLivreException;
 
     @Transactional
     List<Anuncio> listAll(Long userId);
@@ -46,5 +47,5 @@ public interface AnuncioAdapterPort {
     void deleteBy(Long id) throws IllegalStateException;
 
     @Transactional
-    AnuncioSimulationResponse simulateAnuncio(AnuncioSimulation anuncioSimulation) throws IllegalStateException, FailRequestRefreshTokenException;
+    AnuncioSimulationResponse simulateAnuncio(AnuncioSimulation anuncioSimulation) throws MercadoLivreException, FailRequestRefreshTokenException;
 }

@@ -4,6 +4,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.florense.domain.model.*;
+import org.florense.outbound.adapter.mercadolivre.exceptions.MLErrorTypesEnum;
+import org.florense.outbound.adapter.mercadolivre.exceptions.MercadoLivreException;
 import org.florense.outbound.adapter.mercadolivre.mlenum.MLStatusEnum;
 import org.florense.outbound.port.mercadolivre.MercadoLivreAnuncioPort;
 import org.florense.outbound.port.mercadolivre.MercadoLivreVendaPort;
@@ -53,11 +55,8 @@ public class ListAllNewOrders {
                 //Reliza a atualização de um pedido ou cria, caso produto não existir é criado um produto temporario
                 for (Venda venda : order.getVendas()) {
 
-                    if(venda.getPrecoDesconto() >= 80){
-                        venda.setCustoFrete(mercadoLivreAnuncioPort.getFrete(venda.getAnuncio().getMlId(), user,true));
-                        venda.getAnuncio().setCustoFrete(venda.getCustoFrete());
-                    }
-
+                    double valorFrete = mercadoLivreAnuncioPort.getFrete(order.getShippingId(),user,true);
+                    venda.setCustoFrete(valorFrete);
                     var existingAnuncio = findAnuncioByMlId(venda.getAnuncio().getMlId(), user.getId());
 
                     if (Objects.nonNull(existingAnuncio)) {
@@ -65,7 +64,7 @@ public class ListAllNewOrders {
                     }else{
                         Anuncio anuncio = venda.getAnuncio();
                         anuncio.setComplete(false);
-                        anuncio.setCustoFrete(venda.getCustoFrete());
+                        anuncio.setCustoFrete(valorFrete);
                         venda.setAnuncio(createAnuncio(anuncio));
                     }
 

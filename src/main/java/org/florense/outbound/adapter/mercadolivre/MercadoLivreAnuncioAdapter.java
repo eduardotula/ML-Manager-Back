@@ -2,14 +2,15 @@ package org.florense.outbound.adapter.mercadolivre;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.resource.spi.IllegalStateException;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.florense.domain.model.Anuncio;
 import org.florense.domain.model.User;
 import org.florense.outbound.adapter.mercadolivre.client.MercadoLivreAnuncioClient;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
-import org.florense.outbound.adapter.mercadolivre.exceptions.UnauthorizedAcessKeyException;
+import org.florense.outbound.adapter.mercadolivre.exceptions.MLErrorTypesEnum;
+import org.florense.outbound.adapter.mercadolivre.exceptions.MercadoLivreClientException;
+import org.florense.outbound.adapter.mercadolivre.exceptions.MercadoLivreException;
 import org.florense.outbound.adapter.mercadolivre.mapper.MercadoLivreProdutoAnuncio;
 import org.florense.domain.model.ListingTypeEnum;
 import org.florense.outbound.port.mercadolivre.MercadoLivreAnuncioPort;
@@ -33,53 +34,72 @@ public class MercadoLivreAnuncioAdapter extends MercadoLivreAdapter implements M
     private static final int BATCH_SIZE = 50;
 
     @Override
-    public Anuncio getAnuncio(String mlId, User user, boolean retry) throws FailRequestRefreshTokenException, IllegalStateException {
+    public Anuncio getAnuncio(String mlId, User user, boolean retry) throws FailRequestRefreshTokenException, MercadoLivreException {
         try {
             var p = mercadoLivreAnuncioClient.anuncio(mlId, user.getAccessCode());
             return mapper.toAnuncio(p);
-        } catch (RuntimeException e) {
-            if (e.getCause() instanceof UnauthorizedAcessKeyException) {
+        } catch (MercadoLivreClientException e) {
+            if (e.isRefreshToken()) {
                 refreshAccessToken(appId, clientSecret, user);
                 if (retry) {
                     return getAnuncio(mlId, user, false);
                 }
             }
+            throw new MercadoLivreException(String.format("Falha ao obter anuncio %s", mlId), "getAnuncio",MLErrorTypesEnum.DEFAULT, e);
         }
-        throw new IllegalStateException(String.format("Falha ao obter anuncio %s", mlId));
     }
 
     @Override
-    public double getTarifas(double preco, String categoria, ListingTypeEnum typeEnum, User user, boolean retry) throws FailRequestRefreshTokenException, IllegalStateException {
+    public double getTarifas(double preco, String categoria, ListingTypeEnum typeEnum, User user, boolean retry) throws FailRequestRefreshTokenException, MercadoLivreException {
         try {
             Map<String, Object> tarifa = mercadoLivreAnuncioClient.getListingPrices(preco, typeEnum.getValue(), categoria, user.getAccessCode());
             return ((Number) tarifa.get("sale_fee_amount")).doubleValue();
-        } catch (RuntimeException e) {
-            if (e.getCause() instanceof UnauthorizedAcessKeyException) {
+        } catch (MercadoLivreClientException e) {
+            if (e.isRefreshToken()) {
                 refreshAccessToken(appId, clientSecret, user);
                 if (retry) {
                     return getTarifas(preco, categoria, typeEnum, user, false);
                 }
             }
+            throw new MercadoLivreException(String.format("Falha ao obter tarifas categoria %s", categoria), "getTarifas",MLErrorTypesEnum.DEFAULT, e);
         }
-        throw new IllegalStateException(String.format("Falha ao obter tarifas categoria %s", categoria));
     }
 
     @Override
-    public double getFrete(String mlId, User user, boolean retry) throws FailRequestRefreshTokenException, IllegalStateException {
+    public double getFrete(String mlId, User user, boolean retry) throws FailRequestRefreshTokenException, MercadoLivreException {
         try {
             Map<String, Object> frete = mercadoLivreAnuncioClient.getFretePrice(mlId, user.getCep(), user.getAccessCode());
             List<Object> options = (List<Object>) frete.get("options");
             Map<String, Object> option = (Map<String, Object>) options.get(0);
             return ((Number) option.get("list_cost")).doubleValue();
-        } catch (Exception e) {
-            if (e.getCause() instanceof UnauthorizedAcessKeyException) {
+        } catch (MercadoLivreClientException e) {
+            if (e.isRefreshToken()) {
                 refreshAccessToken(appId, clientSecret, user);
                 if (retry) {
                     return getFrete(mlId,user, false);
                 }
+                //Caso produto esteja no full e desativado
+            }else if(e.getDetail().equalsIgnoreCase("non available fbm origins for these items")){
+                throw new MercadoLivreException("Falha ao obter frete de produto Full", "getFrete", MLErrorTypesEnum.FRETE_VALUE,e);
             }
+            throw new MercadoLivreException(String.format("Falha ao obter frete mlId %s", mlId), "getFrete", MLErrorTypesEnum.DEFAULT, e);
         }
-        throw new IllegalStateException(String.format("Falha ao obter frete mlId %s", mlId));
+    }
+    @Override
+    public double getFrete(Long shippingId, User user, boolean retry) throws FailRequestRefreshTokenException, MercadoLivreException{
+        try{
+            Map<String, Object> response = mercadoLivreAnuncioClient.getFretePriceByShippingId(shippingId.toString(), user.getAccessCode());
+            List<Object> options = (List<Object>) response.get("senders");
+            Map<String, Object> senders = (Map<String, Object>) options.get(0);
+            return ((Number) senders.get("cost")).doubleValue();
+
+        }catch (MercadoLivreClientException e){
+            refreshAccessToken(appId, clientSecret, user);
+            if (retry) {
+                return getFrete(shippingId,user, false);
+            }
+            throw new MercadoLivreException(String.format("Falha ao obter frete shippingId %s", shippingId), "getFrete", MLErrorTypesEnum.DEFAULT, e);
+        }
     }
 
     @Override
@@ -97,8 +117,8 @@ public class MercadoLivreAnuncioAdapter extends MercadoLivreAdapter implements M
             }
 
             return allActiveIds;
-        } catch (RuntimeException e) {
-            if (e.getCause() instanceof UnauthorizedAcessKeyException) {
+        } catch (MercadoLivreClientException e) {
+            if (e.isRefreshToken()) {
                 refreshAccessToken(appId, clientSecret, user);
                 if (retry) {
                     return listAllAnunciosMercadoLivre(user, includePaused,false);

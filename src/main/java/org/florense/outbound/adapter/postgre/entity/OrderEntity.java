@@ -24,8 +24,8 @@ public class OrderEntity {
     @Column(name = "order_id")
     private Long orderId;
 
-    @Column(name = "pack_id")
-    private Long packId;
+    @Column(name = "shipping_id")
+    private Long shippingId;
 
     @OneToMany(mappedBy = "order",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VendaEntity> vendas;

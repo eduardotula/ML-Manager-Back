@@ -5,7 +5,6 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.florense.domain.model.User;
-import org.florense.domain.usecase.UserUseCase;
 import org.florense.outbound.adapter.mercadolivre.client.MLAuthService;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
 import org.florense.outbound.adapter.mercadolivre.response.MLRefreshTokenResponse;

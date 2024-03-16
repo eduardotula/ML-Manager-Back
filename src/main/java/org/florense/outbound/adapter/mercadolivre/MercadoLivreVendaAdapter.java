@@ -9,7 +9,9 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.florense.domain.model.*;
 import org.florense.outbound.adapter.mercadolivre.client.MercadoLivreOrderClient;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
-import org.florense.outbound.adapter.mercadolivre.exceptions.UnauthorizedAcessKeyException;
+import org.florense.outbound.adapter.mercadolivre.exceptions.MLErrorTypesEnum;
+import org.florense.outbound.adapter.mercadolivre.exceptions.MercadoLivreClientException;
+import org.florense.outbound.adapter.mercadolivre.exceptions.MercadoLivreException;
 import org.florense.outbound.adapter.mercadolivre.mlenum.MLStatusEnum;
 import org.florense.outbound.adapter.mercadolivre.response.MLOrderResponse;
 import org.florense.outbound.adapter.mercadolivre.response.MLOrderWrapperResponse;
@@ -40,7 +42,7 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
     MercadoLivreOrderClient mercadoLivreOrderClient;
 
     @Override
-    public List<Order> listAllordersByDate(User user, List<MLStatusEnum> status, LocalDateTime startDate, LocalDateTime endDate, boolean retry) throws FailRequestRefreshTokenException, IllegalStateException {
+    public List<Order> listAllordersByDate(User user, List<MLStatusEnum> status, LocalDateTime startDate, LocalDateTime endDate, boolean retry) throws FailRequestRefreshTokenException, MercadoLivreException {
         try {
             Map<Long, Order> listOrders = new LinkedHashMap<>();
             int offset = 0;
@@ -72,20 +74,20 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
             }
             return convertToReturn(listOrders);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            if (e.getCause() instanceof UnauthorizedAcessKeyException) {
+        } catch (MercadoLivreClientException e) {
+            if (e.isRefreshToken()) {
                 refreshAccessToken(appId, clientSecret, user);
                 if (retry) {
                     return listAllordersByDate(user,status,startDate,endDate,false);
                 }
             }
+            throw new MercadoLivreException("Falha ao obter orders","listAllordersByDate", MLErrorTypesEnum.DEFAULT,e);
         }
-        throw new IllegalStateException("Falha ao Buscar vendas");
+
     }
 
     @Override
-    public List<Order> listOrdersUntilExistent(List<MLStatusEnum> status, Long existentOrderId, User user, boolean retry) throws FailRequestRefreshTokenException, IllegalStateException {
+    public List<Order> listOrdersUntilExistent(List<MLStatusEnum> status, Long existentOrderId, User user, boolean retry) throws FailRequestRefreshTokenException, MercadoLivreException {
         try {
             Map<Long, Order> listVendas = new LinkedHashMap<>();
             int offset = 0;
@@ -112,16 +114,17 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
             }
             return convertToReturn(listVendas);
 
-        } catch (Exception e) {
+        } catch (MercadoLivreClientException e) {
             e.printStackTrace();
-            if (e.getCause() instanceof UnauthorizedAcessKeyException) {
+            if (e.isRefreshToken()) {
                 refreshAccessToken(appId, clientSecret, user);
                 if (retry) {
                     return listOrdersUntilExistent(status, existentOrderId, user, false);
                 }
             }
+            throw new MercadoLivreException("Falha ao Buscar vendas", "listOrdersUntilExistent", MLErrorTypesEnum.DEFAULT, e);
+
         }
-        throw new IllegalStateException("Falha ao Buscar vendas");
     }
 
     private List<Order> convertToReturn(Map<Long, Order> orderMap) {
@@ -135,7 +138,7 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
 
     //Esta aqui para evitar timeout em transaction anterior
     @Transactional(Transactional.TxType.REQUIRES_NEW)
-    public Order convertMlOrderResponseToOrder(MLOrderResponse mlOrderResponse, User user) throws FailRequestRefreshTokenException, IllegalStateException {
+    public Order convertMlOrderResponseToOrder(MLOrderResponse mlOrderResponse, User user){
         boolean completo = mlOrderResponse.getCompleto() != null;
 
         Anuncio existingAnuncio = anuncioEntityPort.findAnyByMlId(mlOrderResponse.getMlId(), user);

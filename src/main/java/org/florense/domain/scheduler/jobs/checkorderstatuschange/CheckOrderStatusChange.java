@@ -2,15 +2,11 @@ package org.florense.domain.scheduler.jobs.checkorderstatuschange;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.resource.spi.IllegalStateException;
 import org.florense.domain.model.Order;
 import org.florense.domain.model.User;
 import org.florense.domain.model.Venda;
-import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
 import org.florense.outbound.adapter.mercadolivre.mlenum.MLStatusEnum;
-import org.florense.outbound.port.mercadolivre.MercadoLivreAnuncioPort;
 import org.florense.outbound.port.mercadolivre.MercadoLivreVendaPort;
-import org.florense.outbound.port.postgre.AnuncioEntityPort;
 import org.florense.outbound.port.postgre.OrderEntityPort;
 
 import java.time.LocalDateTime;

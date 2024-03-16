@@ -5,13 +5,13 @@ import jakarta.inject.Inject;
 import jakarta.resource.spi.IllegalStateException;
 import jakarta.transaction.Transactional;
 import org.florense.domain.model.Anuncio;
-import org.florense.domain.model.ListingTypeEnum;
 import org.florense.domain.model.Order;
 import org.florense.domain.model.User;
 import org.florense.inbound.adapter.dto.consultas.AnuncioSimulation;
 import org.florense.inbound.adapter.dto.consultas.AnuncioSimulationResponse;
 import org.florense.inbound.port.AnuncioAdapterPort;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
+import org.florense.outbound.adapter.mercadolivre.exceptions.MercadoLivreException;
 import org.florense.outbound.port.mercadolivre.MercadoLivreAnuncioPort;
 import org.florense.outbound.port.postgre.AnuncioEntityPort;
 import org.florense.outbound.port.postgre.OrderEntityPort;
@@ -35,7 +35,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
     //Cria e atualiza com mercado livre
     @Override
     @Transactional
-    public Anuncio createMlSearch(Anuncio anuncio, Long userId) throws FailRequestRefreshTokenException, IllegalStateException {
+    public Anuncio createMlSearch(Anuncio anuncio, Long userId) throws FailRequestRefreshTokenException, MercadoLivreException {
         User user = getUserOrThrowException(userId);
 
         var existProd = anuncioEntityPort.findByMlId(anuncio.getMlId(), user);
@@ -93,7 +93,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
     //Atualiza dados somente do mercado livre
     @Override
     @Transactional
-    public Anuncio updateSearch(String mlId, Long userId) throws FailRequestRefreshTokenException, IllegalStateException {
+    public Anuncio updateSearch(String mlId, Long userId) throws FailRequestRefreshTokenException, MercadoLivreException {
         User user = getUserOrThrowException(userId);
         var existProd = anuncioEntityPort.findByMlId(mlId, user);
         if (Objects.isNull(existProd)) {
@@ -139,7 +139,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
 
     @Override
     @Transactional
-    public Anuncio findAnuncioByMlIdSearch(String mlId, Long userId) throws FailRequestRefreshTokenException, IllegalStateException {
+    public Anuncio findAnuncioByMlIdSearch(String mlId, Long userId) throws FailRequestRefreshTokenException, MercadoLivreException {
         User user = getUserOrThrowException(userId);
         return mercadoLivreAnuncioPort.getAnuncio(mlId, user, true);
     }
@@ -186,7 +186,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
 
     @Override
     @Transactional
-    public AnuncioSimulationResponse simulateAnuncio(AnuncioSimulation anuncioSimulation) throws IllegalStateException, FailRequestRefreshTokenException {
+    public AnuncioSimulationResponse simulateAnuncio(AnuncioSimulation anuncioSimulation) throws MercadoLivreException, FailRequestRefreshTokenException {
         User user = getUserOrThrowException(anuncioSimulation.getUserId());
         double taxaML = mercadoLivreAnuncioPort.getTarifas(anuncioSimulation.getValorVenda(),anuncioSimulation.getCategoria(),
                 anuncioSimulation.getTipoAnuncio(),user,true);

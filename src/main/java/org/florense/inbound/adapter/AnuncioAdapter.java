@@ -17,6 +17,7 @@ import org.florense.inbound.adapter.dto.consultas.AnuncioSimulation;
 import org.florense.inbound.adapter.dto.consultas.AnuncioSimulationResponse;
 import org.florense.inbound.adapter.mappers.AnuncioDtoMapper;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
+import org.florense.outbound.adapter.mercadolivre.exceptions.MercadoLivreException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,7 +35,7 @@ public class AnuncioAdapter {
 
     @POST
     @Path("")
-    public AnuncioDto createAnuncioSearch(@Valid AnuncioDtoSimple simple, @QueryParam("user-id") Long userId) throws FailRequestRefreshTokenException, IllegalStateException {
+    public AnuncioDto createAnuncioSearch(@Valid AnuncioDtoSimple simple, @QueryParam("user-id") Long userId) throws FailRequestRefreshTokenException, MercadoLivreException {
         Anuncio anuncioDtoSimple = Anuncio.builder().csosn(simple.getCsosn()).mlId(simple.getMlId()).custo(simple.getCusto()).build();
         return anuncioDtoMapper.toDto(anuncioUseCase.createMlSearch(anuncioDtoSimple, userId));
     }
@@ -48,7 +49,7 @@ public class AnuncioAdapter {
 
     @PUT
     @Path("{ml-id}/search")
-    public AnuncioDto searchExitProd(@PathParam("ml-id") String mlID, @QueryParam("user-id") Long userId) throws FailRequestRefreshTokenException, IllegalStateException {
+    public AnuncioDto searchExitProd(@PathParam("ml-id") String mlID, @QueryParam("user-id") Long userId) throws FailRequestRefreshTokenException, MercadoLivreException {
         return anuncioDtoMapper.toDto(anuncioUseCase.updateSearch(mlID, userId));
     }
 
@@ -80,7 +81,7 @@ public class AnuncioAdapter {
 
     @GET
     @Path("/mlId/{ml-id}/ml-api")
-    public AnuncioDto findAnuncioByMlIdSearch(@PathParam("ml-id") String mlId, @QueryParam("user-id") Long userId) throws FailRequestRefreshTokenException, IllegalStateException {
+    public AnuncioDto findAnuncioByMlIdSearch(@PathParam("ml-id") String mlId, @QueryParam("user-id") Long userId) throws FailRequestRefreshTokenException, MercadoLivreException {
         return anuncioDtoMapper.toDto(anuncioUseCase.findAnuncioByMlIdSearch(mlId, userId));
     }
 
@@ -100,7 +101,7 @@ public class AnuncioAdapter {
                                                      @Pattern(regexp = "classico|premium",message = "campo tipo do anuncio, valores permitidos: classico, premium", flags = Pattern.Flag.CASE_INSENSITIVE)
                                                      @QueryParam("tipo-anuncio") String tipoAnuncio,
                                                      @QueryParam("user-id") @NotNull Long userId
-                                                     ) throws IllegalStateException, FailRequestRefreshTokenException {
+                                                     ) throws MercadoLivreException, FailRequestRefreshTokenException {
         ListingTypeEnum listingTypeEnum = tipoAnuncio.equalsIgnoreCase("classico") ? ListingTypeEnum.classico : ListingTypeEnum.premium;
         AnuncioSimulation anuncioSimulation = new AnuncioSimulation(categoria,valorVenda,custo,custoFrete, csosn, listingTypeEnum, userId);
         return this.anuncioUseCase.simulateAnuncio(anuncioSimulation);

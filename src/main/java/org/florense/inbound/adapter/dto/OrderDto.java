@@ -15,7 +15,7 @@ public class OrderDto {
 
     private Long id;
     private Long orderId;
-    private Long packId;
+    private Long shippingId;
     private List<VendaDto> vendas;
     private LocalDateTime orderCreationTime;
     private LocalDateTime createdAt;
