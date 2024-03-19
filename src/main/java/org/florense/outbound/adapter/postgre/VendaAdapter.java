@@ -12,7 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -27,8 +27,10 @@ public class VendaAdapter implements VendaEntityPort {
     public Pagination<Venda> listByAnuncio(Anuncio anuncio, VendaFilter filter){
         Pageable pageable = PageRequest.of(filter.getPageParam().getPage(), filter.getPageParam().getPageSize());
 
-        String status = filter.isIncludeCancelled() ?
-                String.format("%s and %s", MLStatusEnum.PAID.getIdentifier(), MLStatusEnum.CANCELLED.getIdentifier()) : MLStatusEnum.PAID.getIdentifier();
+        List<String> status = new ArrayList<>(List.of(new String[]{MLStatusEnum.PAID.getIdentifier()    }));
+        if(filter.isIncludeCancelled()){
+            status.add(MLStatusEnum.CANCELLED.getIdentifier());
+        }
 
         var page = vendaRepository.listByFilters(filter.getOrderCreationInicial(), filter.getOrderCreationFinal(), anuncio.getId(), status,
                 filter.getSort(), pageable);
