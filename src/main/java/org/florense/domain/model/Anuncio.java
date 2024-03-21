@@ -82,7 +82,7 @@ public class Anuncio {
 
     public static double calculateImposto(String csosn, double precoDesconto){
         BigDecimal porcenNf = new BigDecimal("6.92");
-        if(csosn.equals("102")) new BigDecimal("10.40");
+        if(csosn.equals("102")) porcenNf = new BigDecimal("10.40");
         porcenNf = porcenNf.setScale(2,  RoundingMode.HALF_UP);
         porcenNf = porcenNf.divide(new BigDecimal(100), RoundingMode.HALF_UP);
 

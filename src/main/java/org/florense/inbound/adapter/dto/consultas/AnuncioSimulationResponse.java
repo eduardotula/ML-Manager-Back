@@ -10,4 +10,10 @@ import lombok.*;
 public class AnuncioSimulationResponse {
 
     private double lucro;
+    private double custo;
+    private String csosn;
+    private double taxaMl;
+    private double frete;
+    private double imposto;
+    private String categoria;
 }

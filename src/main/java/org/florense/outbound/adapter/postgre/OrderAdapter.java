@@ -76,7 +76,8 @@ public class OrderAdapter implements OrderEntityPort {
 
     @Override
     public Order findByOrderId(Long orderId){
-        return mapper.toModel(repository.findByOrderId(orderId).orElse(null));
+        var order= repository.findByOrderId(orderId).orElse(null);
+        return mapper.toModel(order);
     }
     @Override
     public void deleteById(Long id){

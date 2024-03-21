@@ -5,12 +5,14 @@ import jakarta.inject.Inject;
 import org.florense.domain.model.Order;
 import org.florense.domain.model.User;
 import org.florense.domain.model.Venda;
+import org.florense.domain.util.Logging;
 import org.florense.outbound.adapter.mercadolivre.mlenum.MLStatusEnum;
 import org.florense.outbound.port.mercadolivre.MercadoLivreVendaPort;
 import org.florense.outbound.port.postgre.OrderEntityPort;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -23,13 +25,21 @@ public class CheckOrderStatusChange {
     @Inject
     MercadoLivreVendaPort mercadoLivreVendaPort;
 
+    Logging logging;
+    @Inject
+    public CheckOrderStatusChange(Logging logging){
+        logging.setOriginClass(CheckOrderStatusChange.class);
+        this.logging = logging;
+    }
+
     public void execute(User user){
         try {
             List<MLStatusEnum> statusEnums = Arrays.asList(MLStatusEnum.CANCELLED);
             LocalDateTime endDate = LocalDateTime.now();
             LocalDateTime startDate = endDate.minusMonths(3);
             List<Order> orders = mercadoLivreVendaPort.listAllordersByDate(user, statusEnums, startDate, endDate,true);
-
+            List<Order> updatedOrders = new LinkedList<>();
+            this.logging.info("teste");
             for(Order mlOrder: orders){
                 Order existingOrder = orderEntityPort.findByOrderId(mlOrder.getOrderId());
 
@@ -38,10 +48,15 @@ public class CheckOrderStatusChange {
                         //Procura pelo mesmo produto na ordem
                         List<Venda> vendas = existingOrder.getVendas().stream().filter(existVenda -> existVenda.getAnuncio().
                                 getMlId().equalsIgnoreCase(mlVenda.getAnuncio().getMlId())).collect(Collectors.toList());
-                        if(!vendas.isEmpty()) vendas.get(0).setStatus(mlVenda.getStatus());
+                        if(!vendas.isEmpty()){
+                            vendas.get(0).setStatus(mlVenda.getStatus());
+                            updatedOrders.add(existingOrder);
+                        }
                     }
                 }
             }
+
+            orderEntityPort.createUpdateAll(updatedOrders);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
