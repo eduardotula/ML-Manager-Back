@@ -43,7 +43,6 @@ public class AnuncioEntity {
     private double taxaML;
     @Column(name = "custo_frete", columnDefinition = "NUMERIC(18,2)")
     private double custoFrete;
-
     @Column(name = "status")
     private String status;
     @Column(name = "listing_type")

@@ -81,11 +81,9 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         if(!existProd.isComplete()){
             List<Order> orders = orderEntityPort.listAllOrdersByAnuncio(existProd);
             orders.forEach(order -> order.getVendas().forEach(venda -> {
-                if(venda.getCusto() == 0){
-                    venda.setCusto(existProd.getCusto());
+                if(venda.getCusto() == 0) venda.setCusto(existProd.getCusto());
+                venda.setLucro(Anuncio.calculateLucro(venda.getAnuncio()));
 
-                    venda.setLucro(Anuncio.calculateLucro(venda.getAnuncio()));
-                }
             }));
             orderEntityPort.createUpdateAll(orders);
         }
@@ -182,11 +180,14 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
     @Override
     @Transactional
     public void deleteBy(Long id) throws IllegalStateException {
-        if (Objects.isNull(anuncioEntityPort.findAnyById(id)))
+        Anuncio anuncio = anuncioEntityPort.findAnyById(id);
+        if (Objects.isNull(anuncio))
             throw new IllegalArgumentException(String.format("Anuncio com id %s não encontrado", id));
 
         try {
-            anuncioEntityPort.disableById(id);
+            List<Order> orders = orderEntityPort.listAllOrdersByAnuncio(anuncio);
+            if(orders.isEmpty()) anuncioEntityPort.deleteById(id);
+            else anuncioEntityPort.disableById(id);
         } catch (Exception e) {
             throw new IllegalStateException(String.format("Falha ao apagar anuncio com id: %s", id));
         }

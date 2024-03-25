@@ -97,7 +97,7 @@ public class AnuncioAdapter {
                                                      @QueryParam("valor-venda") @NotNull double valorVenda,
                                                      @QueryParam("custo") @NotNull double custo,
                                                      @QueryParam("custo-frete") @NotNull double custoFrete,
-                                                     @QueryParam("equivalent-mlId") @NotNull String equivalentMlId,
+                                                     @QueryParam("equivalent-mlId") String equivalentMlId,
                                                      @QueryParam("csosn") @NotNull String csosn,
                                                      @Pattern(regexp = "classico|premium",message = "campo tipo do anuncio, valores permitidos: classico, premium", flags = Pattern.Flag.CASE_INSENSITIVE)
                                                      @QueryParam("tipo-anuncio") String tipoAnuncio,

@@ -69,7 +69,7 @@ public class OrderScheduler {
     public void createJobsOnStartUp(@Observes StartupEvent event){
         schedulerJobEntityPort.deleteAll();
         List<User> users = userEntityPort.listAll();
-//        createScheduleOrdersJobByUser(users);
-//        createSchedulerCheckOrderStatus(users);
+        createScheduleOrdersJobByUser(users);
+        createSchedulerCheckOrderStatus(users);
     }
 }
