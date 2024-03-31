@@ -7,6 +7,7 @@ import org.florense.domain.model.ScheduleJob;
 import org.florense.domain.model.User;
 import org.florense.domain.util.OrderScheduelerJobKeyGenerator;
 import org.florense.outbound.port.postgre.SchedulerJobEntityPort;
+import org.jboss.logging.Logger;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -22,6 +23,8 @@ public class CheckOrderStatusChangeJob implements Job {
     SchedulerJobEntityPort schedulerJobEntityPort;
     @Inject
     OrderScheduelerJobKeyGenerator nameGenerator;
+    @Inject
+    Logger logger;
 
     @Override
     @Transactional
@@ -31,6 +34,7 @@ public class CheckOrderStatusChangeJob implements Job {
             updateNextRunTime(jobExecutionContext, user);
             checkOrderStatusChange.execute(user);
         }catch (Exception e){
+            logger.error(e.getMessage(),e);
             throw new JobExecutionException(e);
         }
     }

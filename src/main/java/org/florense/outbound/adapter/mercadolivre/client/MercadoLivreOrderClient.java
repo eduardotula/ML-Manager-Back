@@ -40,13 +40,4 @@ public interface MercadoLivreOrderClient {
                                                    @QueryParam("limit") int limit,
                                                    @NotBody String token) throws MercadoLivreClientException;
 
-//    @ClientExceptionMapper
-//    static RuntimeException toException(Response response) {
-//        var body = response.readEntity(String.class);
-//        if (response.getStatus() == 401) {
-//            if (body.contains("token"))
-//                return new RuntimeException("status code: 401 generate new Key",new UnauthorizedAcessKeyException(""));
-//        }
-//        return new RuntimeException(String.format("status code: %s body: %s", response.getStatus(), body));
-//    }
 }

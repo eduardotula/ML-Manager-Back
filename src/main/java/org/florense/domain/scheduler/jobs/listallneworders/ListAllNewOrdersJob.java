@@ -5,6 +5,7 @@ import jakarta.transaction.Transactional;
 import org.florense.domain.model.*;
 import org.florense.domain.util.OrderScheduelerJobKeyGenerator;
 import org.florense.outbound.port.postgre.SchedulerJobEntityPort;
+import org.jboss.logging.Logger;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -19,6 +20,8 @@ public class ListAllNewOrdersJob implements Job {
     SchedulerJobEntityPort schedulerJobEntityPort;
     @Inject
     OrderScheduelerJobKeyGenerator nameGenerator;
+    @Inject
+    Logger logger;
 
     @Override
     @Transactional
@@ -28,6 +31,7 @@ public class ListAllNewOrdersJob implements Job {
             updateNextRunTime(jobExecutionContext, user);
             listAllNewOrders.execute(user);
         }catch (Exception e){
+            logger.error(e.getMessage(),e);
             throw new JobExecutionException(e);
         }
 

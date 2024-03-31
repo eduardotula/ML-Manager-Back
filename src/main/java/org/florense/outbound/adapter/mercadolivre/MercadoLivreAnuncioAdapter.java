@@ -14,6 +14,7 @@ import org.florense.outbound.adapter.mercadolivre.exceptions.MercadoLivreExcepti
 import org.florense.outbound.adapter.mercadolivre.mapper.MercadoLivreProdutoAnuncio;
 import org.florense.domain.model.ListingTypeEnum;
 import org.florense.outbound.port.mercadolivre.MercadoLivreAnuncioPort;
+import org.jboss.logging.Logger;
 
 import java.util.*;
 
@@ -32,6 +33,8 @@ public class MercadoLivreAnuncioAdapter extends MercadoLivreAdapter implements M
     @ConfigProperty(name = "quarkus.rest-client.ml-api.secret")
     String clientSecret;
     private static final int BATCH_SIZE = 50;
+    @Inject
+    Logger logger;
 
     @Override
     public Anuncio getAnuncio(String mlId, User user, boolean retry) throws FailRequestRefreshTokenException, MercadoLivreException {
@@ -45,6 +48,7 @@ public class MercadoLivreAnuncioAdapter extends MercadoLivreAdapter implements M
                     return getAnuncio(mlId, user, false);
                 }
             }
+            logger.error("Falha ao obter anuncio", e);
             throw new MercadoLivreException(String.format("Falha ao obter anuncio %s", mlId), "getAnuncio",MLErrorTypesEnum.DEFAULT, e);
         }
     }
@@ -55,12 +59,14 @@ public class MercadoLivreAnuncioAdapter extends MercadoLivreAdapter implements M
             Map<String, Object> tarifa = mercadoLivreAnuncioClient.getListingPrices(preco, typeEnum.getValue(), categoria, user.getAccessCode());
             return ((Number) tarifa.get("sale_fee_amount")).doubleValue();
         } catch (MercadoLivreClientException e) {
+
             if (e.isRefreshToken()) {
                 refreshAccessToken(appId, clientSecret, user);
                 if (retry) {
                     return getTarifas(preco, categoria, typeEnum, user, false);
                 }
             }
+            logger.error(String.format("Falha ao obter tarifas categoria %s", categoria), e);
             throw new MercadoLivreException(String.format("Falha ao obter tarifas categoria %s", categoria), "getTarifas",MLErrorTypesEnum.DEFAULT, e);
         }
     }
@@ -75,6 +81,7 @@ public class MercadoLivreAnuncioAdapter extends MercadoLivreAdapter implements M
             Map<String, Object> option = (Map<String, Object>) options.get(0);
             return ((Number) option.get("list_cost")).doubleValue();
         } catch (MercadoLivreClientException e) {
+
             if (e.isRefreshToken()) {
                 refreshAccessToken(appId, clientSecret, user);
                 if (retry) {
@@ -84,6 +91,8 @@ public class MercadoLivreAnuncioAdapter extends MercadoLivreAdapter implements M
             }else if(e.getDetail().equalsIgnoreCase("non available fbm origins for these items")){
                 throw new MercadoLivreException("Falha ao obter frete de produto Full", "getFrete", MLErrorTypesEnum.FRETE_VALUE,e);
             }
+
+            logger.error(String.format("Falha ao obter frete mlId %s", mlId), e);
             throw new MercadoLivreException(String.format("Falha ao obter frete mlId %s", mlId), "getFrete", MLErrorTypesEnum.DEFAULT, e);
         }
     }
@@ -100,6 +109,7 @@ public class MercadoLivreAnuncioAdapter extends MercadoLivreAdapter implements M
             if (retry) {
                 return getFrete(shippingId,user, false);
             }
+            logger.error(String.format("Falha ao obter frete shippingId %s", shippingId), e);
             throw new MercadoLivreException(String.format("Falha ao obter frete shippingId %s", shippingId), "getFrete", MLErrorTypesEnum.DEFAULT, e);
         }
     }
@@ -126,6 +136,7 @@ public class MercadoLivreAnuncioAdapter extends MercadoLivreAdapter implements M
                     return listAllAnunciosMercadoLivre(user, includePaused,false);
                 }
             }
+            logger.error("Falha ao obter listar anuncios", e);
         }
         return new ArrayList<>();
     }

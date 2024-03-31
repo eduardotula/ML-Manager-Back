@@ -17,6 +17,7 @@ import org.florense.outbound.adapter.mercadolivre.response.MLOrderResponse;
 import org.florense.outbound.adapter.mercadolivre.response.MLOrderWrapperResponse;
 import org.florense.outbound.port.mercadolivre.MercadoLivreVendaPort;
 import org.florense.outbound.port.postgre.AnuncioEntityPort;
+import org.jboss.logging.Logger;
 
 import java.time.LocalDateTime;
 import java.time.Period;
@@ -36,6 +37,9 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
     private static final int BATCH_SIZE = 50;
     @Inject
     AnuncioEntityPort anuncioEntityPort;
+
+    @Inject
+    Logger logger;
 
     @RestClient
     @Inject
@@ -81,6 +85,7 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
                     return listAllordersByDate(user,status,startDate,endDate,false);
                 }
             }
+            logger.error("Falha ao obter orders",e);
             throw new MercadoLivreException("Falha ao obter orders","listAllordersByDate", MLErrorTypesEnum.DEFAULT,e);
         }
 
@@ -122,7 +127,8 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
                     return listOrdersUntilExistent(status, existentOrderId, user, false);
                 }
             }
-            throw new MercadoLivreException("Falha ao Buscar vendas", "listOrdersUntilExistent", MLErrorTypesEnum.DEFAULT, e);
+            logger.error("Falha ao Buscar Orders",e);
+            throw new MercadoLivreException("Falha ao Buscar Orders", "listOrdersUntilExistent", MLErrorTypesEnum.DEFAULT, e);
 
         }
     }

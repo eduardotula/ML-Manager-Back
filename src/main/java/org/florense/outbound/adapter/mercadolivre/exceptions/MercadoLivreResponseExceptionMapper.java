@@ -7,12 +7,15 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.Provider;
 import org.eclipse.microprofile.rest.client.ext.ResponseExceptionMapper;
 import org.florense.domain.util.ObjectMapperUtil;
+import org.jboss.logging.Logger;
 
 @Provider
 @Blocking
 public class MercadoLivreResponseExceptionMapper implements ResponseExceptionMapper<MercadoLivreClientException> {
     @Inject
     ObjectMapperUtil objectMapperUtil;
+    @Inject
+    Logger logger;
 
     @Override
     public MercadoLivreClientException toThrowable(Response response) {
@@ -22,7 +25,7 @@ public class MercadoLivreResponseExceptionMapper implements ResponseExceptionMap
         try {
             mercadoLivreClientException = objectMapperUtil.mapper.readValue(output, MercadoLivreClientException.class);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            logger.error("Falha ao processar resposta de erro", e);
             mercadoLivreClientException.setMessage("Falha ao processar resposta de erro");
         }
         mercadoLivreClientException.setCompleteError(output);

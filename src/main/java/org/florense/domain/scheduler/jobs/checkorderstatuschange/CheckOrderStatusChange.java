@@ -5,10 +5,10 @@ import jakarta.inject.Inject;
 import org.florense.domain.model.Order;
 import org.florense.domain.model.User;
 import org.florense.domain.model.Venda;
-import org.florense.domain.util.Logging;
 import org.florense.outbound.adapter.mercadolivre.mlenum.MLStatusEnum;
 import org.florense.outbound.port.mercadolivre.MercadoLivreVendaPort;
 import org.florense.outbound.port.postgre.OrderEntityPort;
+import org.jboss.logging.Logger;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -24,13 +24,8 @@ public class CheckOrderStatusChange {
     OrderEntityPort orderEntityPort;
     @Inject
     MercadoLivreVendaPort mercadoLivreVendaPort;
-
-    Logging logging;
     @Inject
-    public CheckOrderStatusChange(Logging logging){
-        logging.setOriginClass(CheckOrderStatusChange.class);
-        this.logging = logging;
-    }
+    Logger logger;
 
     public void execute(User user){
         try {
@@ -39,7 +34,6 @@ public class CheckOrderStatusChange {
             LocalDateTime startDate = endDate.minusMonths(3);
             List<Order> orders = mercadoLivreVendaPort.listAllordersByDate(user, statusEnums, startDate, endDate,true);
             List<Order> updatedOrders = new LinkedList<>();
-            this.logging.info("teste");
             for(Order mlOrder: orders){
                 Order existingOrder = orderEntityPort.findByOrderId(mlOrder.getOrderId());
 
@@ -58,7 +52,8 @@ public class CheckOrderStatusChange {
 
             orderEntityPort.createUpdateAll(updatedOrders);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            logger.error(e.getMessage(),e);
+            throw new IllegalStateException(e);
         }
     }
 }

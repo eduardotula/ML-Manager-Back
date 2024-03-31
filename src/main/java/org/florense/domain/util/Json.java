@@ -5,6 +5,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import org.jboss.logging.Logger;
 
 import java.util.HashMap;
 
@@ -12,6 +14,8 @@ import java.util.HashMap;
 public class Json {
 
     private ObjectMapper mapper;
+    @Inject
+    Logger logger;
 
     public Json(){
         this.mapper = new ObjectMapper();
@@ -22,7 +26,7 @@ public class Json {
         try {
             return mapper.writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            logger.error("Falha ao converter objeto em json",e);
             return "{}";
         }
     }

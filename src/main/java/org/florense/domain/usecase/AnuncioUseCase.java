@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import org.florense.domain.model.Anuncio;
 import org.florense.domain.model.Order;
 import org.florense.domain.model.User;
+import org.florense.domain.util.Log;
 import org.florense.inbound.adapter.dto.consultas.AnuncioSimulation;
 import org.florense.inbound.adapter.dto.consultas.AnuncioSimulationResponse;
 import org.florense.inbound.port.AnuncioAdapterPort;
@@ -16,6 +17,7 @@ import org.florense.outbound.port.mercadolivre.MercadoLivreAnuncioPort;
 import org.florense.outbound.port.postgre.AnuncioEntityPort;
 import org.florense.outbound.port.postgre.OrderEntityPort;
 import org.florense.outbound.port.postgre.UserEntityPort;
+import org.jboss.logging.Logger;
 
 import java.util.List;
 import java.util.Objects;
@@ -31,6 +33,8 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
     MercadoLivreAnuncioPort mercadoLivreAnuncioPort;
     @Inject
     OrderEntityPort orderEntityPort;
+    @Inject
+    Logger logger;
 
     //Cria e atualiza com mercado livre
     @Override
@@ -108,9 +112,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         if (completeAnuncio.getPrecoDesconto() >= 80){
             try {
                 completeAnuncio.setCustoFrete(mercadoLivreAnuncioPort.getFrete(completeAnuncio.getMlId(),completeAnuncio.getStatus(), user, true));
-            } catch (MercadoLivreException ignored) {
-                ignored.getClientException();
-            }
+            } catch (MercadoLivreException ignored) {}
         } else completeAnuncio.setCustoFrete(0.0);
         completeAnuncio.update(existProd);
         completeAnuncio.setCsosn(existProd.getCsosn());
@@ -189,6 +191,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
             if(orders.isEmpty()) anuncioEntityPort.deleteById(id);
             else anuncioEntityPort.disableById(id);
         } catch (Exception e) {
+            this.logger.error("Falha ao apagar anuncio com id: %s",e);
             throw new IllegalStateException(String.format("Falha ao apagar anuncio com id: %s", id));
         }
     }

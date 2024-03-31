@@ -12,6 +12,7 @@ import org.florense.domain.util.CronUtils;
 import org.florense.domain.util.OrderScheduelerJobKeyGenerator;
 import org.florense.outbound.port.postgre.SchedulerJobEntityPort;
 import org.florense.outbound.port.postgre.UserEntityPort;
+import org.jboss.logging.Logger;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.florense.domain.scheduler.jobs.listallneworders.ListAllNewOrdersJob;
@@ -35,6 +36,8 @@ public class OrderScheduler {
     UserEntityPort userEntityPort;
     @Inject
     CronUtils cronUtils;
+    @Inject
+    Logger logger;
 
     public void createScheduleOrdersJobByUser(List<User> users){
         try {
@@ -48,6 +51,7 @@ public class OrderScheduler {
             }
 
         } catch (SchedulerException e) {
+            logger.error("Falha ao criar job",e);
             throw new RuntimeException(e);
         }
     }
@@ -62,6 +66,7 @@ public class OrderScheduler {
                 schedulerJobEntityPort.createUpdate(scheduleJob);
             }
         }catch (Exception e){
+            logger.error("Falha ao criar job",e);
             throw new RuntimeException(e);
         }
     }

@@ -11,6 +11,7 @@ import org.florense.outbound.port.mercadolivre.MercadoLivreAnuncioPort;
 import org.florense.outbound.port.mercadolivre.MercadoLivreVendaPort;
 import org.florense.outbound.port.postgre.AnuncioEntityPort;
 import org.florense.outbound.port.postgre.OrderEntityPort;
+import org.jboss.logging.Logger;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -30,7 +31,8 @@ public class ListAllNewOrders {
     AnuncioEntityPort anuncioEntityPort;
     @Inject
     MercadoLivreAnuncioPort mercadoLivreAnuncioPort;
-
+    @Inject
+    Logger logger;
 
     public void execute(User user) throws IllegalStateException{
         try {
@@ -75,6 +77,7 @@ public class ListAllNewOrders {
             orderEntityPort.createUpdateAll(returnOrders);
 
         } catch (Exception e) {
+            logger.error(e.getMessage(),e);
             throw new IllegalStateException(e);
         }
     }
