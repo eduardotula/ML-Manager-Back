@@ -26,8 +26,11 @@ public class OrderEntity {
     @Column(name = "shipping_id")
     private Long shippingId;
 
-    @OneToMany(mappedBy = "order",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "order",fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VendaEntity> vendas;
+
+    @OneToMany(mappedBy = "order",fetch = FetchType.EAGER)
+    private List<ReclamacaoEntity> reclamacoes;
 
     @Column(name = "order_creation_time")
     private LocalDateTime orderCreationTime;

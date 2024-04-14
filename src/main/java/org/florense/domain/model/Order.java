@@ -18,6 +18,7 @@ public class Order {
     private Long orderId;
     private Long shippingId;
     private List<Venda> vendas;
+    private List<Reclamacao> reclamacaoes;
     private LocalDateTime orderCreationTime;
     private LocalDateTime createdAt;
 

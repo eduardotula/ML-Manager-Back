@@ -205,8 +205,10 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         double imposto = Anuncio.calculateImposto(anuncioSimulation.getCsosn(),anuncioSimulation.getValorVenda());
 
         double frete = anuncioSimulation.getCustoFrete();
-        if(!anuncioSimulation.getEquivalentMlId().isEmpty())
-            frete = mercadoLivreAnuncioPort.getFrete(anuncioSimulation.getEquivalentMlId(),"active",user,true);
+        if(anuncioSimulation.getValorVenda() >= 80){
+            if(!anuncioSimulation.getEquivalentMlId().isEmpty())
+                frete = mercadoLivreAnuncioPort.getFrete(anuncioSimulation.getEquivalentMlId(),"active",user,true);
+        }else frete = 0.0;
 
         double lucro = Anuncio.calculateLucro(anuncioSimulation.getCusto(),taxaML, frete, imposto, anuncioSimulation.getValorVenda());
         var response = new AnuncioSimulationResponse(lucro, anuncioSimulation.getCusto(), anuncioSimulation.getCsosn(), taxaML, frete, imposto, anuncioSimulation.getCategoria());
