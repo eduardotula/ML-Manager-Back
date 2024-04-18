@@ -8,7 +8,6 @@ import jakarta.ws.rs.core.MediaType;
 import org.florense.domain.usecase.UserUseCase;
 import org.florense.inbound.adapter.dto.UserDto;
 import org.florense.inbound.adapter.mappers.UserDtoMapper;
-import org.florense.inbound.port.AccessCodePort;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,7 +16,7 @@ import java.util.stream.Collectors;
 @Path("users")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class UserAdapter implements AccessCodePort {
+public class UserAdapter {
 
     @Inject
     UserDtoMapper mapper;

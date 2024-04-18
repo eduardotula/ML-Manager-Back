@@ -28,8 +28,10 @@ public class OrderScheduler {
     int orderRefreshDelay;
     @Inject
     OrderScheduelerJobKeyGenerator jobKeyGenerator;
-    @ConfigProperty(name = "scheduler.job.order.search_order_limit_months")
+    @ConfigProperty(name = "scheduler.job.order.refresh_delay_status_change_hours")
     int orderRefreshDelayStausChangeHours;
+    @ConfigProperty(name = "scheduler.is_enabled")
+    boolean schedulerIsEnabled;
     @Inject
     JobScheduler jobScheduler;
     @Inject
@@ -73,8 +75,10 @@ public class OrderScheduler {
 
     public void createJobsOnStartUp(@Observes StartupEvent event){
         schedulerJobEntityPort.deleteAll();
-        List<User> users = userEntityPort.listAll();
-        createScheduleOrdersJobByUser(users);
-        createSchedulerCheckOrderStatus(users);
+        if(schedulerIsEnabled){
+            List<User> users = userEntityPort.listAll();
+            createScheduleOrdersJobByUser(users);
+            createSchedulerCheckOrderStatus(users);
+        }
     }
 }
