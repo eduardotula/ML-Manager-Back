@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.florense.domain.model.ListingTypeEnum;
+import org.florense.domain.model.enums.ListingTypeEnum;
 
 import java.time.LocalDateTime;
 import java.util.List;

@@ -16,6 +16,7 @@ public class Reclamacao {
     private long id;
     private long mediationId;
     private long resourceId;
+    private long orderId;
     private String type;
     private String stage;
     private String status;

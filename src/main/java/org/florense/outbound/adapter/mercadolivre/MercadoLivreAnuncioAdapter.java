@@ -12,7 +12,7 @@ import org.florense.outbound.adapter.mercadolivre.exceptions.MLErrorTypesEnum;
 import org.florense.outbound.adapter.mercadolivre.exceptions.MercadoLivreClientException;
 import org.florense.outbound.adapter.mercadolivre.exceptions.MercadoLivreException;
 import org.florense.outbound.adapter.mercadolivre.mapper.MercadoLivreProdutoAnuncio;
-import org.florense.domain.model.ListingTypeEnum;
+import org.florense.domain.model.enums.ListingTypeEnum;
 import org.florense.outbound.port.mercadolivre.MercadoLivreAnuncioPort;
 import org.jboss.logging.Logger;
 

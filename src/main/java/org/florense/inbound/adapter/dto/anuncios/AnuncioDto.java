@@ -2,7 +2,7 @@ package org.florense.inbound.adapter.dto.anuncios;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.florense.domain.model.ListingTypeEnum;
+import org.florense.domain.model.enums.ListingTypeEnum;
 import org.florense.inbound.adapter.dto.UrlDto;
 
 import java.time.LocalDateTime;

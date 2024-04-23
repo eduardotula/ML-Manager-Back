@@ -1,10 +1,9 @@
 package org.florense.outbound.port.mercadolivre;
 
-import jakarta.resource.spi.IllegalStateException;
 import org.florense.domain.model.Anuncio;
 import org.florense.domain.model.User;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
-import org.florense.domain.model.ListingTypeEnum;
+import org.florense.domain.model.enums.ListingTypeEnum;
 import org.florense.outbound.adapter.mercadolivre.exceptions.MercadoLivreException;
 
 import java.util.List;

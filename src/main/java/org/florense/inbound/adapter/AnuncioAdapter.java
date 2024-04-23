@@ -9,7 +9,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.florense.domain.model.Anuncio;
-import org.florense.domain.model.ListingTypeEnum;
+import org.florense.domain.model.enums.ListingTypeEnum;
 import org.florense.domain.usecase.AnuncioUseCase;
 import org.florense.inbound.adapter.dto.anuncios.AnuncioDto;
 import org.florense.inbound.adapter.dto.anuncios.AnuncioDtoSimple;

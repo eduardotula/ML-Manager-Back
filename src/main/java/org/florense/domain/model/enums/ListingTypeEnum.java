@@ -1,4 +1,4 @@
-package org.florense.domain.model;
+package org.florense.domain.model.enums;
 
 public enum ListingTypeEnum {
 

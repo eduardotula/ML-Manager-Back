@@ -7,6 +7,7 @@ import org.florense.domain.model.*;
 import org.florense.domain.model.filters.OrderFilter;
 import org.florense.domain.model.filters.VendaFilter;
 import org.florense.domain.scheduler.jobs.listallneworders.ListAllNewOrders;
+import org.florense.inbound.adapter.dto.WebhookNotification;
 import org.florense.outbound.port.postgre.AnuncioEntityPort;
 import org.florense.outbound.port.postgre.OrderEntityPort;
 import org.florense.outbound.port.postgre.UserEntityPort;
@@ -53,6 +54,11 @@ public class OrderUseCase {
     public void deleteById(Long id){
         if(Objects.isNull(orderEntityPort.findById(id))) throw new IllegalArgumentException(String.format("Order com id: %s não encontrado",id));
         orderEntityPort.deleteById(id);
+    }
+
+    @Transactional
+    public void processNotification(WebhookNotification webhookNotification){
+
     }
 
 }

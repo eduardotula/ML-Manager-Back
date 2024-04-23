@@ -1,6 +1,7 @@
 package org.florense.domain.model;
 
 import lombok.*;
+import org.florense.domain.model.enums.ListingTypeEnum;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

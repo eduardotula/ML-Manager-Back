@@ -2,7 +2,7 @@ package org.florense.outbound.adapter.mercadolivre.mapper;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import org.florense.domain.model.Anuncio;
-import org.florense.domain.model.ListingTypeEnum;
+import org.florense.domain.model.enums.ListingTypeEnum;
 import org.florense.domain.model.Url;
 import org.florense.outbound.adapter.mercadolivre.response.MercadoLivreAnuncioResponse;
 import org.mapstruct.*;

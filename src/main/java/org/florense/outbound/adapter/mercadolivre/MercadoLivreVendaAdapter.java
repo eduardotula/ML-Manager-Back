@@ -2,11 +2,11 @@ package org.florense.outbound.adapter.mercadolivre;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.resource.spi.IllegalStateException;
 import jakarta.transaction.Transactional;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.florense.domain.model.*;
+import org.florense.domain.model.enums.ListingTypeEnum;
 import org.florense.outbound.adapter.mercadolivre.client.MercadoLivreOrderClient;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
 import org.florense.outbound.adapter.mercadolivre.exceptions.MLErrorTypesEnum;
@@ -161,7 +161,7 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
 
         var d = mlOrderResponse.getOrderCreationTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         return new Order(null, mlOrderResponse.getOrderId(), mlOrderResponse.getShippingId(),
-                vendas, d, null);
+                vendas, new ArrayList<Reclamacao>(), d, null);
     }
 
 }

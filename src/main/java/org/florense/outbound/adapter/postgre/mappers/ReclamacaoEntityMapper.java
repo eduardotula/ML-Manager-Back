@@ -10,10 +10,10 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "jakarta")
 public interface ReclamacaoEntityMapper {
 
-    @Mapping(source = "order.id", target = "orderId")
+    @Mapping(source = "orderId", target = "order.id")
     ReclamacaoEntity toEntity(Reclamacao reclamacao);
 
-    @Mapping(source = "orderId", target = "order.id")
+    @Mapping(source = "order.id", target = "orderId")
     Reclamacao toModel(ReclamacaoEntity reclamacao);
 
 }

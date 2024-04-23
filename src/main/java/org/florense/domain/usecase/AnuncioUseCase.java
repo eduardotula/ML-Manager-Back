@@ -8,6 +8,7 @@ import org.florense.domain.model.Anuncio;
 import org.florense.domain.model.Order;
 import org.florense.domain.model.User;
 import org.florense.domain.util.Log;
+import org.florense.inbound.adapter.dto.WebhookNotification;
 import org.florense.inbound.adapter.dto.consultas.AnuncioSimulation;
 import org.florense.inbound.adapter.dto.consultas.AnuncioSimulationResponse;
 import org.florense.inbound.port.AnuncioAdapterPort;
@@ -211,7 +212,12 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         }else frete = 0.0;
 
         double lucro = Anuncio.calculateLucro(anuncioSimulation.getCusto(),taxaML, frete, imposto, anuncioSimulation.getValorVenda());
-        var response = new AnuncioSimulationResponse(lucro, anuncioSimulation.getCusto(), anuncioSimulation.getCsosn(), taxaML, frete, imposto, anuncioSimulation.getCategoria());
-        return response;
+        return new AnuncioSimulationResponse(lucro, anuncioSimulation.getCusto(), anuncioSimulation.getCsosn(), taxaML, frete, imposto, anuncioSimulation.getCategoria());
+    }
+
+    @Transactional
+    public void processNotification(WebhookNotification webhookNotification){
+        String mlId = webhookNotification.getResource().split("/")[1];
+
     }
 }
