@@ -33,7 +33,7 @@ public class Anuncio {
     private ListingTypeEnum listingType;
     private User user;
     private double imposto;
-    private boolean complete;
+    private boolean complete = false;
     private List<Url> pictures;
 
     public Anuncio(Long id, String mlId, String sku, String gtin, String url, String descricao,
@@ -62,9 +62,10 @@ public class Anuncio {
         this.pictures = pictures;
     }
 
-    public void update(Anuncio anuncio){
-        this.id = anuncio.getId();
-        this.createdAt = anuncio.getCreatedAt();
+    public void update(Anuncio oldAnucio){
+        this.id = oldAnucio.getId();
+        this.createdAt = oldAnucio.getCreatedAt();
+        this.user = oldAnucio.getUser();
     }
 
     public static double calculateLucro(double custo, double taxaML, double custoFrete, double imposto, double precoDesconto){
@@ -83,7 +84,7 @@ public class Anuncio {
 
     public static double calculateImposto(String csosn, double precoDesconto){
         BigDecimal porcenNf = new BigDecimal("6.92");
-        if(csosn.equals("102")) porcenNf = new BigDecimal("10.40");
+        if("102".equals(csosn)) porcenNf = new BigDecimal("10.40");
         porcenNf = porcenNf.setScale(2,  RoundingMode.HALF_UP);
         porcenNf = porcenNf.divide(new BigDecimal(100), RoundingMode.HALF_UP);
 

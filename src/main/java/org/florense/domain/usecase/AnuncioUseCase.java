@@ -170,7 +170,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
     private User getUserOrThrowException(Long userId) throws IllegalArgumentException {
         User user = userEntityPort.findById(userId);
         if (Objects.isNull(user))
-            throw new IllegalArgumentException(String.format("User com id: %s não encontrado", userId));
+            throw new IllegalArgumentException(String.format("User com id: %d não encontrado", userId));
         return user;
     }
 
@@ -216,8 +216,20 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
     }
 
     @Transactional
-    public void processNotification(WebhookNotification webhookNotification){
-        String mlId = webhookNotification.getResource().split("/")[1];
+    public void processNotification(WebhookNotification webhookNotification) throws FailRequestRefreshTokenException, MercadoLivreException {
+        String mlId = webhookNotification.getResource().split("/")[2];
+        User user = userEntityPort.findByMlIdUser(webhookNotification.getUserIdML());
+        if(Objects.isNull(user)) throw new IllegalArgumentException(String.format("User com MLId %s não encontrado", webhookNotification.getUserIdML()));
 
+        Anuncio existingAnuncio = anuncioEntityPort.findAnyByMlId(mlId,user);
+        Anuncio anuncio = mercadoLivreAnuncioPort.getAnuncio(mlId,user,true);
+
+        if(Objects.isNull(existingAnuncio)){
+            anuncio.setComplete(false);
+            anuncio.setUser(user);
+        }else anuncio.update(existingAnuncio);
+
+        anuncioEntityPort.createUpdate(anuncio);
+        logger.infof("Notificação processada com sucesso %s" , webhookNotification.getUserIdML());
     }
 }

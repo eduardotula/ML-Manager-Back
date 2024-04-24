@@ -3,7 +3,6 @@ package org.florense.domain.util;
 import jakarta.enterprise.context.Dependent;
 import jakarta.inject.Inject;
 import lombok.Getter;
-import org.florense.outbound.adapter.postgre.LogAdapter;
 import org.jboss.logging.Logger;
 
 @Dependent
@@ -13,8 +12,6 @@ public class LoggingOld {
     private String originClass = LoggingOld.class.getName();
     @Inject
     Logger logger;
-    @Inject
-    LogAdapter logAdapter;
 
     public void info(String message) {
         this.info(message, null);

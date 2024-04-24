@@ -46,6 +46,23 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
     MercadoLivreOrderClient mercadoLivreOrderClient;
 
     @Override
+    public Order getOrder(String mlOrderId, User user, boolean retry) throws MercadoLivreException, FailRequestRefreshTokenException {
+        try {
+            var o = mercadoLivreOrderClient.order(user.getAccessCode(), mlOrderId);
+            return convertMlOrderResponseToOrder(o, user);
+        } catch (MercadoLivreClientException e) {
+            if (e.isRefreshToken()) {
+                refreshAccessToken(appId, clientSecret, user);
+                if (retry) {
+                    return getOrder(mlOrderId, user, false);
+                }
+            }
+            logger.error("Falha ao obter order", e);
+            throw new MercadoLivreException(String.format("Falha ao obter order %s", mlOrderId), "mlOrderId",MLErrorTypesEnum.DEFAULT, e);
+        }
+    }
+
+    @Override
     public List<Order> listAllordersByDate(User user, List<MLStatusEnum> status, LocalDateTime startDate, LocalDateTime endDate, boolean retry) throws FailRequestRefreshTokenException, MercadoLivreException {
         try {
             Map<Long, Order> listOrders = new LinkedHashMap<>();
@@ -159,9 +176,16 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
 
         List<Venda> vendas = new ArrayList<>(List.of(venda));
 
+        List<Reclamacao> reclamcoes = new ArrayList<>();
+        mlOrderResponse.getMediations().forEach(mediation ->{
+            Reclamacao reclamacao = new Reclamacao();
+            reclamacao.setMediationId(mediation);
+            reclamcoes.add(reclamacao);
+        });
+
         var d = mlOrderResponse.getOrderCreationTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         return new Order(null, mlOrderResponse.getOrderId(), mlOrderResponse.getShippingId(),
-                vendas, new ArrayList<Reclamacao>(), d, null);
+                vendas, reclamcoes, d, null);
     }
 
 }

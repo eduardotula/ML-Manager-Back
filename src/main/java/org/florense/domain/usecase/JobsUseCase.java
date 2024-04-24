@@ -33,7 +33,7 @@ public class JobsUseCase {
     private User getUserOrThrowException(Long userId) throws IllegalArgumentException {
         User user = userEntityPort.findById(userId);
         if (Objects.isNull(user))
-            throw new IllegalArgumentException(String.format("User com id: %s não encontrado", userId));
+            throw new IllegalArgumentException(String.format("User com id: %d não encontrado", userId));
         return user;
     }
 }

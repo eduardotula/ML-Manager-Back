@@ -22,7 +22,7 @@ public class UserUseCase {
 
     public User update(User user) {
         var existAccessCode = port.findById(user.getId());
-        if(existAccessCode == null) throw new IllegalArgumentException(String.format("User com id: %s não encontrado", user.getId()));
+        if(existAccessCode == null) throw new IllegalArgumentException(String.format("User com id: %d não encontrado", user.getId()));
 
         return port.createUpdate(user);
     }
@@ -35,7 +35,7 @@ public class UserUseCase {
     }
 
     public void deleteById(Long id){
-        if(port.findById(id) == null) throw new IllegalArgumentException(String.format("User com id: %s não encontrado",id));
+        if(port.findById(id) == null) throw new IllegalArgumentException(String.format("User com id: %d não encontrado",id));
         port.deleteById(id);
     }
 

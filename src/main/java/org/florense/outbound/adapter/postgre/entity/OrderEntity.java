@@ -29,7 +29,7 @@ public class OrderEntity {
     @OneToMany(mappedBy = "order",fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VendaEntity> vendas;
 
-    @OneToMany(mappedBy = "order",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "order",fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     private List<ReclamacaoEntity> reclamacoes;
 
     @Column(name = "order_creation_time")

@@ -4,12 +4,14 @@ import io.quarkus.rest.client.reactive.NotBody;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.QueryParam;
 import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import org.florense.outbound.adapter.mercadolivre.exceptions.MercadoLivreClientException;
 import org.florense.outbound.adapter.mercadolivre.exceptions.MercadoLivreResponseExceptionMapper;
+import org.florense.outbound.adapter.mercadolivre.response.MLOrderResponse;
 import org.florense.outbound.adapter.mercadolivre.response.MLOrderWrapperResponse;
 
 @ApplicationScoped
@@ -40,4 +42,9 @@ public interface MercadoLivreOrderClient {
                                                    @QueryParam("limit") int limit,
                                                    @NotBody String token) throws MercadoLivreClientException;
 
+
+    @GET
+    @Path("/{order_id}")
+    @ClientHeaderParam(name = "Authorization", value = "Bearer {token}")
+    MLOrderResponse order(@NotBody String token, @PathParam("order_id") String orderId) throws MercadoLivreClientException;
 }

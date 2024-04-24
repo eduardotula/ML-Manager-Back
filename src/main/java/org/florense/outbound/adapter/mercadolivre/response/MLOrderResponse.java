@@ -8,8 +8,10 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -30,6 +32,8 @@ public class MLOrderResponse {
     private double precoDesconto;
     @JsonProperty("fulfilled")
     private Boolean completo;
+    @JsonIgnore
+    private List<Long> mediations = new ArrayList<>();
     @JsonIgnore
     private double saleFee;
 
@@ -55,6 +59,12 @@ public class MLOrderResponse {
             this.mlId = (String) item.get("id");
             this.title = (String) item.get("title");
         }
+    }
+
+    @JsonProperty("mediations")
+    private void setMediations(List<Map<String, Long>> list){
+        if(Objects.isNull(list) || list.isEmpty()) return;
+        this.mediations = new ArrayList<>(list.get(0).values());
     }
 
     @JsonProperty("shipping")

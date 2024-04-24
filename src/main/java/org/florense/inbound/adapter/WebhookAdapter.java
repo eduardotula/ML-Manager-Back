@@ -1,5 +1,6 @@
 package org.florense.inbound.adapter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -10,7 +11,11 @@ import jakarta.ws.rs.core.MediaType;
 import org.florense.domain.model.enums.NotificationTopicEnum;
 import org.florense.domain.usecase.AnuncioUseCase;
 import org.florense.domain.usecase.OrderUseCase;
+import org.florense.domain.util.ObjectMapperUtil;
 import org.florense.inbound.adapter.dto.WebhookNotification;
+import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
+import org.florense.outbound.adapter.mercadolivre.exceptions.MercadoLivreException;
+import org.jboss.logging.Logger;
 import org.jboss.resteasy.reactive.ResponseStatus;
 
 @ApplicationScoped
@@ -23,10 +28,15 @@ public class WebhookAdapter {
     OrderUseCase orderUseCase;
     @Inject
     AnuncioUseCase anuncioUseCase;
+    @Inject
+    Logger logger;
+    @Inject
+    ObjectMapperUtil objectMapperUtil;
 
     @POST
     @ResponseStatus(200)
-    public void mercadoLivreNotification(WebhookNotification webhookNotification){
+    public void mercadoLivreNotification(WebhookNotification webhookNotification) throws FailRequestRefreshTokenException, MercadoLivreException, JsonProcessingException {
+        logger.infof("Notificação recebida %s", objectMapperUtil.mapper.writeValueAsString(webhookNotification));
         String topic = webhookNotification.getTopic();
 
         if (topic.equals(NotificationTopicEnum.ORDERS.getValue())) orderUseCase.processNotification(webhookNotification);

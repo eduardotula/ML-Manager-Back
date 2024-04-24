@@ -8,6 +8,9 @@ import org.florense.domain.model.filters.OrderFilter;
 import org.florense.domain.model.filters.VendaFilter;
 import org.florense.domain.scheduler.jobs.listallneworders.ListAllNewOrders;
 import org.florense.inbound.adapter.dto.WebhookNotification;
+import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
+import org.florense.outbound.adapter.mercadolivre.exceptions.MercadoLivreException;
+import org.florense.outbound.port.mercadolivre.MercadoLivreVendaPort;
 import org.florense.outbound.port.postgre.AnuncioEntityPort;
 import org.florense.outbound.port.postgre.OrderEntityPort;
 import org.florense.outbound.port.postgre.UserEntityPort;
@@ -27,6 +30,8 @@ public class OrderUseCase {
     UserEntityPort userEntityPort;
     @Inject
     AnuncioEntityPort anuncioEntityPort;
+    @Inject
+    MercadoLivreVendaPort mercadoLivreVendaPort;
 
     @Transactional
     public Pagination<Order> listOrderByFilters(Long userId,OrderFilter filter){
@@ -57,8 +62,15 @@ public class OrderUseCase {
     }
 
     @Transactional
-    public void processNotification(WebhookNotification webhookNotification){
+    public void processNotification(WebhookNotification webhookNotification) throws FailRequestRefreshTokenException, MercadoLivreException {
+        String orderMlId = webhookNotification.getResource().split("/")[2];
+        User user = userEntityPort.findByMlIdUser(webhookNotification.getUserIdML());
+        if(Objects.isNull(user)) throw new IllegalArgumentException(String.format("User com MLId %s não encontrado", webhookNotification.getUserIdML()));
 
+        Order order = mercadoLivreVendaPort.getOrder(orderMlId,user,true);
+        if(Objects.isNull(order)){
+
+        }
     }
 
 }

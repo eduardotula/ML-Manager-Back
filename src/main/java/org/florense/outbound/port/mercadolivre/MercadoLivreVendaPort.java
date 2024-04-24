@@ -12,6 +12,8 @@ import java.util.List;
 
 public interface MercadoLivreVendaPort {
 
+    Order getOrder(String mlOrderId, User user, boolean retry) throws MercadoLivreException, FailRequestRefreshTokenException;
+
     List<Order> listAllordersByDate(User user, List<MLStatusEnum> status, LocalDateTime startDate, LocalDateTime endDate, boolean retry) throws FailRequestRefreshTokenException, MercadoLivreException;
 
     List<Order> listOrdersUntilExistent(List<MLStatusEnum> status, Long existentOrderId, User user, boolean retry) throws FailRequestRefreshTokenException, MercadoLivreException;

@@ -33,6 +33,12 @@ public class UserAdapter implements UserEntityPort {
     }
 
     @Override
+    public User findByMlIdUser(String mlUserId){
+        var user = repository.findByUserIdML(mlUserId).orElse(null);
+        return user != null ? mapper.toModel(user) : null;
+    }
+
+    @Override
     public List<User> listAll() {
         return repository.findAll().stream().map(mapper::toModel).collect(Collectors.toList());
     }
