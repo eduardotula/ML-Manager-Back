@@ -10,6 +10,7 @@ import org.florense.domain.scheduler.jobs.listallneworders.ListAllNewOrders;
 import org.florense.inbound.adapter.dto.WebhookNotification;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
 import org.florense.outbound.adapter.mercadolivre.exceptions.MercadoLivreException;
+import org.florense.outbound.port.mercadolivre.MercadoLivreAnuncioPort;
 import org.florense.outbound.port.mercadolivre.MercadoLivreVendaPort;
 import org.florense.outbound.port.postgre.AnuncioEntityPort;
 import org.florense.outbound.port.postgre.OrderEntityPort;
@@ -32,6 +33,8 @@ public class OrderUseCase {
     AnuncioEntityPort anuncioEntityPort;
     @Inject
     MercadoLivreVendaPort mercadoLivreVendaPort;
+    @Inject
+    MercadoLivreAnuncioPort mercadoLivreAnuncioPort;
 
     @Transactional
     public Pagination<Order> listOrderByFilters(Long userId,OrderFilter filter){
@@ -68,9 +71,32 @@ public class OrderUseCase {
         if(Objects.isNull(user)) throw new IllegalArgumentException(String.format("User com MLId %s não encontrado", webhookNotification.getUserIdML()));
 
         Order order = mercadoLivreVendaPort.getOrder(orderMlId,user,true);
-        if(Objects.isNull(order)){
 
+        //Procura se o mesmo pedido já existe e prepara para atualizar
+        var existingOrder = orderEntityPort.findByOrderId(order.getOrderId());
+        if (Objects.nonNull(existingOrder)) {
+            order.setId(existingOrder.getId());
+            order.updateVendasByMatchingByMlId(existingOrder.getVendas());
         }
+        //Reliza a atualização de um pedido ou cria, caso produto não existir é criado um produto temporario
+        for (Venda venda : order.getVendas()) {
+
+            double valorFrete = mercadoLivreAnuncioPort.getFrete(order.getShippingId(),user,true);
+            venda.setCustoFrete(valorFrete);
+            var existingAnuncio = anuncioEntityPort.findAnyByMlId(venda.getAnuncio().getMlId(), user);
+
+            if (Objects.nonNull(existingAnuncio)) {
+                venda.setAnuncio(existingAnuncio);
+            }else{
+                Anuncio anuncio = venda.getAnuncio();
+                anuncio.setComplete(false);
+                anuncio.setCustoFrete(valorFrete);
+                venda.setAnuncio(anuncioEntityPort.createUpdate((anuncio)));
+            }
+
+            venda.setDataFromAnuncio(venda.getAnuncio());
+        }
+        orderEntityPort.createUpdate(order);
     }
 
 }

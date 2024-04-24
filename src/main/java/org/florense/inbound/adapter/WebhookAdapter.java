@@ -11,6 +11,7 @@ import jakarta.ws.rs.core.MediaType;
 import org.florense.domain.model.enums.NotificationTopicEnum;
 import org.florense.domain.usecase.AnuncioUseCase;
 import org.florense.domain.usecase.OrderUseCase;
+import org.florense.domain.usecase.ReclamacaoUseCase;
 import org.florense.domain.util.ObjectMapperUtil;
 import org.florense.inbound.adapter.dto.WebhookNotification;
 import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshTokenException;
@@ -29,6 +30,8 @@ public class WebhookAdapter {
     @Inject
     AnuncioUseCase anuncioUseCase;
     @Inject
+    ReclamacaoUseCase reclamacaoUseCase;
+    @Inject
     Logger logger;
     @Inject
     ObjectMapperUtil objectMapperUtil;
@@ -41,6 +44,7 @@ public class WebhookAdapter {
 
         if (topic.equals(NotificationTopicEnum.ORDERS.getValue())) orderUseCase.processNotification(webhookNotification);
         else if(topic.equals(NotificationTopicEnum.ITEMS.getValue())) anuncioUseCase.processNotification(webhookNotification);
+        else if(topic.equals(NotificationTopicEnum.CLAIMS.getValue())) reclamacaoUseCase.processNotification(webhookNotification);
     }
 
 }

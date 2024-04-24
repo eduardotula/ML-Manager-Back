@@ -23,8 +23,8 @@ public class ReclamacaoEntity {
     private long id;
 
     @NotNull
-    @Column(name = "mediation_id")
-    private long mediationId;
+    @Column(name = "reclamacao_id")
+    private long reclamacaoId;
 
     @NotNull
     @Column(name = "resource_id")

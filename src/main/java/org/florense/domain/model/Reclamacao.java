@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class Reclamacao {
 
     private long id;
-    private long mediationId;
+    private long reclamacaoId;
     private long resourceId;
     private long orderId;
     private String type;

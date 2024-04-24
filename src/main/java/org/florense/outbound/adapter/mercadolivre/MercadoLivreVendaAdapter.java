@@ -179,7 +179,7 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
         List<Reclamacao> reclamcoes = new ArrayList<>();
         mlOrderResponse.getMediations().forEach(mediation ->{
             Reclamacao reclamacao = new Reclamacao();
-            reclamacao.setMediationId(mediation);
+            reclamacao.setReclamacaoId(mediation);
             reclamcoes.add(reclamacao);
         });
 
