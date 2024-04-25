@@ -230,6 +230,6 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         }else anuncio.update(existingAnuncio);
 
         anuncioEntityPort.createUpdate(anuncio);
-        logger.infof("Notificação processada com sucesso %s" , webhookNotification.getUserIdML());
+        logger.infof("Notificação processada com sucesso mlId: %s" , mlId);
     }
 }

@@ -16,6 +16,7 @@ import org.florense.outbound.port.postgre.AnuncioEntityPort;
 import org.florense.outbound.port.postgre.OrderEntityPort;
 import org.florense.outbound.port.postgre.UserEntityPort;
 import org.florense.outbound.port.postgre.VendaEntityPort;
+import org.jboss.logging.Logger;
 
 import java.util.Objects;
 
@@ -35,6 +36,8 @@ public class OrderUseCase {
     MercadoLivreVendaPort mercadoLivreVendaPort;
     @Inject
     MercadoLivreAnuncioPort mercadoLivreAnuncioPort;
+    @Inject
+    Logger logger;
 
     @Transactional
     public Pagination<Order> listOrderByFilters(Long userId,OrderFilter filter){
@@ -97,6 +100,7 @@ public class OrderUseCase {
             venda.setDataFromAnuncio(venda.getAnuncio());
         }
         orderEntityPort.createUpdate(order);
+        logger.infof("Notificação processada com sucesso orderId: %s" , orderMlId);
     }
 
 }
