@@ -52,7 +52,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
                 completeAnuncio.getCategoria(), completeAnuncio.getListingType(), user, true));
         if (completeAnuncio.getPrecoDesconto() >= 80){
             try {
-                completeAnuncio.setCustoFrete(mercadoLivreAnuncioPort.getFrete(completeAnuncio.getMlId(), completeAnuncio.getStatus(), user, true));
+                completeAnuncio.setCustoFrete(mercadoLivreAnuncioPort.getFrete(completeAnuncio.getMlId(), user, true));
             } catch (MercadoLivreException e) {
                 completeAnuncio.setCustoFrete(0.0);
             }
@@ -112,7 +112,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
                 completeAnuncio.getCategoria(), completeAnuncio.getListingType(), user, true));
         if (completeAnuncio.getPrecoDesconto() >= 80){
             try {
-                completeAnuncio.setCustoFrete(mercadoLivreAnuncioPort.getFrete(completeAnuncio.getMlId(),completeAnuncio.getStatus(), user, true));
+                completeAnuncio.setCustoFrete(mercadoLivreAnuncioPort.getFrete(completeAnuncio.getMlId(), user, true));
             } catch (MercadoLivreException ignored) {}
         } else completeAnuncio.setCustoFrete(0.0);
         completeAnuncio.update(existProd);
@@ -205,10 +205,11 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
                 anuncioSimulation.getTipoAnuncio(),user,true);
         double imposto = Anuncio.calculateImposto(anuncioSimulation.getCsosn(),anuncioSimulation.getValorVenda());
 
-        double frete = anuncioSimulation.getCustoFrete();
+        double frete;
         if(anuncioSimulation.getValorVenda() >= 80){
             if(!anuncioSimulation.getEquivalentMlId().isEmpty())
-                frete = mercadoLivreAnuncioPort.getFrete(anuncioSimulation.getEquivalentMlId(),"active",user,true);
+                frete = mercadoLivreAnuncioPort.getFrete(anuncioSimulation.getEquivalentMlId(),user,true);
+            else frete = mercadoLivreAnuncioPort.getFrete(anuncioSimulation.getMlId(), user, true);
         }else frete = 0.0;
 
         double lucro = Anuncio.calculateLucro(anuncioSimulation.getCusto(),taxaML, frete, imposto, anuncioSimulation.getValorVenda());

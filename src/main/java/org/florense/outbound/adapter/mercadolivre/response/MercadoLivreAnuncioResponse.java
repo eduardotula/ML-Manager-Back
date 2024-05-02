@@ -32,6 +32,9 @@ public class MercadoLivreAnuncioResponse {
     private String listing_type_id;
     @JsonIgnore
     private List<String> pictures;
+    @JsonIgnore
+    private boolean isFulfillment = false;
+
 
     @JsonSetter("attributes")
     private void setTheAttributes(List<Map<String, Object>> list){
@@ -47,6 +50,15 @@ public class MercadoLivreAnuncioResponse {
     private void setFotosUrls(List<Map<String, String>> list){
         this.pictures = new LinkedList<>();
         list.forEach(p -> pictures.add(p.get("url")));
+    }
+
+    @JsonSetter("shipping")
+    private void setFull(Map<String, Object> map){
+        if(!map.isEmpty()){
+            if("fulfillment".equals(map.getOrDefault("logistic_type", ""))){
+                this.isFulfillment = true;
+            }
+        }
     }
 
 }

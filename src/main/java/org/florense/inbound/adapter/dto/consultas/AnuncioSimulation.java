@@ -11,6 +11,7 @@ import org.florense.domain.model.enums.ListingTypeEnum;
 public class AnuncioSimulation {
 
     private String categoria;
+    private String mlId;
     private double valorVenda;
     private double custo;
     private double custoFrete;

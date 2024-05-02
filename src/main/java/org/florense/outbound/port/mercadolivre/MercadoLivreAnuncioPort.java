@@ -15,7 +15,7 @@ public interface MercadoLivreAnuncioPort {
 
     double getTarifas(double preco, String categoria, ListingTypeEnum typeEnum, User user, boolean retry) throws FailRequestRefreshTokenException, MercadoLivreException;
 
-    double getFrete(String mlId,String anuncioStatus,User user, boolean retry) throws FailRequestRefreshTokenException, MercadoLivreException;
+    double getFrete(String mlId,User user, boolean retry) throws FailRequestRefreshTokenException, MercadoLivreException;
 
     double getFrete(Long shippingId, User user, boolean retry) throws FailRequestRefreshTokenException, MercadoLivreException;
 

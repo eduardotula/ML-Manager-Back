@@ -35,6 +35,7 @@ public class Anuncio {
     private double imposto;
     private boolean complete = false;
     private List<Url> pictures;
+    private boolean isFulfillment;
 
     public Anuncio(Long id, String mlId, String sku, String gtin, String url, String descricao,
                    String categoria, double custo, String csosn, double precoDesconto, double taxaML,

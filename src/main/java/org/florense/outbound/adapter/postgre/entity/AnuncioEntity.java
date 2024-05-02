@@ -58,5 +58,8 @@ public class AnuncioEntity {
 
     @Column(name = "complete")
     private boolean complete;
+    @Column(name = "is_fulfillment")
+    private boolean isFulfillment;
+
 
 }

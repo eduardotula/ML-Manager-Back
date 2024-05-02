@@ -47,4 +47,6 @@ public class AnuncioDto {
     private double lucro;
     private List<UrlDto> pictures;
     private boolean complete;
+    private boolean isFulfillment;
+
 }
