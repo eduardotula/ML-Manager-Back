@@ -27,6 +27,7 @@ public class MercadoLivreResponseExceptionMapper implements ResponseExceptionMap
         } catch (JsonProcessingException e) {
             logger.error("Falha ao processar resposta de erro", e);
             mercadoLivreClientException.setMessage("Falha ao processar resposta de erro");
+            logger.infof("resposta completa: %s", output);
         }
         mercadoLivreClientException.setCompleteError(output);
         if(response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()){

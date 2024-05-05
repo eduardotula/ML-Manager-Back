@@ -34,7 +34,7 @@ public class VendaEntity {
     private double lucro;
     @Column(name = "completo")
     private boolean completo;
-    @Column(name = "stauts")
+    @Column(name = "status")
     private String status;
 
     @ManyToOne
