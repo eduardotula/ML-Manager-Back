@@ -39,3 +39,4 @@ if [[ "${DB_HEROKU_SPLIT,,}" == "true" ]]; then
   # substring the DATABASE_URL between ':' and '@'
   export DB_JDBC_PASSWORD=$(expr $DATABASE_URL : '.*:\([^@]*\)@.*')
 fi
+
