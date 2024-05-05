@@ -42,4 +42,4 @@ nb-configuration.xml
 
 # Plugin directory
 /.quarkus/cli/plugins/
-Build.txt
+.Build.txt

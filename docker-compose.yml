@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+
+  monitoring:
+
+    container_name: ml-manager-back
+    image: ml-manager-back
+    build:
+      context: ./
+      dockerfile: ./src/main/docker/Dockerfile.jvm
+      args:
+        DB_HEROKU_SPLIT: "true"
+    
+    ports:
+      - 8080:8080
+    networks:
+      - heroku-net
+    environment:
+      - JAVA_OPTIONS=-Xms256m -Xmx512m
+      - DB_ECHO_VALUES=true      
+      - PORT=8080
+      - DB_HEROKU_SPLIT=true
+
+networks:
+  heroku-net:
+    driver: bridge
