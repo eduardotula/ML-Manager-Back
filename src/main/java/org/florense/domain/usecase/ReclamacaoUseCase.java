@@ -34,6 +34,8 @@ public class ReclamacaoUseCase {
 
     @Transactional
     public void processNotification(WebhookNotification webhookNotification) throws FailRequestRefreshTokenException, MercadoLivreException {
+        logger.infof("Final processNotification: userMlId %s", webhookNotification.getUserIdML());
+
         String mlReclamacaoId = webhookNotification.getResource().split("/")[3];
         User user = userEntityPort.findByMlIdUser(webhookNotification.getUserIdML());
         if(Objects.isNull(user)) throw new IllegalArgumentException(String.format("User com MLId %s não encontrado", webhookNotification.getUserIdML()));

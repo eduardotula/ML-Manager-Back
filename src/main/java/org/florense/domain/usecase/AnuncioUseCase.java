@@ -41,6 +41,8 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
     @Override
     @Transactional
     public Anuncio createMlSearch(Anuncio anuncio, Long userId) throws FailRequestRefreshTokenException, MercadoLivreException {
+        logger.infof("Inicio createMlSearch: anuncio.mlId %s userId %d", anuncio.getMlId(), userId);
+
         User user = getUserOrThrowException(userId);
 
         var existProd = anuncioEntityPort.findByMlId(anuncio.getMlId(), user);
@@ -64,6 +66,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         completeAnuncio.setUser(user);
         completeAnuncio.setComplete(true);
 
+        logger.infof("Final createMlSearch: anuncio.mlId %s userId %d", anuncio.getMlId(), userId);
         return anuncioEntityPort.createUpdate(completeAnuncio);
     }
 
@@ -71,6 +74,8 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
     @Override
     @Transactional
     public Anuncio updateSimple(Anuncio anuncio, Long userId) {
+        logger.infof("Inicio updateSimple: anuncio.mlId %s userId %d", anuncio.getMlId(), userId);
+
         User user = getUserOrThrowException(userId);
 
         var existProd = anuncioEntityPort.findAnyByMlId(anuncio.getMlId(), user);
@@ -94,6 +99,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         }
         existProd.setComplete(true);
 
+        logger.infof("Final updateSimple: anuncio.mlId %s userId %d", anuncio.getMlId(), userId);
         return anuncioEntityPort.createUpdate(existProd);
     }
 
@@ -101,6 +107,8 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
     @Override
     @Transactional
     public Anuncio updateSearch(String mlId, Long userId) throws FailRequestRefreshTokenException, MercadoLivreException {
+        logger.infof("Inicio updateSearch: mlId %s userId %d", mlId, userId);
+
         User user = getUserOrThrowException(userId);
         var existProd = anuncioEntityPort.findByMlId(mlId, user);
         if (Objects.isNull(existProd)) {
@@ -123,6 +131,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         completeAnuncio.setComplete(true);
         verifyIfAnuncioMatchesUserOrThrowException(completeAnuncio, user);
 
+        logger.infof("Final updateSearch: mlId %s userId %d", mlId, userId);
         return anuncioEntityPort.createUpdate(completeAnuncio);
     }
 
@@ -183,6 +192,8 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
     @Override
     @Transactional
     public void deleteBy(Long id) throws IllegalStateException {
+        logger.infof("Inicio deleteBy: id %d", id);
+
         Anuncio anuncio = anuncioEntityPort.findAnyById(id);
         if (Objects.isNull(anuncio))
             throw new IllegalArgumentException(String.format("Anuncio com id %s não encontrado", id));
@@ -195,6 +206,8 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
             this.logger.error("Falha ao apagar anuncio com id: %s",e);
             throw new IllegalStateException(String.format("Falha ao apagar anuncio com id: %s", id));
         }
+        logger.infof("Final deleteBy: id %d", id);
+
     }
 
     @Override
@@ -218,6 +231,8 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
 
     @Transactional
     public void processNotification(WebhookNotification webhookNotification) throws FailRequestRefreshTokenException, MercadoLivreException {
+        logger.infof("Inicio processNotification AnuncioUseCase: userIdML %s", webhookNotification.getUserIdML());
+
         String mlId = webhookNotification.getResource().split("/")[2];
         User user = userEntityPort.findByMlIdUser(webhookNotification.getUserIdML());
         if(Objects.isNull(user)) throw new IllegalArgumentException(String.format("User com MLId %s não encontrado", webhookNotification.getUserIdML()));

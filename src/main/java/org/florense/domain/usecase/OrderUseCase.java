@@ -63,12 +63,17 @@ public class OrderUseCase {
 
     @Transactional
     public void deleteById(Long id){
+        logger.infof("Inicio deleteById: id %d", id);
+
         if(Objects.isNull(orderEntityPort.findById(id))) throw new IllegalArgumentException(String.format("Order com id: %s não encontrado",id));
         orderEntityPort.deleteById(id);
+        logger.infof("Final deleteById: id %d", id);
     }
 
     @Transactional
     public void processNotification(WebhookNotification webhookNotification) throws FailRequestRefreshTokenException, MercadoLivreException {
+        logger.infof("Inicio processNotification: userMlId %s ", webhookNotification.getUserIdML());
+
         String orderMlId = webhookNotification.getResource().split("/")[2];
         User user = userEntityPort.findByMlIdUser(webhookNotification.getUserIdML());
         if(Objects.isNull(user)) throw new IllegalArgumentException(String.format("User com MLId %s não encontrado", webhookNotification.getUserIdML()));
