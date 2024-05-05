@@ -42,4 +42,10 @@ public class UserAdapter {
         return useCase.listALl().stream().map(mapper::toDto).collect(Collectors.toList());
     }
 
+    @DELETE
+    @Path("/{id}")
+    public void deleteUserById(@PathParam("id") Long id){
+        useCase.deleteById(id);
+    }
+
 }

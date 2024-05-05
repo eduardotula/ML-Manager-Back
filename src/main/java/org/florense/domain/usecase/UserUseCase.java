@@ -7,6 +7,7 @@ import org.florense.outbound.adapter.mercadolivre.exceptions.FailRequestRefreshT
 import org.florense.outbound.port.postgre.UserEntityPort;
 
 import java.util.List;
+import java.util.Objects;
 
 @RequestScoped
 public class UserUseCase {
@@ -15,23 +16,18 @@ public class UserUseCase {
     UserEntityPort port;
 
     public User create(User user) {
-        if(user.getId() != null) throw new IllegalArgumentException(String.format("User com id: %s já registrado", user.getId()));
+        if(Objects.nonNull(port.findById(user.getId()))) throw new IllegalArgumentException(String.format("User com id: %s já registrado", user.getId()));
+        if(Objects.nonNull(port.findByMlIdUser(user.getUserIdML()))) throw new IllegalArgumentException(String.format("User com mlId: %s já registrado", user.getUserIdML()));
+
         user.setId(null);
         return port.createUpdate(user);
     }
 
     public User update(User user) {
-        var existAccessCode = port.findById(user.getId());
-        if(existAccessCode == null) throw new IllegalArgumentException(String.format("User com id: %d não encontrado", user.getId()));
+        var existingUser = port.findById(user.getId());
+        if(existingUser == null) throw new IllegalArgumentException(String.format("User com id: %d não encontrado", user.getId()));
 
         return port.createUpdate(user);
-    }
-
-    //Atualmente retorna o unico accessCode, metodo criado para possiveis implementações futuras em que pode haver mais de um accessCode e users
-    public User get() throws FailRequestRefreshTokenException {
-        var accesses = port.listAll();
-        if(accesses.isEmpty()) throw new FailRequestRefreshTokenException("Falha ao obter AccessToken error: User não encontrado");
-        return accesses.get(0);
     }
 
     public void deleteById(Long id){
