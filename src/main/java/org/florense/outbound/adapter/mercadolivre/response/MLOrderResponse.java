@@ -52,8 +52,8 @@ public class MLOrderResponse {
             this.title = "";
         }else{
             var orderItems = list.get(0);
-            this.quantity = ((Number) orderItems.get("quantity")).intValue();
-            this.saleFee = ((Number) orderItems.get("sale_fee")).doubleValue();
+            this.quantity = ((Number) orderItems.getOrDefault("quantity", "0")).intValue();
+            this.saleFee = ((Number) orderItems.getOrDefault("sale_fee", "0.0")).doubleValue();
 
             var item = (Map<String, Object>)list.get(0).get("item");
             this.mlId = (String) item.get("id");

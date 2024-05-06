@@ -237,8 +237,8 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         User user = userEntityPort.findByMlIdUser(webhookNotification.getUserIdML());
         if(Objects.isNull(user)) throw new IllegalArgumentException(String.format("User com MLId %s não encontrado", webhookNotification.getUserIdML()));
 
-        Anuncio existingAnuncio = anuncioEntityPort.findAnyByMlId(mlId,user);
         Anuncio anuncio = mercadoLivreAnuncioPort.getAnuncio(mlId,user,true);
+        Anuncio existingAnuncio = anuncioEntityPort.findAnyByMlId(mlId,user);
 
         if(Objects.isNull(existingAnuncio)){
             anuncio.setComplete(false);

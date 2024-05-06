@@ -32,9 +32,9 @@ public class MLOrderWrapperResponse {
 
     @JsonProperty("paging")
     private void setPaging(Map<String, Integer> paging){
-        this.total = paging.get("total");
-        this.offset = paging.get("offset");
-        this.limit = paging.get("limit");
+        this.total = paging.getOrDefault("total", 0);
+        this.offset = paging.getOrDefault("offset", 0);
+        this.limit = paging.getOrDefault("limit", 0);
     }
 
 }

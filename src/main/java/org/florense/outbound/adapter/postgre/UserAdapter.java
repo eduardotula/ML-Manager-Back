@@ -22,6 +22,7 @@ public class UserAdapter implements UserEntityPort {
     @Override
     public User createUpdate(User user){
         if(user.getId() == null) user.setCreatedAt(LocalDateTime.now());
+        if(user.getCreatedAt() == null) user.setCreatedAt(LocalDateTime.now());
 
         return mapper.toModel(repository.save(mapper.toEntity(user)));
     }
