@@ -23,16 +23,16 @@ public class MLClaimResponse {
 
     @JsonProperty("resource_id")
     public Long resourceId;
-    public String type;
-    public String stage;
+    public String type = "";
+    public String stage = "";
 
-    public String status;
+    public String status = "";
     @JsonIgnore
-    public String reason;
+    public String reason = "";
     @JsonIgnore
-    public String closedBy;
+    public String closedBy = "";
     @JsonIgnore
-    private String benefited;
+    private String benefited = "";
 
     @JsonIgnore
     private LocalDateTime reclamacaoCreatedAt;

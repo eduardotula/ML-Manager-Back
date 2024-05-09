@@ -33,7 +33,7 @@ public class ReclamacaoUseCase {
     Logger logger;
 
     @Transactional
-    public void processNotification(WebhookNotification webhookNotification) throws FailRequestRefreshTokenException, MercadoLivreException {
+    public synchronized void processNotification(WebhookNotification webhookNotification) throws FailRequestRefreshTokenException, MercadoLivreException {
         logger.infof("Final processNotification: userMlId %s", webhookNotification.getUserIdML());
 
         String mlReclamacaoId = webhookNotification.getResource().split("/")[3];

@@ -1,5 +1,6 @@
 package org.florense.domain.usecase;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.resource.spi.IllegalStateException;
@@ -23,7 +24,7 @@ import org.jboss.logging.Logger;
 import java.util.List;
 import java.util.Objects;
 
-@RequestScoped
+@ApplicationScoped
 public class AnuncioUseCase implements AnuncioAdapterPort {
 
     @Inject
@@ -230,7 +231,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
     }
 
     @Transactional
-    public void processNotification(WebhookNotification webhookNotification) throws FailRequestRefreshTokenException, MercadoLivreException {
+    public synchronized void processNotification(WebhookNotification webhookNotification) throws FailRequestRefreshTokenException, MercadoLivreException {
         logger.infof("Inicio processNotification AnuncioUseCase: userIdML %s", webhookNotification.getUserIdML());
 
         String mlId = webhookNotification.getResource().split("/")[2];

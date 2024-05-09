@@ -1,5 +1,6 @@
 package org.florense.domain.usecase;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -20,7 +21,7 @@ import org.jboss.logging.Logger;
 
 import java.util.Objects;
 
-@RequestScoped
+@ApplicationScoped
 public class OrderUseCase {
     @Inject
     OrderEntityPort orderEntityPort;
@@ -71,7 +72,7 @@ public class OrderUseCase {
     }
 
     @Transactional
-    public void processNotification(WebhookNotification webhookNotification) throws FailRequestRefreshTokenException, MercadoLivreException {
+    public synchronized void processNotification(WebhookNotification webhookNotification) throws FailRequestRefreshTokenException, MercadoLivreException {
         logger.infof("Inicio processNotification: userMlId %s ", webhookNotification.getUserIdML());
 
         String orderMlId = webhookNotification.getResource().split("/")[2];

@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.florense.outbound.adapter.mercadolivre.exceptions.MLErrorTypesEnum;
+import org.florense.outbound.adapter.mercadolivre.exceptions.MercadoLivreClientException;
+import org.florense.outbound.adapter.mercadolivre.exceptions.MercadoLivreException;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -42,22 +45,35 @@ public class MLOrderResponse {
     @JsonIgnore
     private String title;
     @JsonIgnore
-    private int quantity;
+    private int quantity = 0;
 
     @JsonProperty("order_items")
-    private void setOrderItems(List<Map<String, Object>> list){
-        if(list.isEmpty()){
-            this.quantity = 0;
-            this.mlId = "";
-            this.title = "";
-        }else{
+    private void setOrderItems(List<Map<String, Object>> list) throws MercadoLivreException {
+        if(!list.isEmpty()){
             var orderItems = list.get(0);
-            this.quantity = ((Number) orderItems.getOrDefault("quantity", "0")).intValue();
-            this.saleFee = ((Number) orderItems.getOrDefault("sale_fee", "0.0")).doubleValue();
+            if(orderItems != null){
 
-            var item = (Map<String, Object>)list.get(0).get("item");
-            this.mlId = (String) item.get("id");
-            this.title = (String) item.get("title");
+                var quantity = orderItems.get("quantity");
+                if(Objects.nonNull(quantity)) this.quantity = ((Number) quantity).intValue();
+                else throw new MercadoLivreException("Falha ao mapear resposta de MLClient quantity nao encontrado em order_items", "setOrderItems", MLErrorTypesEnum.DEFAULT, null);
+
+                var saleFee = orderItems.get("sale_fee");
+                if(Objects.nonNull(saleFee)) this.saleFee = ((Number) saleFee).doubleValue();
+                else throw new MercadoLivreException("Falha ao mapear resposta de MLClient sale_fee nao encontrado em order_items", "setOrderItems", MLErrorTypesEnum.DEFAULT, null);
+
+                var item = (Map<String, Object>)list.get(0).get("item");
+                if(item != null){
+                    var mlId = item.get("id");
+                    if(Objects.nonNull(mlId)) this.mlId = (String) mlId;
+                    else throw new MercadoLivreException("Falha ao mapear resposta de MLClient id nao encontrado em order_items", "setOrderItems", MLErrorTypesEnum.DEFAULT, null);
+
+                    var title = item.get("title");
+                    if(Objects.nonNull(title)) this.title = (String) title;
+                    else throw new MercadoLivreException("Falha ao mapear resposta de MLClient title nao encontrado em order_items", "setOrderItems", MLErrorTypesEnum.DEFAULT, null);
+
+                }else throw new MercadoLivreException("Falha ao mapear resposta de MLClient item nao encontrado em order_items", "setOrderItems", MLErrorTypesEnum.DEFAULT, null);
+
+            }
         }
     }
 
