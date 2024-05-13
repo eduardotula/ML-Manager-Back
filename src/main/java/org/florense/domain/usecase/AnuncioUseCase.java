@@ -249,7 +249,10 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         if(Objects.isNull(existingAnuncio)){
             anuncio.setComplete(false);
             anuncio.setUser(user);
-        }else anuncio.update(existingAnuncio);
+        }else{
+            anuncio.update(existingAnuncio);
+            anuncio.setComplete(anuncio.isComplete());
+        }
 
         anuncioEntityPort.createUpdate(anuncio);
         logger.infof("Notificação processada com sucesso mlId: %s" , mlId);
