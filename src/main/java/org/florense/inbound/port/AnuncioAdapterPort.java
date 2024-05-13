@@ -19,7 +19,7 @@ public interface AnuncioAdapterPort {
 
     //Somente atualiza um anuncio
     @Transactional
-    Anuncio updateSimple(Anuncio anuncio, Long userId);
+    Anuncio updateSimple(Anuncio anuncio, Long userId) throws FailRequestRefreshTokenException, MercadoLivreException;
 
     //Atualiza dados somente do mercado livre
     @Transactional

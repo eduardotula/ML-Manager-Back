@@ -1,6 +1,7 @@
 package org.florense.inbound.adapter.dto.anuncios;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.florense.domain.model.enums.ListingTypeEnum;
 import org.florense.inbound.adapter.dto.UrlDto;
@@ -31,6 +32,7 @@ public class AnuncioDto {
     @NotNull
     private double custo;
     @NotNull
+    @Pattern(regexp = "102|500",message = "campo tipo do anuncio, valores: 102, 500", flags = Pattern.Flag.CASE_INSENSITIVE)
     private String csosn;
     @NotNull
     private double precoDesconto;

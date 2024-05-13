@@ -42,7 +42,7 @@ public class AnuncioAdapter {
 
     @PUT
     @Path("")
-    public AnuncioDto updateAnuncioSimple(@Valid AnuncioDtoSimple simple, @QueryParam("user-id") Long userId) {
+    public AnuncioDto updateAnuncioSimple(@Valid AnuncioDtoSimple simple, @QueryParam("user-id") Long userId) throws FailRequestRefreshTokenException, MercadoLivreException {
         Anuncio anuncioDtoSimple = Anuncio.builder().csosn(simple.getCsosn()).mlId(simple.getMlId()).custo(simple.getCusto()).build();
         return anuncioDtoMapper.toDto(anuncioUseCase.updateSimple(anuncioDtoSimple, userId));
     }

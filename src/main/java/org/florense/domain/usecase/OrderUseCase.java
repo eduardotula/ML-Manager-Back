@@ -80,11 +80,11 @@ public class OrderUseCase {
         if(Objects.isNull(user)) throw new IllegalArgumentException(String.format("User com MLId %s não encontrado", webhookNotification.getUserIdML()));
 
         Order order = mercadoLivreVendaPort.getOrder(orderMlId,user,true);
-
         //Procura se o mesmo pedido já existe e prepara para atualizar
         var existingOrder = orderEntityPort.findByOrderId(order.getOrderId());
         if (Objects.nonNull(existingOrder)) {
             order.setId(existingOrder.getId());
+            order.setCreatedAt(existingOrder.getCreatedAt());
             order.updateVendasByMatchingByMlId(existingOrder.getVendas());
         }
         //Reliza a atualização de um pedido ou cria, caso produto não existir é criado um produto temporario
@@ -92,21 +92,17 @@ public class OrderUseCase {
 
             double valorFrete = mercadoLivreAnuncioPort.getFrete(order.getShippingId(),user,true);
             venda.setCustoFrete(valorFrete);
-            var existingAnuncio = anuncioEntityPort.findAnyByMlId(venda.getAnuncio().getMlId(), user);
 
-            if (Objects.nonNull(existingAnuncio)) {
-                venda.setAnuncio(existingAnuncio);
-            }else{
-                Anuncio anuncio = venda.getAnuncio();
-                anuncio.setComplete(false);
-                anuncio.setCustoFrete(valorFrete);
-                venda.setAnuncio(anuncioEntityPort.createUpdate((anuncio)));
-            }
-
-            venda.setDataFromAnuncio(venda.getAnuncio());
+            Anuncio existingAnuncio = venda.getAnuncio();
+            existingAnuncio.setPrecoDesconto(venda.getPrecoDesconto());
+            existingAnuncio.setCustoFrete(valorFrete);
+            double lucro = Anuncio.calculateLucro(existingAnuncio);
+            if(venda.getTaxaML() > 0) existingAnuncio.setTaxaML(venda.getTaxaML());
+            venda.setLucro(lucro);
+            existingAnuncio.setLucro(lucro);
+            anuncioEntityPort.createUpdate(existingAnuncio);
         }
         orderEntityPort.createUpdate(order);
         logger.infof("Notificação processada com sucesso orderId: %s" , orderMlId);
     }
-
 }

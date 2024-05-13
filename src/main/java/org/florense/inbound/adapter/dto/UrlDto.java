@@ -12,7 +12,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UrlDto {
 
-    private Long id;
     private String url;
 
 }

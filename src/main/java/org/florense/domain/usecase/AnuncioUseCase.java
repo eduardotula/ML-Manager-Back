@@ -1,14 +1,12 @@
 package org.florense.domain.usecase;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.resource.spi.IllegalStateException;
 import jakarta.transaction.Transactional;
 import org.florense.domain.model.Anuncio;
 import org.florense.domain.model.Order;
 import org.florense.domain.model.User;
-import org.florense.domain.util.Log;
 import org.florense.inbound.adapter.dto.WebhookNotification;
 import org.florense.inbound.adapter.dto.consultas.AnuncioSimulation;
 import org.florense.inbound.adapter.dto.consultas.AnuncioSimulationResponse;
@@ -74,7 +72,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
     //Somente atualiza um anuncio
     @Override
     @Transactional
-    public Anuncio updateSimple(Anuncio anuncio, Long userId) {
+    public Anuncio updateSimple(Anuncio anuncio, Long userId) throws FailRequestRefreshTokenException, MercadoLivreException {
         logger.infof("Inicio updateSimple: anuncio.mlId %s userId %d", anuncio.getMlId(), userId);
 
         User user = getUserOrThrowException(userId);
@@ -91,12 +89,16 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
 
         if(!existProd.isComplete()){
             List<Order> orders = orderEntityPort.listAllOrdersByAnuncio(existProd);
-            orders.forEach(order -> order.getVendas().forEach(venda -> {
-                if(venda.getCusto() == 0) venda.setCusto(existProd.getCusto());
-                venda.setLucro(Anuncio.calculateLucro(existProd));
 
+            Anuncio finalExistProd = existProd;
+            orders.forEach(order -> order.getVendas().forEach(venda -> {
+                if(venda.getCusto() == 0) venda.setCusto(finalExistProd.getCusto());
+                venda.setLucro(Anuncio.calculateLucro(finalExistProd));
             }));
             orderEntityPort.createUpdateAll(orders);
+
+            Anuncio completeAnuncio = mercadoLivreAnuncioPort.getAnuncio(anuncio.getMlId(), user, true);
+            existProd = setAnuncioDataForAnuncioUpdate(completeAnuncio, existProd, user);
         }
         existProd.setComplete(true);
 
@@ -115,22 +117,9 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         if (Objects.isNull(existProd)) {
             throw new IllegalArgumentException(String.format("Anuncio com mlId: %s não encontrado", mlId));
         }
-
         Anuncio completeAnuncio = mercadoLivreAnuncioPort.getAnuncio(mlId, user, true);
-        completeAnuncio.setTaxaML(mercadoLivreAnuncioPort.getTarifas(completeAnuncio.getPrecoDesconto(),
-                completeAnuncio.getCategoria(), completeAnuncio.getListingType(), user, true));
-        if (completeAnuncio.getPrecoDesconto() >= 80){
-            try {
-                completeAnuncio.setCustoFrete(mercadoLivreAnuncioPort.getFrete(completeAnuncio.getMlId(), user, true));
-            } catch (MercadoLivreException ignored) {}
-        } else completeAnuncio.setCustoFrete(0.0);
-        completeAnuncio.update(existProd);
-        completeAnuncio.setCsosn(existProd.getCsosn());
-        completeAnuncio.setCusto(existProd.getCusto());
-        completeAnuncio.setLucro(Anuncio.calculateLucro(completeAnuncio));
-        completeAnuncio.setUser(user);
-        completeAnuncio.setComplete(true);
         verifyIfAnuncioMatchesUserOrThrowException(completeAnuncio, user);
+        completeAnuncio = setAnuncioDataForAnuncioUpdate(completeAnuncio, existProd, user);
 
         logger.infof("Final updateSearch: mlId %s userId %d", mlId, userId);
         return anuncioEntityPort.createUpdate(completeAnuncio);
@@ -209,6 +198,21 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         }
         logger.infof("Final deleteBy: id %d", id);
 
+    }
+
+    public Anuncio setAnuncioDataForAnuncioUpdate(Anuncio anuncioMercadoLivre, Anuncio existProd, User user) throws FailRequestRefreshTokenException, MercadoLivreException {
+        anuncioMercadoLivre.setTaxaML(mercadoLivreAnuncioPort.getTarifas(anuncioMercadoLivre.getPrecoDesconto(),
+                anuncioMercadoLivre.getCategoria(), anuncioMercadoLivre.getListingType(), user, true));
+        if (anuncioMercadoLivre.getPrecoDesconto() >= 80){
+            try {
+                anuncioMercadoLivre.setCustoFrete(mercadoLivreAnuncioPort.getFrete(anuncioMercadoLivre.getMlId(), user, true));
+            } catch (MercadoLivreException ignored) {}
+        } else anuncioMercadoLivre.setCustoFrete(0.0);
+        anuncioMercadoLivre.update(existProd);
+        anuncioMercadoLivre.setCsosn(existProd.getCsosn());
+        anuncioMercadoLivre.setCusto(existProd.getCusto());
+        anuncioMercadoLivre.setLucro(Anuncio.calculateLucro(anuncioMercadoLivre));
+        return anuncioMercadoLivre;
     }
 
     @Override

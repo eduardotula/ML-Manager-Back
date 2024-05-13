@@ -22,12 +22,15 @@ public class Order {
     private LocalDateTime orderCreationTime;
     private LocalDateTime createdAt;
 
-    public void updateVendasByMatchingByMlId(List<Venda> newVendas){
-        newVendas.forEach(newVenda ->{
-            var incomplete = this.vendas.stream().filter(old -> Objects.equals(old.getAnuncio().getMlId(),
-                    newVenda.getAnuncio().getMlId())).findFirst();
+    public void updateVendasByMatchingByMlId(List<Venda> oldVendas){
+        oldVendas.forEach(oldVenda ->{
+            var incomplete = this.vendas.stream().filter(newVenda -> Objects.equals(newVenda.getAnuncio().getMlId(),
+                    oldVenda.getAnuncio().getMlId())).findFirst();
 
-            incomplete.ifPresent(venda -> newVenda.setId(venda.getOrderId()));
+            incomplete.ifPresent(venda -> {
+                venda.setId(oldVenda.getId());
+                venda.setCreatedAt(oldVenda.getCreatedAt());
+            });
         });
     }
 }
