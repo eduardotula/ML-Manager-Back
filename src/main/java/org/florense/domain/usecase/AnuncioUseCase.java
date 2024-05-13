@@ -121,6 +121,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         verifyIfAnuncioMatchesUserOrThrowException(existProd, user);
         completeAnuncio = setAnuncioDataForAnuncioUpdate(completeAnuncio, existProd, user);
 
+        completeAnuncio.setComplete(true);
         logger.infof("Final updateSearch: mlId %s userId %d", mlId, userId);
         return anuncioEntityPort.createUpdate(completeAnuncio);
     }
