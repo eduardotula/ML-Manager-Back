@@ -251,7 +251,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
             anuncio.setUser(user);
         }else{
             anuncio.update(existingAnuncio);
-            anuncio.setComplete(anuncio.isComplete());
+            anuncio.setComplete(existingAnuncio.isComplete());
         }
 
         anuncioEntityPort.createUpdate(anuncio);
