@@ -118,7 +118,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
             throw new IllegalArgumentException(String.format("Anuncio com mlId: %s não encontrado", mlId));
         }
         Anuncio completeAnuncio = mercadoLivreAnuncioPort.getAnuncio(mlId, user, true);
-        verifyIfAnuncioMatchesUserOrThrowException(completeAnuncio, user);
+        verifyIfAnuncioMatchesUserOrThrowException(existProd, user);
         completeAnuncio = setAnuncioDataForAnuncioUpdate(completeAnuncio, existProd, user);
 
         logger.infof("Final updateSearch: mlId %s userId %d", mlId, userId);
