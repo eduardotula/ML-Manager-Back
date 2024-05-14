@@ -105,7 +105,7 @@ public class AnuncioAdapter {
                                                      @QueryParam("user-id") @NotNull Long userId
                                                      ) throws MercadoLivreException, FailRequestRefreshTokenException {
         ListingTypeEnum listingTypeEnum = tipoAnuncio.equalsIgnoreCase("classico") ? ListingTypeEnum.classico : ListingTypeEnum.premium;
-        AnuncioSimulation anuncioSimulation = new AnuncioSimulation(mlId, categoria,valorVenda,custo,custoFrete, equivalentMlId ,csosn, listingTypeEnum, userId);
+        AnuncioSimulation anuncioSimulation = new AnuncioSimulation(categoria,mlId,valorVenda,custo,custoFrete, equivalentMlId ,csosn, listingTypeEnum, userId);
         return this.anuncioUseCase.simulateAnuncio(anuncioSimulation);
     }
 }

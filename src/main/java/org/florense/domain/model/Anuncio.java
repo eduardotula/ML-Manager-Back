@@ -69,6 +69,12 @@ public class Anuncio {
         this.user = oldAnucio.getUser();
     }
 
+    public void updateLocalData(Anuncio oldAnuncio){
+        this.custo = oldAnuncio.getCusto();
+        this.csosn = oldAnuncio.getCsosn();
+        this.lucro = calculateLucro(this);
+    }
+
     public static double calculateLucro(double custo, double taxaML, double custoFrete, double imposto, double precoDesconto){
         if (precoDesconto <= 80) custoFrete = 0.0;
         BigDecimal nfTaxa = new BigDecimal(Double.toString(imposto));
@@ -86,11 +92,12 @@ public class Anuncio {
     public static double calculateImposto(String csosn, double precoDesconto){
         BigDecimal porcenNf = new BigDecimal("6.92");
         if("102".equals(csosn)) porcenNf = new BigDecimal("10.40");
-        porcenNf = porcenNf.setScale(2,  RoundingMode.HALF_UP);
+        porcenNf = porcenNf.setScale(4,  RoundingMode.HALF_UP);
         porcenNf = porcenNf.divide(new BigDecimal(100), RoundingMode.HALF_UP);
 
-        var precoDescontoBig = BigDecimal.valueOf(precoDesconto).setScale(2, RoundingMode.HALF_UP);
+        var precoDescontoBig = BigDecimal.valueOf(precoDesconto).setScale(3, RoundingMode.HALF_UP);
         BigDecimal nfTaxa = precoDescontoBig.multiply(porcenNf);
+        nfTaxa = nfTaxa.setScale(2,RoundingMode.HALF_UP);
         return nfTaxa.doubleValue();
     }
 

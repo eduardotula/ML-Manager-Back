@@ -36,7 +36,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
     @Inject
     Logger logger;
 
-    //Cria e atualiza com mercado livre
+    //Cria um anuncio e busca informações no mercado livre
     @Override
     @Transactional
     public Anuncio createMlSearch(Anuncio anuncio, Long userId) throws FailRequestRefreshTokenException, MercadoLivreException {
@@ -59,17 +59,16 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
             }
         } else completeAnuncio.setCustoFrete(0.0);
 
-        completeAnuncio.setCusto(anuncio.getCusto());
-        completeAnuncio.setCsosn(anuncio.getCsosn());
+        completeAnuncio.update(anuncio);
+        completeAnuncio.updateLocalData(anuncio);
         completeAnuncio.setLucro(Anuncio.calculateLucro(completeAnuncio));
-        completeAnuncio.setUser(user);
         completeAnuncio.setComplete(true);
 
         logger.infof("Final createMlSearch: anuncio.mlId %s userId %d", anuncio.getMlId(), userId);
         return anuncioEntityPort.createUpdate(completeAnuncio);
     }
 
-    //Somente atualiza um anuncio
+    //Somente atualiza um anuncio sem buscar com mercado livre
     @Override
     @Transactional
     public Anuncio updateSimple(Anuncio anuncio, Long userId) throws FailRequestRefreshTokenException, MercadoLivreException {
@@ -81,24 +80,19 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         if (Objects.isNull(existProd))
             throw new IllegalArgumentException(String.format("Anuncio com id %s não encontrado", anuncio.getMlId()));
 
-        existProd.setCsosn(anuncio.getCsosn());
-        existProd.setCusto(anuncio.getCusto());
-        existProd.setLucro(Anuncio.calculateLucro(existProd));
-        existProd.setUser(user);
+        Anuncio completeAnuncio = mercadoLivreAnuncioPort.getAnuncio(anuncio.getMlId(), user, true);
+        existProd = setAnuncioDataForAnuncioUpdate(completeAnuncio, existProd, user);
+
         verifyIfAnuncioMatchesUserOrThrowException(existProd, user);
 
         if(!existProd.isComplete()){
             List<Order> orders = orderEntityPort.listAllOrdersByAnuncio(existProd);
-
             Anuncio finalExistProd = existProd;
             orders.forEach(order -> order.getVendas().forEach(venda -> {
                 if(venda.getCusto() == 0) venda.setCusto(finalExistProd.getCusto());
                 venda.setLucro(Anuncio.calculateLucro(finalExistProd));
             }));
             orderEntityPort.createUpdateAll(orders);
-
-            Anuncio completeAnuncio = mercadoLivreAnuncioPort.getAnuncio(anuncio.getMlId(), user, true);
-            existProd = setAnuncioDataForAnuncioUpdate(completeAnuncio, existProd, user);
         }
         existProd.setComplete(true);
 
@@ -106,7 +100,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         return anuncioEntityPort.createUpdate(existProd);
     }
 
-    //Atualiza dados somente do mercado livre
+    //Busca novas atualizações do anuncio no mercado livre
     @Override
     @Transactional
     public Anuncio updateSearch(String mlId, Long userId) throws FailRequestRefreshTokenException, MercadoLivreException {
@@ -208,11 +202,9 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
             try {
                 anuncioMercadoLivre.setCustoFrete(mercadoLivreAnuncioPort.getFrete(anuncioMercadoLivre.getMlId(), user, true));
             } catch (MercadoLivreException ignored) {}
-        } else anuncioMercadoLivre.setCustoFrete(0.0);
+        } else anuncioMercadoLivre.setCustoFrete(existProd.getCustoFrete());
         anuncioMercadoLivre.update(existProd);
-        anuncioMercadoLivre.setCsosn(existProd.getCsosn());
-        anuncioMercadoLivre.setCusto(existProd.getCusto());
-        anuncioMercadoLivre.setLucro(Anuncio.calculateLucro(anuncioMercadoLivre));
+        anuncioMercadoLivre.updateLocalData(existProd);
         return anuncioMercadoLivre;
     }
 
@@ -246,12 +238,16 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         Anuncio anuncio = mercadoLivreAnuncioPort.getAnuncio(mlId,user,true);
         Anuncio existingAnuncio = anuncioEntityPort.findAnyByMlId(mlId,user);
 
-        if(Objects.isNull(existingAnuncio)){
-            anuncio.setComplete(false);
-            anuncio.setUser(user);
-        }else{
+        double taxaMl = mercadoLivreAnuncioPort.getTarifas(anuncio.getPrecoDesconto(),anuncio.getCategoria(),anuncio.getListingType(),user,true);
+        double custoFrete = mercadoLivreAnuncioPort.getFrete(anuncio.getMlId(), user,true);
+        anuncio.setTaxaML(taxaMl);
+        anuncio.setCustoFrete(custoFrete);
+
+        anuncio.setUser(user);
+        if(Objects.nonNull(existingAnuncio)){
             anuncio.update(existingAnuncio);
             anuncio.setComplete(existingAnuncio.isComplete());
+            anuncio.updateLocalData(existingAnuncio);
         }
 
         anuncioEntityPort.createUpdate(anuncio);
