@@ -4,6 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.resource.spi.IllegalStateException;
 import jakarta.transaction.Transactional;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.florense.domain.model.Anuncio;
 import org.florense.domain.model.Order;
 import org.florense.domain.model.User;
@@ -35,6 +36,8 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
     OrderEntityPort orderEntityPort;
     @Inject
     Logger logger;
+    @ConfigProperty(name = "mercado-livre.maxpriceforfrete")
+    double maxPriceFrete;
 
     //Cria um anuncio e busca informações no mercado livre
     @Override
@@ -51,7 +54,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         Anuncio completeAnuncio = mercadoLivreAnuncioPort.getAnuncio(anuncio.getMlId(), user, true);
         completeAnuncio.setTaxaML(mercadoLivreAnuncioPort.getTarifas(completeAnuncio.getPrecoDesconto(),
                 completeAnuncio.getCategoria(), completeAnuncio.getListingType(), user, true));
-        if (completeAnuncio.getPrecoDesconto() >= 80){
+        if (completeAnuncio.getPrecoDesconto() >= maxPriceFrete){
             try {
                 completeAnuncio.setCustoFrete(mercadoLivreAnuncioPort.getFrete(completeAnuncio.getMlId(), user, true));
             } catch (MercadoLivreException e) {
@@ -63,6 +66,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         completeAnuncio.updateLocalData(anuncio);
         completeAnuncio.setLucro(Anuncio.calculateLucro(completeAnuncio));
         completeAnuncio.setComplete(true);
+        completeAnuncio.setUser(user);
 
         logger.infof("Final createMlSearch: anuncio.mlId %s userId %d", anuncio.getMlId(), userId);
         return anuncioEntityPort.createUpdate(completeAnuncio);
@@ -198,13 +202,14 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
     public Anuncio setAnuncioDataForAnuncioUpdate(Anuncio anuncioMercadoLivre, Anuncio existProd, User user) throws FailRequestRefreshTokenException, MercadoLivreException {
         anuncioMercadoLivre.setTaxaML(mercadoLivreAnuncioPort.getTarifas(anuncioMercadoLivre.getPrecoDesconto(),
                 anuncioMercadoLivre.getCategoria(), anuncioMercadoLivre.getListingType(), user, true));
-        if (anuncioMercadoLivre.getPrecoDesconto() >= 80){
+        if (anuncioMercadoLivre.getPrecoDesconto() >= maxPriceFrete){
             try {
                 anuncioMercadoLivre.setCustoFrete(mercadoLivreAnuncioPort.getFrete(anuncioMercadoLivre.getMlId(), user, true));
             } catch (MercadoLivreException ignored) {}
-        } else anuncioMercadoLivre.setCustoFrete(existProd.getCustoFrete());
+        } else anuncioMercadoLivre.setCustoFrete(0);
         anuncioMercadoLivre.update(existProd);
         anuncioMercadoLivre.updateLocalData(existProd);
+
         return anuncioMercadoLivre;
     }
 
@@ -217,7 +222,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
         double imposto = Anuncio.calculateImposto(anuncioSimulation.getCsosn(),anuncioSimulation.getValorVenda());
 
         double frete;
-        if(anuncioSimulation.getValorVenda() >= 80){
+        if(anuncioSimulation.getValorVenda() >= maxPriceFrete){
             if(!anuncioSimulation.getEquivalentMlId().isEmpty())
                 frete = mercadoLivreAnuncioPort.getFrete(anuncioSimulation.getEquivalentMlId(),user,true);
             else frete = mercadoLivreAnuncioPort.getFrete(anuncioSimulation.getMlId(), user, true);

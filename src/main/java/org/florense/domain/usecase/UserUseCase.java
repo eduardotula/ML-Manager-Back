@@ -21,7 +21,7 @@ public class UserUseCase {
     public User create(User user) {
         logger.infof("Inicio createUser: name %s mlUserId %d", user.getName(), user.getUserIdML());
 
-        if(Objects.nonNull(port.findById(user.getId()))) throw new IllegalArgumentException(String.format("User com id: %s já registrado", user.getId()));
+        if(user.getId() != null && Objects.nonNull(port.findById(user.getId()))) throw new IllegalArgumentException(String.format("User com id: %s já registrado", user.getId()));
         if(Objects.nonNull(port.findByMlIdUser(user.getUserIdML()))) throw new IllegalArgumentException(String.format("User com mlId: %s já registrado", user.getUserIdML()));
 
         user.setId(null);

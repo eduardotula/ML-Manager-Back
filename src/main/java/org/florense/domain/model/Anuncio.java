@@ -1,7 +1,10 @@
 package org.florense.domain.model;
 
 import lombok.*;
+import org.eclipse.microprofile.config.ConfigProvider;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.florense.domain.model.enums.ListingTypeEnum;
+import org.florense.domain.usecase.AnuncioUseCase;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -76,7 +79,8 @@ public class Anuncio {
     }
 
     public static double calculateLucro(double custo, double taxaML, double custoFrete, double imposto, double precoDesconto){
-        if (precoDesconto <= 80) custoFrete = 0.0;
+
+        if (precoDesconto <= ConfigProvider.getConfig().getValue("mercado-livre.maxpriceforfrete",Double.class)) custoFrete = 0.0;
         BigDecimal nfTaxa = new BigDecimal(Double.toString(imposto));
         double custoTotal = custo + taxaML + custoFrete + nfTaxa.doubleValue();
         var lucroBig = new BigDecimal(precoDesconto - custoTotal);
