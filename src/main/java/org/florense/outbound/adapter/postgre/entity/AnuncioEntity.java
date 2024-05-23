@@ -60,6 +60,8 @@ public class AnuncioEntity {
     private boolean complete;
     @Column(name = "is_fulfillment")
     private boolean isFulfillment;
+    @Column(name = "catalog_listing")
+    private boolean catalogListing = false;
 
 
 }

@@ -34,6 +34,8 @@ public class MercadoLivreAnuncioResponse {
     private List<String> pictures;
     @JsonIgnore
     private boolean isFulfillment = false;
+    @JsonProperty("catalog_listing")
+    private boolean catalogListing = false;
 
 
     @JsonSetter("attributes")

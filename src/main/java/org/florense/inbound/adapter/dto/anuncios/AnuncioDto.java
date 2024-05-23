@@ -50,5 +50,6 @@ public class AnuncioDto {
     private List<UrlDto> pictures;
     private boolean complete;
     private boolean isFulfillment;
+    private boolean catalogListing;
 
 }

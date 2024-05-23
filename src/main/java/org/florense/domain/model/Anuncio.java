@@ -39,6 +39,7 @@ public class Anuncio {
     private boolean complete = false;
     private List<Url> pictures;
     private boolean isFulfillment;
+    private boolean catalogListing;
 
     public Anuncio(Long id, String mlId, String sku, String gtin, String url, String descricao,
                    String categoria, double custo, String csosn, double precoDesconto, double taxaML,
