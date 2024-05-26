@@ -1,5 +1,4 @@
 #!/bin/sh
-
 if [[ "${DB_HEROKU_SPLIT,,}" == "true" ]]; then
 
   export DB_JDBC_URL=jdbc:postgresql://${DATABASE_URL#*@}
