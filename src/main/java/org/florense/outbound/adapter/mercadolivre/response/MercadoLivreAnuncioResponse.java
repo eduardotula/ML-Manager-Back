@@ -32,8 +32,7 @@ public class MercadoLivreAnuncioResponse {
     private String listing_type_id;
     @JsonIgnore
     private List<String> pictures;
-    @JsonIgnore
-    private boolean isFulfillment = false;
+    private boolean fulfillment = false;
     @JsonProperty("catalog_listing")
     private boolean catalogListing = false;
 
@@ -58,7 +57,7 @@ public class MercadoLivreAnuncioResponse {
     private void setFull(Map<String, Object> map){
         if(!map.isEmpty()){
             if("fulfillment".equals(map.getOrDefault("logistic_type", ""))){
-                this.isFulfillment = true;
+                this.fulfillment = true;
             }
         }
     }

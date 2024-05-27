@@ -59,7 +59,7 @@ public class AnuncioEntity {
     @Column(name = "complete")
     private boolean complete;
     @Column(name = "is_fulfillment")
-    private boolean isFulfillment;
+    private boolean fulfillment;
     @Column(name = "catalog_listing")
     private boolean catalogListing = false;
 

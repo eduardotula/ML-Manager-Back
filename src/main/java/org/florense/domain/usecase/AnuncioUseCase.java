@@ -62,9 +62,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
             }
         } else completeAnuncio.setCustoFrete(0.0);
 
-        completeAnuncio.update(anuncio);
-        completeAnuncio.updateLocalData(anuncio);
-        completeAnuncio.setLucro(Anuncio.calculateLucro(completeAnuncio));
+        completeAnuncio = setAnuncioDataForAnuncioUpdate(completeAnuncio, anuncio, user);
         completeAnuncio.setComplete(true);
         completeAnuncio.setUser(user);
 
@@ -86,6 +84,7 @@ public class AnuncioUseCase implements AnuncioAdapterPort {
 
         Anuncio completeAnuncio = mercadoLivreAnuncioPort.getAnuncio(anuncio.getMlId(), user, true);
         existProd = setAnuncioDataForAnuncioUpdate(completeAnuncio, existProd, user);
+        existProd.updateLocalData(anuncio);
 
         verifyIfAnuncioMatchesUserOrThrowException(existProd, user);
 

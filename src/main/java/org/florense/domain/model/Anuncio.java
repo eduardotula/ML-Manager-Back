@@ -38,34 +38,8 @@ public class Anuncio {
     private double imposto;
     private boolean complete = false;
     private List<Url> pictures;
-    private boolean isFulfillment;
+    private boolean fulfillment;
     private boolean catalogListing;
-
-    public Anuncio(Long id, String mlId, String sku, String gtin, String url, String descricao,
-                   String categoria, double custo, String csosn, double precoDesconto, double taxaML,
-                   double custoFrete, String status, LocalDateTime createdAt,
-                   ListingTypeEnum listingType, User user, boolean complete, List<Url> pictures) {
-        this.id = id;
-        this.mlId = mlId;
-        this.sku = sku;
-        this.gtin = gtin;
-        this.url = url;
-        this.descricao = descricao;
-        this.categoria = categoria;
-        this.custo = custo;
-        this.csosn = csosn;
-        this.precoDesconto = precoDesconto;
-        this.taxaML = taxaML;
-        this.custoFrete = custoFrete;
-        this.status = status;
-        this.createdAt = createdAt;
-        this.lucro = calculateLucro(custo, taxaML, custoFrete, imposto, precoDesconto);
-        this.listingType = listingType;
-        this.user = user;
-        this.imposto = calculateImposto(this.csosn, this.precoDesconto);
-        this.complete = complete;
-        this.pictures = pictures;
-    }
 
     public void update(Anuncio oldAnucio){
         this.id = oldAnucio.getId();
@@ -76,6 +50,7 @@ public class Anuncio {
     public void updateLocalData(Anuncio oldAnuncio){
         this.custo = oldAnuncio.getCusto();
         this.csosn = oldAnuncio.getCsosn();
+        this.complete = oldAnuncio.complete;
         this.lucro = calculateLucro(this);
     }
 
