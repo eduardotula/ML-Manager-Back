@@ -36,6 +36,7 @@ public class AnuncioDto {
     private String csosn;
     @NotNull
     private double precoDesconto;
+    private int avaliableQuantity;
     @NotNull
     private double taxaML;
     @NotNull

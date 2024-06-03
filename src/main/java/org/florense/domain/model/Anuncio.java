@@ -28,6 +28,7 @@ public class Anuncio {
     private double custo;
     private String csosn;
     private double precoDesconto;
+    private int avaliableQuantity;
     private double taxaML;
     private double custoFrete;
     private String status;

@@ -28,6 +28,7 @@ public class MercadoLivreAnuncioResponse {
     private String gtin;
     @JsonIgnore
     private String sku;
+    private String available_quantity;
     private String status;
     private String listing_type_id;
     @JsonIgnore

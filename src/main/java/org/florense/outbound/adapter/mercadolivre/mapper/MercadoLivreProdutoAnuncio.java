@@ -18,6 +18,7 @@ public interface MercadoLivreProdutoAnuncio {
     @Mapping(source = "permalink", target = "url")
     @Mapping(source = "category_id", target = "categoria")
     @Mapping(source = "price", target = "precoDesconto")
+    @Mapping(source = "available_quantity", target = "avaliableQuantity")
     @Mapping(source = "listing_type_id", target = "listingType", qualifiedByName = "mapListingType")
     @Mapping(source = "pictures", target = "pictures", qualifiedByName = "urlsMapping")
     Anuncio toAnuncio(MercadoLivreAnuncioResponse ml);

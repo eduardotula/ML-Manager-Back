@@ -39,6 +39,8 @@ public class AnuncioEntity {
     private String csosn;
     @Column(name = "preco_desconto", columnDefinition = "NUMERIC(18,2)")
     private double precoDesconto;
+    @Column(name = "avaliable_quantity", columnDefinition = "integer")
+    private int avaliableQuantity;
     @Column(name = "taxa_ml", columnDefinition = "NUMERIC(18,2)")
     private double taxaML;
     @Column(name = "custo_frete", columnDefinition = "NUMERIC(18,2)")
