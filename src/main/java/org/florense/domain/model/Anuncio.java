@@ -39,6 +39,7 @@ public class Anuncio {
     private double imposto;
     private boolean complete = false;
     private List<Url> pictures;
+    private String thumbnailUrl;
     private boolean fulfillment;
     private boolean catalogListing;
 

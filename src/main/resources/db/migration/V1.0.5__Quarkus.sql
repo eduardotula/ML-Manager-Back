@@ -1,0 +1,1 @@
+ALTER TABLE public.anuncio ADD thumbnail_url VARCHAR(255);

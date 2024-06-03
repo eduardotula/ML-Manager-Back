@@ -48,6 +48,7 @@ public class AnuncioDto {
     private double imposto;
     private ListingTypeEnum listingType;
     private double lucro;
+    private String thumbnailUrl;
     private List<UrlDto> pictures;
     private boolean complete;
     private boolean fulfillment;

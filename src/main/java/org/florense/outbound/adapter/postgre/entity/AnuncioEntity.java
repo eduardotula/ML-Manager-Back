@@ -57,7 +57,8 @@ public class AnuncioEntity {
 
     @OneToMany(mappedBy = "anuncio",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UrlEntity> pictures;
-
+    @Column(name = "thumbnail_url", columnDefinition = "VARCHAR(255)")
+    private String thumbnailUrl;
     @Column(name = "complete")
     private boolean complete;
     @Column(name = "is_fulfillment")

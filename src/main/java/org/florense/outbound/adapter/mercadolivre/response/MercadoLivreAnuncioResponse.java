@@ -33,6 +33,7 @@ public class MercadoLivreAnuncioResponse {
     private String listing_type_id;
     @JsonIgnore
     private List<String> pictures;
+    private String thumbnail;
     private boolean fulfillment = false;
     @JsonProperty("catalog_listing")
     private boolean catalogListing = false;
