@@ -46,13 +46,16 @@ public class ScriptsAdapter {
 
         orders.forEach(orderEntity -> {
             orderEntity.getVendas().forEach(vendaEntity -> {
-                var imposto = Anuncio.calculateImposto(vendaEntity.getAnuncio().getCsosn(),vendaEntity.getPrecoDesconto());
-                vendaEntity.setImposto(imposto);
-                vendaEntity.setLucro(Anuncio.calculateLucro(vendaEntity.getCusto(),vendaEntity.getTaxaML(),vendaEntity.getCustoFrete(),imposto,vendaEntity.getPrecoDesconto()));
+                if(vendaEntity.getAnuncio().isComplete()){
+                    var imposto = Anuncio.calculateImposto(vendaEntity.getAnuncio().getCsosn(),vendaEntity.getPrecoDesconto());
+                    vendaEntity.setImposto(imposto);
+                    vendaEntity.setLucro(Anuncio.calculateLucro(vendaEntity.getCusto(),vendaEntity.getTaxaML(),vendaEntity.getCustoFrete(),imposto,vendaEntity.getPrecoDesconto()));
 
-                var anuncio = anuncioRepository.find(vendaEntity.getAnuncio().getId()).orElseThrow();
-                anuncio.setImposto(Anuncio.calculateImposto(anuncio.getCsosn(),anuncio.getPrecoDesconto()));
-                anuncioEntityList.add(anuncio);
+                    var anuncio = anuncioRepository.find(vendaEntity.getAnuncio().getId()).orElseThrow();
+                    anuncio.setImposto(Anuncio.calculateImposto(anuncio.getCsosn(),anuncio.getPrecoDesconto()));
+                    anuncioEntityList.add(anuncio);
+                }
+
             });
         });
 
