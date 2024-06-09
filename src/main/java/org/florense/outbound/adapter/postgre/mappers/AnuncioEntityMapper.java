@@ -16,7 +16,6 @@ import java.util.List;
 @Mapper(componentModel = "jakarta", uses = {VendaEntityMapper.class})
 public interface AnuncioEntityMapper {
 
-    @Mapping(source = ".", target = "imposto", qualifiedByName = "calculateImposto")
     @Mapping(source = ".", target = "lucro", qualifiedByName = "calculateLucro")
     Anuncio toModel(AnuncioEntity anuncio);
 
@@ -25,11 +24,6 @@ public interface AnuncioEntityMapper {
     @AfterMapping
     default void afterMappingEntity(@MappingTarget AnuncioEntity anuncio){
         anuncio.getPictures().forEach(pic -> pic.setAnuncio(anuncio));
-    }
-
-    @Named("calculateImposto")
-    default double calculateImposto(AnuncioEntity anuncio){
-        return Anuncio.calculateImposto(anuncio.getCsosn(), anuncio.getPrecoDesconto());
     }
 
     @Named("calculateLucro")

@@ -19,6 +19,7 @@ public class VendaDto {
     private double custoFrete;
     private double custo;
     private double lucro;
+    private double imposto;
     private boolean completo;
     private String status;
 

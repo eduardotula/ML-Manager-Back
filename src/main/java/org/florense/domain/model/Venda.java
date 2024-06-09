@@ -18,6 +18,7 @@ public class Venda {
     private double custoFrete;
     private double custo;
     private double lucro;
+    private double imposto;
     private boolean completo;
     private String status;
     private Long orderId;

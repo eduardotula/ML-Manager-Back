@@ -166,12 +166,12 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
 
         Anuncio existingAnuncio = anuncioEntityPort.findAnyByMlId(mlOrderResponse.getMlId(), user);
         if (Objects.isNull(existingAnuncio)) {
-            existingAnuncio = new Anuncio(null, mlOrderResponse.getMlId(), "", "", "", mlOrderResponse.getTitle(), "", 0.0, "", mlOrderResponse.getPrecoDesconto(),0, mlOrderResponse.getSaleFee(),
-                    0.0, "active", null, 0.0, ListingTypeEnum.classico, user,0.0, false, new ArrayList<>(),"", false, false);
+            existingAnuncio = new Anuncio(null, mlOrderResponse.getMlId(), "", "", "", mlOrderResponse.getTitle(), "", 0.0, "", 0.0,mlOrderResponse.getPrecoDesconto(),0, mlOrderResponse.getSaleFee(),
+                    0.0, "active", null, 0.0, ListingTypeEnum.classico, user, false, new ArrayList<>(), "", false, false, "");
         }
 
         Venda venda = new Venda(null, mlOrderResponse.getQuantity(), mlOrderResponse.getPrecoDesconto(), mlOrderResponse.getSaleFee(),
-                0.0, existingAnuncio.getCusto(), 0.0, completo, mlOrderResponse.getStatus(),
+                0.0, existingAnuncio.getCusto(), 0.0,0.0, completo, mlOrderResponse.getStatus(),
                 mlOrderResponse.getOrderId(), existingAnuncio, null);
 
         List<Venda> vendas = new ArrayList<>(List.of(venda));

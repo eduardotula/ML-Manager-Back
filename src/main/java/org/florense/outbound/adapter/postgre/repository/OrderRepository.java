@@ -36,4 +36,11 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
             " join v.anuncio a " +
             " where a.id = :anuncioId")
     List<OrderEntity> listOrdersByAnuncio(@Param("anuncioId") Long anuncioId);
+
+    @Query(value = "from orderM o " +
+            " join o.vendas v " +
+            " join v.anuncio a " +
+            " join a.user u " +
+            " where u.id = :userId")
+    List<OrderEntity> listOrdersByUserId(@Param("userId") Long userId);
 }

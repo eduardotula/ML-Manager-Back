@@ -27,6 +27,7 @@ public class Anuncio {
     private String categoria;
     private double custo;
     private String csosn;
+    private double imposto;
     private double precoDesconto;
     private int avaliableQuantity;
     private double taxaML;
@@ -36,7 +37,6 @@ public class Anuncio {
     private double lucro;
     private ListingTypeEnum listingType;
     private User user;
-    private double imposto;
     private boolean complete = false;
     private List<Url> pictures;
     private String thumbnailUrl;
