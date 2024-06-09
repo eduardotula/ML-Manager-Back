@@ -53,5 +53,7 @@ public class AnuncioDto {
     private boolean complete;
     private boolean fulfillment;
     private boolean catalogListing;
+    private String catalogProductId;
+
 
 }

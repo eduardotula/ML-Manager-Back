@@ -15,6 +15,7 @@ import org.florense.outbound.adapter.mercadolivre.exceptions.MercadoLivreExcepti
 import org.florense.outbound.adapter.mercadolivre.mlenum.MLStatusEnum;
 import org.florense.outbound.adapter.mercadolivre.response.MLOrderResponse;
 import org.florense.outbound.adapter.mercadolivre.response.MLOrderWrapperResponse;
+import org.florense.outbound.adapter.mercadolivre.response.MLResponseWrapper;
 import org.florense.outbound.port.mercadolivre.MercadoLivreVendaPort;
 import org.florense.outbound.port.postgre.AnuncioEntityPort;
 import org.jboss.logging.Logger;
@@ -80,11 +81,11 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
             while (offset < total) {
                 var start = ZonedDateTime.of(startDate.toLocalDate(),startDate.toLocalTime(),ZoneId.systemDefault());
                 var end = ZonedDateTime.of(endDate.toLocalDate(),endDate.toLocalTime(),ZoneId.systemDefault());
-                MLOrderWrapperResponse resp = mercadoLivreOrderClient.vendasOrderDesc(
+                MLResponseWrapper<MLOrderResponse> resp = mercadoLivreOrderClient.vendasOrderDesc(
                         user.getUserIdML(), DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(start), DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(end),
                         filterStatus.toString(), offset, "date_asc", BATCH_SIZE, user.getAccessCode());
 
-                for (MLOrderResponse orderRespons : resp.getOrderResponses()) {
+                for (MLOrderResponse orderRespons : resp.getData()) {
                     var newOrder = convertMlOrderResponseToOrder(orderRespons, user);
                     var existingOrder = listOrders.put(orderRespons.getShippingId(), newOrder);
                     if (Objects.nonNull(existingOrder)) existingOrder.getVendas().addAll(newOrder.getVendas());
@@ -122,7 +123,7 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
                 var resp = mercadoLivreOrderClient.vendasOrderDescByStatus(user.getUserIdML(),
                         filterStatus.toString(), "date_desc", offset, BATCH_SIZE, user.getAccessCode());
 
-                for (MLOrderResponse mlOrderResponse : resp.getOrderResponses()) {
+                for (MLOrderResponse mlOrderResponse : resp.getData()) {
                     if (mlOrderResponse.getOrderId().equals(existentOrderId)) {
                         return convertToReturn(listVendas);
                     }
@@ -137,7 +138,6 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
             return convertToReturn(listVendas);
 
         } catch (MercadoLivreClientException e) {
-            e.printStackTrace();
             if (e.isRefreshToken()) {
                 refreshAccessToken(appId, clientSecret, user);
                 if (retry) {

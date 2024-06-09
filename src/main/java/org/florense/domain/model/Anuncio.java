@@ -42,6 +42,7 @@ public class Anuncio {
     private String thumbnailUrl;
     private boolean fulfillment;
     private boolean catalogListing;
+    private String catalogProductId;
 
     public void update(Anuncio oldAnucio){
         this.id = oldAnucio.getId();

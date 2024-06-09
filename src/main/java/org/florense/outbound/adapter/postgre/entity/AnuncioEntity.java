@@ -65,6 +65,8 @@ public class AnuncioEntity {
     private boolean fulfillment;
     @Column(name = "catalog_listing")
     private boolean catalogListing = false;
+    @Column(name = "catalog_product_id")
+    private String catalogProductId;
 
 
 }

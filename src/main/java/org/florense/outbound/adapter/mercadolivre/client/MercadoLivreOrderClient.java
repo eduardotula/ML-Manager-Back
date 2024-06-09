@@ -13,6 +13,7 @@ import org.florense.outbound.adapter.mercadolivre.exceptions.MercadoLivreClientE
 import org.florense.outbound.adapter.mercadolivre.exceptions.MercadoLivreResponseExceptionMapper;
 import org.florense.outbound.adapter.mercadolivre.response.MLOrderResponse;
 import org.florense.outbound.adapter.mercadolivre.response.MLOrderWrapperResponse;
+import org.florense.outbound.adapter.mercadolivre.response.MLResponseWrapper;
 
 @ApplicationScoped
 @RegisterProvider(MercadoLivreResponseExceptionMapper.class)
@@ -23,19 +24,19 @@ public interface MercadoLivreOrderClient {
     @GET
     @Path("/search")
     @ClientHeaderParam(name = "Authorization", value = "Bearer {token}")
-    MLOrderWrapperResponse  vendasOrderDesc(@QueryParam("seller") String userId,
-                                            @QueryParam("order.date_created.from")String dataInicial,
-                                            @QueryParam("order.date_created.to") String dataFinal,
-                                            @QueryParam("order.status") String status,
-                                            @QueryParam("offset") int offset,
-                                            @QueryParam("sort") String sort,
-                                            @QueryParam("limit") int limit,
-                                            @NotBody String token) throws MercadoLivreClientException;
+    MLResponseWrapper<MLOrderResponse> vendasOrderDesc(@QueryParam("seller") String userId,
+                                      @QueryParam("order.date_created.from")String dataInicial,
+                                      @QueryParam("order.date_created.to") String dataFinal,
+                                      @QueryParam("order.status") String status,
+                                      @QueryParam("offset") int offset,
+                                      @QueryParam("sort") String sort,
+                                      @QueryParam("limit") int limit,
+                                      @NotBody String token) throws MercadoLivreClientException;
 
     @GET
     @Path("/search")
     @ClientHeaderParam(name = "Authorization", value = "Bearer {token}")
-    MLOrderWrapperResponse vendasOrderDescByStatus(@QueryParam("seller") String userId,
+    MLResponseWrapper<MLOrderResponse> vendasOrderDescByStatus(@QueryParam("seller") String userId,
                                                    @QueryParam("order.status") String status,
                                                    @QueryParam("sort") String sort,
                                                    @QueryParam("offset") int offset,
