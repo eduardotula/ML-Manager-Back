@@ -63,4 +63,6 @@ public class ScriptsAdapter {
         anuncioRepository.saveAll(anuncioEntityList);
     }
 
+
+
 }
