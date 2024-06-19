@@ -27,6 +27,7 @@ public class CheckOrderStatusChange {
     @Inject
     Logger logger;
 
+    @Deprecated
     public void execute(User user){
         try {
             List<MLStatusEnum> statusEnums = Arrays.asList(MLStatusEnum.CANCELLED);

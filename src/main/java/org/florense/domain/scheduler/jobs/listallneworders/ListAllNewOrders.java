@@ -34,6 +34,7 @@ public class ListAllNewOrders {
     @Inject
     Logger logger;
 
+    @Deprecated
     public void execute(User user) throws IllegalStateException{
         try {
             Order lastOrder = getLastOrderByUser(user);

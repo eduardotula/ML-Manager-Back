@@ -15,12 +15,14 @@ import org.florense.outbound.adapter.mercadolivre.exceptions.MercadoLivreExcepti
 import org.florense.outbound.adapter.postgre.AnuncioAdapter;
 import org.florense.outbound.adapter.postgre.OrderAdapter;
 import org.florense.outbound.adapter.postgre.entity.AnuncioEntity;
+import org.florense.outbound.adapter.postgre.entity.VendaEntity;
 import org.florense.outbound.adapter.postgre.mappers.OrderEntityMapper;
 import org.florense.outbound.adapter.postgre.mappers.VendaEntityMapper;
 import org.florense.outbound.adapter.postgre.repository.AnuncioRepository;
 import org.florense.outbound.adapter.postgre.repository.OrderRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -49,17 +51,22 @@ public class ScriptsAdapter {
     public void recalculateLucro(@QueryParam("user-id") Long userId) throws FailRequestRefreshTokenException, MercadoLivreException {
         var orders = orderRepository.listOrdersByUserId(userId);
 
+
         orders.forEach(orderEntity -> {
+
+            List<VendaEntity> newVendas = new ArrayList<>();
             orderEntity.getVendas().forEach(vendaEntity -> {
+
                 if(vendaEntity.getAnuncio().isComplete()){
                     var venda = vendaEntityMapper.toModel(vendaEntity);
-                    var imposto = Anuncio.calculateImposto(vendaEntity.getAnuncio().getCsosn(),vendaEntity.getPrecoDesconto());
-                    venda.setImpostoTotal(imposto);
-
-                    vendaEntity.setLucro(Anuncio.calculateLucro(vendaEntity.getCusto(),vendaEntity.getTaxaML(),vendaEntity.getCustoFrete(),imposto,vendaEntity.getPrecoDesconto()));
+                    venda.setCustoTotal(venda.getCusto());
+                    venda.setTaxaMLTotal(venda.getTaxaML());
+                    venda.setImpostoTotal(Anuncio.calculateImposto(venda.getAnuncio().getCsosn(),venda.getPrecoDesconto()));
+                    venda.setLucroTotal(Anuncio.calculateLucro(venda.getCusto(),venda.getTaxaML(),venda.getCustoFrete(),venda.getImposto(),venda.getPrecoDesconto()));
+                    newVendas.add(vendaEntityMapper.toEntity(venda));
                 }
-
             });
+            orderEntity.setVendas(newVendas);
         });
         orderRepository.saveAll(orders);
     }

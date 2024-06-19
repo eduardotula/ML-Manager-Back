@@ -104,7 +104,7 @@ public class OrderUseCase {
             venda.setCustoFreteTotal(existingAnuncio.getCustoFrete());
             venda.setImpostoTotal(existingAnuncio.getImposto());
             venda.setLucroTotal(existingAnuncio.getLucro());
-            anuncioEntityPort.createUpdate(existingAnuncio);
+            venda.setAnuncio(anuncioEntityPort.createUpdate(existingAnuncio));
         }
         orderEntityPort.createUpdate(order);
         logger.infof("Notificação processada com sucesso orderId: %s" , orderMlId);

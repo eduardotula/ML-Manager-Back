@@ -60,6 +60,7 @@ public class Anuncio {
     }
 
     public static double calculateLucro(double custo, double taxaML, double custoFrete, double imposto, double precoDesconto){
+        if(custo <= 0) return 0.0;
 
         if (precoDesconto <= ConfigProvider.getConfig().getValue("mercado-livre.maxpriceforfrete",Double.class)) custoFrete = 0.0;
         BigDecimal nfTaxa = new BigDecimal(Double.toString(imposto));
