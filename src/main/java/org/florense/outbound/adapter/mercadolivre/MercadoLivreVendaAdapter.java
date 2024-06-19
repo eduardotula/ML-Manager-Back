@@ -173,6 +173,8 @@ public class MercadoLivreVendaAdapter extends MercadoLivreAdapter implements Mer
         Venda venda = new Venda(null, mlOrderResponse.getQuantity(), mlOrderResponse.getPrecoDesconto(), mlOrderResponse.getSaleFee(),
                 0.0, existingAnuncio.getCusto(), 0.0,0.0, completo, mlOrderResponse.getStatus(),
                 mlOrderResponse.getOrderId(), existingAnuncio, null);
+        venda.setTaxaMLTotal(venda.getTaxaML());
+        venda.setCustoTotal(existingAnuncio.getCusto());
 
         List<Venda> vendas = new ArrayList<>(List.of(venda));
 
