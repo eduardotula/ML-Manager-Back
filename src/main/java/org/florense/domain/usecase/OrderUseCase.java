@@ -101,7 +101,7 @@ public class OrderUseCase {
             existingAnuncio.setLucro(lucro);
 
             venda.setCustoTotal(existingAnuncio.getCusto());
-            venda.setCustoFreteTotal(existingAnuncio.getCustoFrete());
+            venda.setCustoFrete(existingAnuncio.getCustoFrete());
             venda.setImpostoTotal(existingAnuncio.getImposto());
             venda.setLucroTotal(existingAnuncio.getLucro());
             venda.setAnuncio(anuncioEntityPort.createUpdate(existingAnuncio));
