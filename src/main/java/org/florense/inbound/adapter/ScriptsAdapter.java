@@ -61,8 +61,8 @@ public class ScriptsAdapter {
                     var venda = vendaEntityMapper.toModel(vendaEntity);
                     venda.setCustoTotal(venda.getCusto());
                     venda.setTaxaMLTotal(venda.getTaxaML());
-                    venda.setImpostoTotal(Anuncio.calculateImposto(venda.getAnuncio().getCsosn(),venda.getPrecoDesconto()));
-                    venda.setLucroTotal(Anuncio.calculateLucro(venda.getCusto(),venda.getTaxaML(),venda.getCustoFrete(),venda.getImposto(),venda.getPrecoDesconto()));
+                    venda.setImposto(Anuncio.calculateImposto(venda.getAnuncio().getCsosn(),venda.getPrecoDesconto()));
+                    venda.setLucro(Anuncio.calculateLucro(venda.getCusto(),venda.getTaxaML(),venda.getCustoFrete(),venda.getImposto(),venda.getPrecoDesconto()));
                     newVendas.add(vendaEntityMapper.toEntity(venda));
                 }
             });

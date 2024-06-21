@@ -93,11 +93,11 @@ public class OrderUseCase {
             double valorFrete = mercadoLivreAnuncioPort.getFrete(order.getShippingId(),user,true);
 
             Anuncio existingAnuncio = venda.getAnuncio();
-            existingAnuncio.setPrecoDesconto(venda.getPrecoDesconto() / venda.getQuantidade());
-            existingAnuncio.setCustoFrete(valorFrete);
+            existingAnuncio.setPrecoDesconto((double) Math.round((venda.getPrecoDesconto() / venda.getQuantidade()) * 100) / 100);
+            existingAnuncio.setCustoFrete((double) Math.round((valorFrete / venda.getQuantidade()) * 100) / 100);
 
-            double lucro = Anuncio.calculateLucro(existingAnuncio);
             if(venda.getTaxaML() > 0) existingAnuncio.setTaxaML(venda.getTaxaML() / venda.getQuantidade());
+            double lucro = Anuncio.calculateLucro(existingAnuncio);
             existingAnuncio.setLucro(lucro);
 
             venda.setCustoTotal(existingAnuncio.getCusto());
