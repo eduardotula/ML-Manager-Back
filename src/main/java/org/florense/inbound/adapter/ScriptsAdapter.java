@@ -7,6 +7,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.florense.domain.model.Anuncio;
 import org.florense.domain.model.PageParam;
+import org.florense.domain.model.Venda;
 import org.florense.domain.model.filters.OrderFilter;
 import org.florense.domain.usecase.OrderUseCase;
 import org.florense.inbound.adapter.dto.WebhookNotification;
@@ -25,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequestScoped
 @Path("/scripts")
@@ -32,8 +34,9 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 public class ScriptsAdapter {
 
+
     @Inject
-    public OrderUseCase orderUseCase;
+    OrderAdapter orderAdapter;
 
     @Inject
     public OrderRepository orderRepository;
@@ -41,7 +44,7 @@ public class ScriptsAdapter {
     public AnuncioRepository anuncioRepository;
 
     @Inject
-    VendaEntityMapper vendaEntityMapper;
+    OrderEntityMapper orderEntityMapper;
 
 
 
@@ -49,26 +52,26 @@ public class ScriptsAdapter {
     @Path("/recalculateLucro")
     @Transactional
     public void recalculateLucro(@QueryParam("user-id") Long userId) throws FailRequestRefreshTokenException, MercadoLivreException {
-        var orders = orderRepository.listOrdersByUserId(userId);
+        var orders = orderRepository.listOrdersByUserId(userId).stream().map(orderEntityMapper::toModel).collect(Collectors.toList());
 
 
-        orders.forEach(orderEntity -> {
 
-            List<VendaEntity> newVendas = new ArrayList<>();
-            orderEntity.getVendas().forEach(vendaEntity -> {
+        orders.forEach(order -> {
 
-                if(vendaEntity.getAnuncio().isComplete()){
-                    var venda = vendaEntityMapper.toModel(vendaEntity);
+            List<Venda> newVendas = new ArrayList<>();
+            order.getVendas().forEach(venda -> {
+
+                if(venda.getAnuncio().isComplete()){
                     venda.setCustoTotal(venda.getCusto());
                     venda.setTaxaMLTotal(venda.getTaxaML());
                     venda.setImposto(Anuncio.calculateImposto(venda.getAnuncio().getCsosn(),venda.getPrecoDesconto()));
                     venda.setLucro(Anuncio.calculateLucro(venda.getCusto(),venda.getTaxaML(),venda.getCustoFrete(),venda.getImposto(),venda.getPrecoDesconto()));
-                    newVendas.add(vendaEntityMapper.toEntity(venda));
+                    newVendas.add(venda);
                 }
             });
-            orderEntity.setVendas(newVendas);
+            order.setVendas(newVendas);
         });
-        orderRepository.saveAll(orders);
+        orderAdapter.createUpdateAll(orders);
     }
 
 
